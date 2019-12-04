@@ -10,7 +10,7 @@ The engine use XML to describe internal graphics layout that has following targe
 and has following features :
 
 - XML described layout, even including commands. See [hello_world.xml](app/hello_world/layouts/hello_world.xml) for example.
-- Uses [XML schema](xg/src/xg/schema/layout.xsd) to provide validation and intellisense function by Visual Studio.
+- Uses [XML schema](src/xg/schema/layout.xsd) to provide validation and intellisense function by Visual Studio.
 - Debug marker ready for tools like [RenderDoc](https://renderdoc.org/)
 - Loading resources by thread pool.
 - Ability to serialize XML layout to binary file.
