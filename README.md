@@ -1,5 +1,4 @@
-# xg
-XML-based Vulkan Graphics Engine
+# XML-based Vulkan Graphics Engine
 
 The engine use XML to describe internal graphics layout that has following targets :
 
