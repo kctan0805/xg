@@ -4,6 +4,8 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
+option(XG_BUILD_APPS "Build the XG example applications" ON)
+
 set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(
@@ -39,4 +41,7 @@ include_directories(
 )
 add_subdirectory(third_party)
 add_subdirectory(src)
-add_subdirectory(app)
+
+if (XG_BUILD_APPS)
+    add_subdirectory(app)
+endif()
