@@ -1,0 +1,30 @@
+[submodule "third_party/exprtk"]
+	path = third_party/exprtk
+	url = https://github.com/ArashPartow/exprtk.git
+[submodule "third_party/glfw"]
+	path = third_party/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "third_party/glm"]
+	path = third_party/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "third_party/spdlog"]
+	path = third_party/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "third_party/stb"]
+	path = third_party/stb
+	url = https://github.com/nothings/stb.git
+[submodule "third_party/thread-pool-cpp"]
+	path = third_party/thread-pool-cpp
+	url = https://github.com/inkooboo/thread-pool-cpp.git
+[submodule "third_party/tinyxml2"]
+	path = third_party/tinyxml2
+	url = https://github.com/leethomason/tinyxml2.git
+[submodule "third_party/VulkanMemoryAllocator"]
+	path = third_party/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+[submodule "third_party/cereal"]
+	path = third_party/cereal
+	url = https://github.com/USCiLab/cereal.git
+[submodule "third_party/embed"]
+	path = third_party/embed
+	url = https://github.com/magcks/embed.git

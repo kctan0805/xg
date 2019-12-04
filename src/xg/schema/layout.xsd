@@ -1,0 +1,1602 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="FormatType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Undefined" />
+      <xs:enumeration value="R4G4UnormPack8" />
+      <xs:enumeration value="R4G4B4A4UnormPack16" />
+      <xs:enumeration value="B4G4R4A4UnormPack16" />
+      <xs:enumeration value="R5G6B5UnormPack16" />
+      <xs:enumeration value="B5G6R5UnormPack16" />
+      <xs:enumeration value="R5G5B5A1UnormPack16" />
+      <xs:enumeration value="B5G5R5A1UnormPack16" />
+      <xs:enumeration value="A1R5G5B5UnormPack16" />
+      <xs:enumeration value="R8Unorm" />
+      <xs:enumeration value="R8Snorm" />
+      <xs:enumeration value="R8Uscaled" />
+      <xs:enumeration value="R8Sscaled" />
+      <xs:enumeration value="R8Uint" />
+      <xs:enumeration value="R8Sint" />
+      <xs:enumeration value="R8Srgb" />
+      <xs:enumeration value="R8G8Unorm" />
+      <xs:enumeration value="R8G8Snorm" />
+      <xs:enumeration value="R8G8Uscaled" />
+      <xs:enumeration value="R8G8Sscaled" />
+      <xs:enumeration value="R8G8Uint" />
+      <xs:enumeration value="R8G8Sint" />
+      <xs:enumeration value="R8G8Srgb" />
+      <xs:enumeration value="R8G8B8Unorm" />
+      <xs:enumeration value="R8G8B8Snorm" />
+      <xs:enumeration value="R8G8B8Uscaled" />
+      <xs:enumeration value="R8G8B8Sscaled" />
+      <xs:enumeration value="R8G8B8Uint" />
+      <xs:enumeration value="R8G8B8Sint" />
+      <xs:enumeration value="R8G8B8Srgb" />
+      <xs:enumeration value="B8G8R8Unorm" />
+      <xs:enumeration value="B8G8R8Snorm" />
+      <xs:enumeration value="B8G8R8Uscaled" />
+      <xs:enumeration value="B8G8R8Sscaled" />
+      <xs:enumeration value="B8G8R8Uint" />
+      <xs:enumeration value="B8G8R8Sint" />
+      <xs:enumeration value="B8G8R8Srgb" />
+      <xs:enumeration value="R8G8B8A8Unorm" />
+      <xs:enumeration value="R8G8B8A8Snorm" />
+      <xs:enumeration value="R8G8B8A8Uscaled" />
+      <xs:enumeration value="R8G8B8A8Sscaled" />
+      <xs:enumeration value="R8G8B8A8Uint" />
+      <xs:enumeration value="R8G8B8A8Sint" />
+      <xs:enumeration value="R8G8B8A8Srgb" />
+      <xs:enumeration value="B8G8R8A8Unorm" />
+      <xs:enumeration value="B8G8R8A8Snorm" />
+      <xs:enumeration value="B8G8R8A8Uscaled" />
+      <xs:enumeration value="B8G8R8A8Sscaled" />
+      <xs:enumeration value="B8G8R8A8Uint" />
+      <xs:enumeration value="B8G8R8A8Sint" />
+      <xs:enumeration value="B8G8R8A8Srgb" />
+      <xs:enumeration value="A8B8G8R8UnormPack32" />
+      <xs:enumeration value="A8B8G8R8SnormPack32" />
+      <xs:enumeration value="A8B8G8R8UscaledPack32" />
+      <xs:enumeration value="A8B8G8R8SscaledPack32" />
+      <xs:enumeration value="A8B8G8R8UintPack32" />
+      <xs:enumeration value="A8B8G8R8SintPack32" />
+      <xs:enumeration value="A8B8G8R8SrgbPack32" />
+      <xs:enumeration value="A2R10G10B10UnormPack32" />
+      <xs:enumeration value="A2R10G10B10SnormPack32" />
+      <xs:enumeration value="A2R10G10B10UscaledPack32" />
+      <xs:enumeration value="A2R10G10B10SscaledPack32" />
+      <xs:enumeration value="A2R10G10B10UintPack32" />
+      <xs:enumeration value="A2R10G10B10SintPack32" />
+      <xs:enumeration value="A2B10G10R10UnormPack32" />
+      <xs:enumeration value="A2B10G10R10SnormPack32" />
+      <xs:enumeration value="A2B10G10R10UscaledPack32" />
+      <xs:enumeration value="A2B10G10R10SscaledPack32" />
+      <xs:enumeration value="A2B10G10R10UintPack32" />
+      <xs:enumeration value="A2B10G10R10SintPack32" />
+      <xs:enumeration value="R16Unorm" />
+      <xs:enumeration value="R16Snorm" />
+      <xs:enumeration value="R16Uscaled" />
+      <xs:enumeration value="R16Sscaled" />
+      <xs:enumeration value="R16Uint" />
+      <xs:enumeration value="R16Sint" />
+      <xs:enumeration value="R16Sfloat" />
+      <xs:enumeration value="R16G16Unorm" />
+      <xs:enumeration value="R16G16Snorm" />
+      <xs:enumeration value="R16G16Uscaled" />
+      <xs:enumeration value="R16G16Sscaled" />
+      <xs:enumeration value="R16G16Uint" />
+      <xs:enumeration value="R16G16Sint" />
+      <xs:enumeration value="R16G16Sfloat" />
+      <xs:enumeration value="R16G16B16Unorm" />
+      <xs:enumeration value="R16G16B16Snorm" />
+      <xs:enumeration value="R16G16B16Uscaled" />
+      <xs:enumeration value="R16G16B16Sscaled" />
+      <xs:enumeration value="R16G16B16Uint" />
+      <xs:enumeration value="R16G16B16Sint" />
+      <xs:enumeration value="R16G16B16Sfloat" />
+      <xs:enumeration value="R16G16B16A16Unorm" />
+      <xs:enumeration value="R16G16B16A16Snorm" />
+      <xs:enumeration value="R16G16B16A16Uscaled" />
+      <xs:enumeration value="R16G16B16A16Sscaled" />
+      <xs:enumeration value="R16G16B16A16Uint" />
+      <xs:enumeration value="R16G16B16A16Sint" />
+      <xs:enumeration value="R16G16B16A16Sfloat" />
+      <xs:enumeration value="R32Uint" />
+      <xs:enumeration value="R32Sint" />
+      <xs:enumeration value="R32Sfloat" />
+      <xs:enumeration value="R32G32Uint" />
+      <xs:enumeration value="R32G32Sint" />
+      <xs:enumeration value="R32G32Sfloat" />
+      <xs:enumeration value="R32G32B32Uint" />
+      <xs:enumeration value="R32G32B32Sint" />
+      <xs:enumeration value="R32G32B32Sfloat" />
+      <xs:enumeration value="R32G32B32A32Uint" />
+      <xs:enumeration value="R32G32B32A32Sint" />
+      <xs:enumeration value="R32G32B32A32Sfloat" />
+      <xs:enumeration value="R64Uint" />
+      <xs:enumeration value="R64Sint" />
+      <xs:enumeration value="R64Sfloat" />
+      <xs:enumeration value="R64G64Uint" />
+      <xs:enumeration value="R64G64Sint" />
+      <xs:enumeration value="R64G64Sfloat" />
+      <xs:enumeration value="R64G64B64Uint" />
+      <xs:enumeration value="R64G64B64Sint" />
+      <xs:enumeration value="R64G64B64Sfloat" />
+      <xs:enumeration value="R64G64B64A64Uint" />
+      <xs:enumeration value="R64G64B64A64Sint" />
+      <xs:enumeration value="R64G64B64A64Sfloat" />
+      <xs:enumeration value="B10G11R11UfloatPack32" />
+      <xs:enumeration value="E5B9G9R9UfloatPack32" />
+      <xs:enumeration value="D16Unorm" />
+      <xs:enumeration value="X8D24UnormPack32" />
+      <xs:enumeration value="D32Sfloat" />
+      <xs:enumeration value="S8Uint" />
+      <xs:enumeration value="D16UnormS8Uint" />
+      <xs:enumeration value="D24UnormS8Uint" />
+      <xs:enumeration value="D32SfloatS8Uint" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ImageUsageType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="TransferSrc" />
+      <xs:enumeration value="TransferDst" />
+      <xs:enumeration value="Sampled" />
+      <xs:enumeration value="Storage" />
+      <xs:enumeration value="ColorAttachment" />
+      <xs:enumeration value="DepthStencilAttachment" />
+      <xs:enumeration value="TransientAttachment" />
+      <xs:enumeration value="InputAttachment" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ImageUsageTypeList">
+    <xs:list itemType="ImageUsageType"/>
+  </xs:simpleType>
+  
+  <xs:element name="Swapchain">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="window" type="xs:IDREF" />
+      <xs:attribute name="minImageCount" type="xs:unsignedByte" />
+      <xs:attribute name="imageFormat" type="FormatType" />
+      <xs:attribute name="imageColorSpace">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="SrgbNonlinear" />
+            <xs:enumeration value="DisplayP3Nonlinear" />
+            <xs:enumeration value="ExtendedSrgbLinear" />
+            <xs:enumeration value="DisplayP3Linear" />
+            <xs:enumeration value="DciP3Nonlinear" />
+            <xs:enumeration value="Bt709Linear" />
+            <xs:enumeration value="Bt709Nonlinear" />
+            <xs:enumeration value="Bt2020Linear" />
+            <xs:enumeration value="Hdr10St2084" />
+            <xs:enumeration value="Dolbyvision" />
+            <xs:enumeration value="Hdr10Hlg" />
+            <xs:enumeration value="AdobergbLinear" />
+            <xs:enumeration value="AdobergbNonlinear" />
+            <xs:enumeration value="PassThrough" />
+            <xs:enumeration value="ExtendedSrgbNonlinear" />
+            <xs:enumeration value="DisplayNative" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="width" type="xs:string" />
+      <xs:attribute name="height" type="xs:string" />
+      <xs:attribute name="imageArrayLayers" type="xs:unsignedByte" />
+      <xs:attribute name="imageUsage" type="ImageUsageTypeList" />
+      <xs:attribute name="preTransform">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Identity" />
+            <xs:enumeration value="Rotate90" />
+            <xs:enumeration value="Rotate180" />
+            <xs:enumeration value="Rotate270" />
+            <xs:enumeration value="HorizontalMirror" />
+            <xs:enumeration value="HorizontalMirrorRotate90" />
+            <xs:enumeration value="HorizontalMirrorRotate180" />
+            <xs:enumeration value="HorizontalMirrorRotate270" />
+            <xs:enumeration value="Inherit" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="compositeAlpha" type="xs:string" />
+      <xs:attribute name="presentMode">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Immediate" />
+            <xs:enumeration value="Mailbox" />
+            <xs:enumeration value="Fifo" />
+            <xs:enumeration value="FifoRelaxed" />
+            <xs:enumeration value="SharedDemandRefresh" />
+            <xs:enumeration value="SharedContinuousRefresh" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="clipped" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="QueueFamilyType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Graphics" />
+      <xs:enumeration value="Compute" />
+      <xs:enumeration value="Transfer" />
+      <xs:enumeration value="SparseBinding" />
+      <xs:enumeration value="Protected" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="QueueFamilyTypeList">
+    <xs:list itemType="QueueFamilyType"/>
+  </xs:simpleType>  
+  
+  <xs:simpleType name="DescriptorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Sampler" />
+      <xs:enumeration value="CombinedImageSampler" />
+      <xs:enumeration value="SampledImage" />
+      <xs:enumeration value="StorageImage" />
+      <xs:enumeration value="UniformTexelBuffer" />
+      <xs:enumeration value="StorageTexelBuffer" />
+      <xs:enumeration value="UniformBuffer" />
+      <xs:enumeration value="StorageBuffer" />
+      <xs:enumeration value="UniformBufferDynamic" />
+      <xs:enumeration value="StorageBufferDynamic" />
+      <xs:enumeration value="InputAttachment" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ShaderStageFlagsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Vertex" />
+      <xs:enumeration value="TessellationControl" />
+      <xs:enumeration value="TessellationEvaluation" />
+      <xs:enumeration value="Geometry" />
+      <xs:enumeration value="Fragment" />
+      <xs:enumeration value="Compute" />
+      <xs:enumeration value="AllGraphics" />
+      <xs:enumeration value="All" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ShaderStageFlagsTypeList">
+    <xs:list itemType="ShaderStageFlagsType"/>
+  </xs:simpleType>
+
+  <xs:element name="ShaderModule">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" />
+      <xs:attribute name="file" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="BufferUsageType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="TransferSrc" />
+      <xs:enumeration value="TransferDst" />
+      <xs:enumeration value="UniformTexelBuffer" />
+      <xs:enumeration value="StorageTexelBuffer" />
+      <xs:enumeration value="UniformBuffer" />
+      <xs:enumeration value="StorageBuffer" />
+      <xs:enumeration value="IndexBuffer" />
+      <xs:enumeration value="VertexBuffer" />
+      <xs:enumeration value="IndirectBuffer" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BufferUsageTypeList">
+    <xs:list itemType="BufferUsageType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="MemoryAllocFlagsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Undefined" />
+      <xs:enumeration value="DedicatedMemory" />
+      <xs:enumeration value="NeverAllocate" />
+      <xs:enumeration value="CreateMapped" />
+      <xs:enumeration value="CanBecomeLost" />
+      <xs:enumeration value="CanMakeOtherLost" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MemoryAllocFlagsTypeList">
+    <xs:list itemType="MemoryAllocFlagsType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="MemoryUsageType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Unknown" />
+      <xs:enumeration value="GpuOnly" />
+      <xs:enumeration value="CpuOnly" />
+      <xs:enumeration value="CpuToGpu" />
+      <xs:enumeration value="GpuToCpu" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="Buffer">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="size" type="xs:string" default="0" />
+      <xs:attribute name="usage" type="BufferUsageTypeList" use="required" />
+      <xs:attribute name="allocFlags" type="MemoryAllocFlagsTypeList" default="DedicatedMemory" />
+      <xs:attribute name="memUsage" type="MemoryUsageType" default="GpuOnly" />
+      <xs:attribute name="unit" type="xs:string" default="0" />
+      <xs:attribute name="unitSize" type="xs:string" default="0" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="ImageLayoutType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Undefined" />
+      <xs:enumeration value="General" />
+      <xs:enumeration value="ColorAttachmentOptimal" />
+      <xs:enumeration value="DepthStencilAttachmentOptimal" />
+      <xs:enumeration value="DepthStencilReadOnlyOptimal" />
+      <xs:enumeration value="ShaderReadOnlyOptimal" />
+      <xs:enumeration value="TransferSrcOptimal" />
+      <xs:enumeration value="TransferDstOptimal" />
+      <xs:enumeration value="Preinitialized" />
+      <xs:enumeration value="DepthReadOnlyStencilAttachmentOptimal" />
+      <xs:enumeration value="DepthAttachmentStencilReadOnlyOptimalv" />
+      <xs:enumeration value="PresentSrc" />
+      <xs:enumeration value="SharedPresent" />
+    </xs:restriction>
+  </xs:simpleType>  
+  
+  <xs:element name="DescriptorSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="Descriptor">
+          <xs:complexType>
+            <xs:attribute name="binding" type="xs:unsignedByte" use="required" />
+            <xs:attribute name="descriptorType" type="DescriptorType" default="Sampler" />
+            <xs:attribute name="buffer" type="xs:IDREF" />
+            <xs:attribute name="sampler" type="xs:IDREF" />
+            <xs:attribute name="imageView" type="xs:IDREF" />
+            <xs:attribute name="imageLayout" type="ImageLayoutType" default="Undefined" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="descriptorPool" type="xs:IDREF" />
+      <xs:attribute name="setLayout" type="xs:IDREF" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DescriptorSetLayout">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="DescriptorSetLayoutBinding">
+          <xs:complexType>
+            <xs:attribute name="binding" type="xs:unsignedByte" use="required" />
+            <xs:attribute name="descriptorType" type="DescriptorType" default="Sampler" />
+            <xs:attribute name="descriptorCount" type="xs:unsignedByte" default="1" />
+            <xs:attribute name="stageFlags" type="ShaderStageFlagsTypeList" use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="PipelineLayout">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="DescriptorSetLayout" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="SetLayout">
+          <xs:complexType>
+            <xs:attribute name="descriptorSetLayout" type="xs:IDREF" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="PushConstantRange">
+          <xs:complexType>
+            <xs:attribute name="stageFlags" type="ShaderStageFlagsTypeList" use="required" />
+            <xs:attribute name="offset" type="xs:string" />
+            <xs:attribute name="size" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Fence">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="signaled" type="xs:boolean" default="false" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="CommandBuffer">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="commandPool" type="xs:IDREF" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Stage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ShaderModule" />
+        <xs:element minOccurs="0" name="SpecializationInfo">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="1" maxOccurs="unbounded" name="MapEntry">
+                <xs:complexType>
+                  <xs:attribute name="constantID" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="offset" type="xs:unsignedInt" use="required" />
+                  <xs:attribute name="size" type="xs:unsignedInt" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="dataSize" type="xs:unsignedInt" default="0" />
+            <xs:attribute name="data" type="xs:IDREF" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="stage" type="ShaderStageFlagsType" use="required" />
+      <xs:attribute name="module" type="xs:IDREF" />
+      <xs:attribute name="name" type="xs:string" default="main" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="ImageType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1D" />
+      <xs:enumeration value="2D" />
+      <xs:enumeration value="3D" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ImageViewType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1D" />
+      <xs:enumeration value="2D" />
+      <xs:enumeration value="3D" />
+      <xs:enumeration value="Cube" />
+      <xs:enumeration value="1DArray" />
+      <xs:enumeration value="2DArray" />
+      <xs:enumeration value="CubeArray" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ImageAspectFlagsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Color" />
+      <xs:enumeration value="Depth" />
+      <xs:enumeration value="Stencil" />
+      <xs:enumeration value="Metadata" />
+      <xs:enumeration value="Plane0" />
+      <xs:enumeration value="Plane1" />
+      <xs:enumeration value="Plane2" />
+      <xs:enumeration value="MemoryPlane0" />
+      <xs:enumeration value="MemoryPlane1" />
+      <xs:enumeration value="MemoryPlane2" />
+      <xs:enumeration value="MemoryPlane3" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ImageAspectFlagsTypeList">
+    <xs:list itemType="ImageAspectFlagsType"/>
+  </xs:simpleType>
+
+  <xs:element name="ImageView">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="image" type="xs:IDREF" />
+      <xs:attribute name="viewType" type="ImageViewType" default="2D" />
+      <xs:attribute name="format" type="FormatType" use="required" />
+      <xs:attribute name="aspectMask" type="ImageAspectFlagsTypeList" default="Color" />
+      <xs:attribute name="baseMipLevel" type="xs:unsignedByte" default="0" />
+      <xs:attribute name="levelCount" type="xs:unsignedByte" default="1" />
+      <xs:attribute name="baseArrayLayer" type="xs:unsignedByte" default="0" />
+      <xs:attribute name="layerCount" type="xs:unsignedByte" default="1" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="RenderPass">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Multiview">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="ViewMask">
+                <xs:complexType>
+                  <xs:attribute name="value" type="xs:unsignedInt" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="ViewOffset">
+                <xs:complexType>
+                  <xs:attribute name="value" type="xs:unsignedInt" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="CorrelationMask">
+                <xs:complexType>
+                  <xs:attribute name="value" type="xs:unsignedInt" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element maxOccurs="unbounded" name="Attachment">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:ID" use="required" />
+            <xs:attribute name="format" type="FormatType" use="required" />
+            <xs:attribute name="loadOp" type="AttachmentLoadOpType" default="DontCare" />
+            <xs:attribute name="storeOp" type="AttachmentStoreOpType" default="DontCare" />
+            <xs:attribute name="stencilLoadOp" type="AttachmentLoadOpType" default="DontCare" />
+            <xs:attribute name="stencilStoreOp" type="AttachmentStoreOpType" default="DontCare" />
+            <xs:attribute name="initialLayout" type="ImageLayoutType" default="Undefined" />
+            <xs:attribute name="finalLayout" type="ImageLayoutType" default="Undefined" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element maxOccurs="unbounded" name="Subpass">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="ColorAttachment">
+                <xs:complexType>
+                  <xs:attribute name="attachment" type="xs:IDREF" />
+                  <xs:attribute name="layout" type="ImageLayoutType" default="Undefined" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element minOccurs="0" name="DepthStencilAttachment">
+                <xs:complexType>
+                  <xs:attribute name="attachment" type="xs:IDREF" />
+                  <xs:attribute name="layout" type="ImageLayoutType" default="Undefined" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:ID" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element maxOccurs="unbounded" name="Dependency">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Source">
+                <xs:complexType>
+                  <xs:attribute name="subpass" type="xs:IDREF" />
+                  <xs:attribute name="stageMask" type="PipelineStageFlagsTypeList" use="required" />
+                  <xs:attribute name="accessMask" type="AccessFlagsTypeList" default="Undefined" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Destination">
+                <xs:complexType>
+                  <xs:attribute name="subpass" type="xs:IDREF" />
+                  <xs:attribute name="stageMask" type="PipelineStageFlagsTypeList" use="required" />
+                  <xs:attribute name="accessMask" type="AccessFlagsTypeList" default="Undefined" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="AttachmentLoadOpType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Load" />
+      <xs:enumeration value="Clear" />
+      <xs:enumeration value="DontCare" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AttachmentStoreOpType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Store" />
+      <xs:enumeration value="DontCare" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineStageFlagsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="TopOfPipe" />
+      <xs:enumeration value="DrawIndirect" />
+      <xs:enumeration value="VertexInput" />
+      <xs:enumeration value="VertexShader" />
+      <xs:enumeration value="TessellationControlShader" />
+      <xs:enumeration value="TessellationEvaluationShader" />
+      <xs:enumeration value="GeometryShader" />
+      <xs:enumeration value="FragmentShader" />
+      <xs:enumeration value="EarlyFragmentTests" />
+      <xs:enumeration value="LateFragmentTests" />
+      <xs:enumeration value="ColorAttachmentOutput" />
+      <xs:enumeration value="ComputeShader" />
+      <xs:enumeration value="Transfer" />
+      <xs:enumeration value="BottomOfPipe" />
+      <xs:enumeration value="Host" />
+      <xs:enumeration value="AllGraphics" />
+      <xs:enumeration value="AllCommands" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineStageFlagsTypeList">
+    <xs:list itemType="PipelineStageFlagsType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="AccessFlagsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Undefined" />
+      <xs:enumeration value="IndirectCommandRead" />
+      <xs:enumeration value="IndexRead" />
+      <xs:enumeration value="VertexAttributeRead" />
+      <xs:enumeration value="UniformRead" />
+      <xs:enumeration value="InputAttachmentRead" />
+      <xs:enumeration value="ShaderRead" />
+      <xs:enumeration value="ShaderWrite" />
+      <xs:enumeration value="ColorAttachmentRead" />
+      <xs:enumeration value="ColorAttachmentWrite" />
+      <xs:enumeration value="DepthStencilAttachmentRead" />
+      <xs:enumeration value="DepthStencilAttachmentWrite" />
+      <xs:enumeration value="TransferRead" />
+      <xs:enumeration value="TransferWrite" />
+      <xs:enumeration value="HostRead" />
+      <xs:enumeration value="HostWrite" />
+      <xs:enumeration value="MemoryRead" />
+      <xs:enumeration value="MemoryWrite" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AccessFlagsTypeList">
+    <xs:list itemType="AccessFlagsType"/>
+  </xs:simpleType>
+
+  <xs:element name="Framebuffer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="Attachment">
+          <xs:complexType>
+            <xs:attribute name="swapchain" type="xs:IDREF" />
+            <xs:attribute name="imageView" type="xs:IDREF" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="renderPass" type="xs:IDREF" use="required" />
+      <xs:attribute name="width" type="xs:string" />
+      <xs:attribute name="height" type="xs:string" />
+      <xs:attribute name="layers" type="xs:unsignedByte" default="1" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Semaphore">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="QueryType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Occlusion" />
+      <xs:enumeration value="PipelineStatistics" />
+      <xs:enumeration value="Timestamp" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="QueryPool">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="queryType" type="QueryType" default="Occlusion" />
+      <xs:attribute name="queryCount" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Event">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="PrimitiveTopologyType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="PointList" />
+      <xs:enumeration value="LineList" />
+      <xs:enumeration value="LineStrip" />
+      <xs:enumeration value="TriangleList" />
+      <xs:enumeration value="TriangleStrip" />
+      <xs:enumeration value="TriangleFan" />
+      <xs:enumeration value="LineListWithAdjacency" />
+      <xs:enumeration value="LineStripWithAdjacency" />
+      <xs:enumeration value="TriangleListWithAdjacency" />
+      <xs:enumeration value="TriangleStripWithAdjacency" />
+      <xs:enumeration value="PatchList" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="Viewport">
+    <xs:complexType>
+      <xs:attribute name="x" type="xs:string" default="0.0" />
+      <xs:attribute name="y" type="xs:string" default="0.0" />
+      <xs:attribute name="width" type="xs:string" use="required" />
+      <xs:attribute name="height" type="xs:string" use="required" />
+      <xs:attribute name="minDepth" type="xs:decimal" default="0.0" />
+      <xs:attribute name="maxDepth" type="xs:decimal" default="1.0" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Scissor">
+    <xs:complexType>
+      <xs:attribute name="x" type="xs:string" default="0" />
+      <xs:attribute name="y" type="xs:string" default="0" />
+      <xs:attribute name="width" type="xs:string" use="required" />
+      <xs:attribute name="height" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>  
+  
+  <xs:simpleType name="ColorComponentType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="R" />
+      <xs:enumeration value="G" />
+      <xs:enumeration value="B" />
+      <xs:enumeration value="A" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ColorComponentTypeList">
+    <xs:list itemType="ColorComponentType"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="FilterType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Nearest" />
+      <xs:enumeration value="Linear" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="CommandList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Function">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="data" type="xs:IDREF" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="PipelineBarrier">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="BufferMemoryBarrier">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Source">
+                          <xs:complexType>
+                            <xs:attribute name="accessMask" type="AccessFlagsTypeList" default="Undefined" />
+                            <xs:attribute name="queue" type="xs:IDREF" use="required" />
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="Destination">
+                          <xs:complexType>
+                            <xs:attribute name="accessMask" type="AccessFlagsTypeList" default="Undefined" />
+                            <xs:attribute name="queue" type="xs:IDREF" use="required" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="buffer" type="xs:IDREF" use="required" />
+                      <xs:attribute name="offset" type="xs:string" default="0" />
+                      <xs:attribute name="size" type="xs:string" default="-1" />
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element minOccurs="0" name="ImageMemoryBarrier">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Source">
+                          <xs:complexType>
+                            <xs:attribute name="accessMask" type="AccessFlagsTypeList" default="Undefined" />
+                            <xs:attribute name="layout" type="ImageLayoutType" default="Undefined" />
+                            <xs:attribute name="queue" type="xs:IDREF" use="required" />
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="Destination">
+                          <xs:complexType>
+                            <xs:attribute name="accessMask" type="AccessFlagsTypeList" default="Undefined" />
+                            <xs:attribute name="layout" type="ImageLayoutType" default="Undefined" />
+                            <xs:attribute name="queue" type="xs:IDREF" use="required" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="image" type="xs:IDREF" />
+                      <xs:attribute name="swapchain" type="xs:IDREF" />
+                      <xs:attribute name="aspectMask" type="ImageAspectFlagsTypeList" default="Color" />
+                      <xs:attribute name="baseMipLevel" type="xs:unsignedByte" default="0" />
+                      <xs:attribute name="levelCount" type="xs:unsignedByte" default="1" />
+                      <xs:attribute name="baseArrayLayer" type="xs:unsignedByte" default="0" />
+                      <xs:attribute name="layerCount" type="xs:unsignedByte" default="1" />
+                    </xs:complexType>
+                  </xs:element>
+                </xs:choice>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="srcStageMask" type="PipelineStageFlagsTypeList" use="required" />
+              <xs:attribute name="dstStageMask" type="PipelineStageFlagsTypeList" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="CopyBuffer">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Region">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="Source">
+                        <xs:complexType>
+                          <xs:attribute name="srcOffset" type="xs:string" default="0" />
+                          <xs:attribute name="dstOffset" type="xs:string" default="0" />
+                          <xs:attribute name="size" type="xs:string" />
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="Destination">
+                        <xs:complexType>
+                          <xs:attribute name="srcOffset" type="xs:string" default="0" />
+                          <xs:attribute name="dstOffset" type="xs:string" default="0" />
+                          <xs:attribute name="size" type="xs:string" default="0" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="srcBuffer" type="xs:IDREF" use="required" />
+              <xs:attribute name="dstBuffer" type="xs:IDREF" use="required" />
+            </xs:complexType>
+          </xs:element>          
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Dispatch">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="groupCountX" type="xs:string" default="1" />
+              <xs:attribute name="groupCountY" type="xs:string" default="1" />
+              <xs:attribute name="groupCountZ" type="xs:string" default="1" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="BeginRenderPass">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" name="RenderArea">
+                  <xs:complexType>
+                    <xs:attribute name="x" type="xs:string" default="0" />
+                    <xs:attribute name="y" type="xs:string" default="0" />
+                    <xs:attribute name="width" type="xs:string" use="required" />
+                    <xs:attribute name="height" type="xs:string" use="required" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="ClearValues">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:choice maxOccurs="unbounded">
+                        <xs:element minOccurs="0" maxOccurs="unbounded" name="ClearColorValue">
+                          <xs:complexType>
+                            <xs:attribute name="value" type="xs:string" default="0.0 0.0 0.0 0.0" />
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="unbounded" name="ClearDepthStencilValue">
+                          <xs:complexType>
+                            <xs:attribute name="depth" type="xs:decimal" default="1.0" />
+                            <xs:attribute name="stencil" type="xs:unsignedByte" default="0" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:choice>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="renderPass" type="xs:IDREF" use="required" />
+              <xs:attribute name="framebuffer" type="xs:IDREF" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="EndRenderPass">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="SetViewport">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Viewport" />
+              </xs:sequence>              
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="firstViewport" type="xs:unsignedInt" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="SetScissor">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Scissor" />
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="firstScissor" type="xs:unsignedInt" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="BindDescriptorSets">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="DescriptorSet">
+                  <xs:complexType>
+                    <xs:attribute name="descriptorSet" type="xs:IDREF" use="required" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="DynamicOffset">
+                  <xs:complexType>
+                    <xs:attribute name="buffer" type="xs:IDREF" use="required" />
+                    <xs:attribute name="unit" type="xs:string" use="required" />
+                    <xs:attribute name="unitSize" type="xs:string" use="required" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="pipelineBindPoint" default="Graphics">
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="Graphics" />
+                    <xs:enumeration value="Compute" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="layout" type="xs:IDREF" use="required" />
+              <xs:attribute name="firstSet" type="xs:unsignedByte" default="0" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="BindPipeline">
+            <xs:complexType>
+              <xs:attribute name="pipeline" type="xs:IDREF" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="BindVertexBuffers">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="Buffer">
+                  <xs:complexType>
+                    <xs:attribute name="buffer" type="xs:IDREF" use="required" />
+                    <xs:attribute name="offset" type="xs:unsignedInt" default="0" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="firstBinding" type="xs:unsignedByte" default="0" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="BindIndexBuffer">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="buffer" type="xs:IDREF" use="required" />
+              <xs:attribute name="indexType" default="Uint16">
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="Uint16" />
+                    <xs:enumeration value="Uint32" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="DrawIndexed">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="indexCount" type="xs:unsignedInt" use="required" />
+              <xs:attribute name="instanceCount" type="xs:unsignedInt" default="1" />
+              <xs:attribute name="firstIndex" type="xs:unsignedInt" default="0" />
+              <xs:attribute name="vertexOffset" type="xs:unsignedInt" default="0" />
+              <xs:attribute name="firstInstance" type="xs:unsignedInt" default="0" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="DrawIndexedIndirect">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="buffer" type="xs:IDREF" use="required" />
+              <xs:attribute name="unit" type="xs:string" use="required" />
+              <xs:attribute name="unitSize" type="xs:string" use="required" />
+              <xs:attribute name="drawCount" type="xs:string" default="1" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="BlitImage">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="Region">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="Source">
+                        <xs:complexType>
+                          <xs:attribute name="x0" type="xs:string" default="0" />
+                          <xs:attribute name="y0" type="xs:string" default="0" />
+                          <xs:attribute name="z0" type="xs:string" default="0" />
+                          <xs:attribute name="x1" type="xs:string" use="required" />
+                          <xs:attribute name="y1" type="xs:string" use="required" />
+                          <xs:attribute name="z1" type="xs:string" default="0" />
+                          <xs:attribute name="aspectMask" type="ImageAspectFlagsTypeList" default="Color" />
+                          <xs:attribute name="mipLevel" type="xs:unsignedByte" default="0" />
+                          <xs:attribute name="baseArrayLayer" type="xs:unsignedByte" default="0" />
+                          <xs:attribute name="layerCount" type="xs:unsignedByte" default="1" />
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="Destination">
+                        <xs:complexType>
+                          <xs:attribute name="x0" type="xs:string" default="0" />
+                          <xs:attribute name="y0" type="xs:string" default="0" />
+                          <xs:attribute name="z0" type="xs:string" default="0" />
+                          <xs:attribute name="x1" type="xs:string" use="required" />
+                          <xs:attribute name="y1" type="xs:string" use="required" />
+                          <xs:attribute name="z1" type="xs:string" default="0" />
+                          <xs:attribute name="aspectMask" type="ImageAspectFlagsTypeList" default="Color" />
+                          <xs:attribute name="mipLevel" type="xs:unsignedByte" default="0" />
+                          <xs:attribute name="baseArrayLayer" type="xs:unsignedByte" default="0" />
+                          <xs:attribute name="layerCount" type="xs:unsignedByte" default="1" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="srcImage" type="xs:IDREF" />
+              <xs:attribute name="srcSwapchain" type="xs:IDREF" />
+              <xs:attribute name="srcImageLayout" type="ImageLayoutType" default="Undefined" />
+              <xs:attribute name="dstImage" type="xs:IDREF" />
+              <xs:attribute name="dstSwapchain" type="xs:IDREF" />
+              <xs:attribute name="dstImageLayout" type="ImageLayoutType" default="Undefined" />
+              <xs:attribute name="filter" type="FilterType" default="Nearest" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="PushConstants">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="layout" type="xs:IDREF" />
+              <xs:attribute name="stageFlags" type="ShaderStageFlagsTypeList" use="required" />
+              <xs:attribute name="offset" type="xs:string" />
+              <xs:attribute name="size" type="xs:string" />
+              <xs:attribute name="data" type="xs:IDREF" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="ResetQueryPool">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:string" />
+              <xs:attribute name="queryPool" type="xs:IDREF" use="required" />
+              <xs:attribute name="firstQuery" type="xs:unsignedInt" default="0" />
+              <xs:attribute name="queryCount" type="xs:unsignedInt" default="0" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="SetEvent">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="event" type="xs:IDREF" use="required" />
+              <xs:attribute name="stageMask" type="PipelineStageFlagsTypeList" default="AllCommands" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="ResetEvent">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="event" type="xs:IDREF" use="required" />
+              <xs:attribute name="stageMask" type="PipelineStageFlagsTypeList" default="AllCommands" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" />
+      <xs:attribute name="commandList" type="xs:IDREF" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="CommandContext">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:ID" />
+      <xs:attribute name="commandGroup" type="xs:IDREF" use="required" />
+      <xs:attribute name="commandBuffer" type="xs:IDREF" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="QueueSubmit">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Submit">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="Wait">
+                <xs:complexType>
+                  <xs:attribute name="semaphore" type="xs:IDREF" use="required" />
+                  <xs:attribute name="dstStageMask" type="PipelineStageFlagsTypeList" use="required" />
+                  <xs:attribute name="frameOffset" type="xs:byte" default="0" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element maxOccurs="unbounded" name="CommandBuffer">
+                <xs:complexType>
+                  <xs:attribute name="commandBuffer" type="xs:IDREF" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="SignalSemaphore">
+                <xs:complexType>
+                  <xs:attribute name="semaphore" type="xs:IDREF" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" />
+      <xs:attribute name="queue" type="xs:IDREF" />
+      <xs:attribute name="fence" type="xs:IDREF" />
+      <xs:attribute name="enabled" type="xs:boolean" default="true" />
+      <xs:attribute name="queueSubmit" type="xs:IDREF" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="QueuePresent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="WaitSemaphore">
+            <xs:complexType>
+              <xs:attribute name="semaphore" type="xs:IDREF" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Swapchain">
+            <xs:complexType>
+              <xs:attribute name="swapchain" type="xs:IDREF" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID" />
+      <xs:attribute name="queue" type="xs:IDREF" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Engine">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element maxOccurs="unbounded" name="Constant">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="value" type="xs:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Renderer">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="Window">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element minOccurs="0" ref="Swapchain" />
+                      </xs:sequence>
+                      <xs:attribute name="id" type="xs:ID" use="required" />
+                      <xs:attribute name="xpos" type="xs:string" default="-1" />
+                      <xs:attribute name="ypos" type="xs:string" default="-1" />
+                      <xs:attribute name="width" type="xs:string" use="required" />
+                      <xs:attribute name="height" type="xs:string" use="required" />
+                      <xs:attribute name="title" type="xs:string" />
+                      <xs:attribute name="resizable" type="xs:boolean" default="false" />
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element ref="Swapchain" minOccurs="0" />
+                  <xs:element name="Device" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="Queue">
+                          <xs:complexType>
+                            <xs:attribute name="id" type="xs:ID" use="required" />
+                            <xs:attribute name="queueFamily" type="QueueFamilyTypeList" default="Graphics" />
+                            <xs:attribute name="presentable" type="xs:boolean" default="false" />
+                            <xs:attribute name="priority" type="xs:decimal" default="0.0" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:choice>
+              </xs:sequence>
+              <xs:attribute name="appName" type="xs:string" use="required" />
+              <xs:attribute name="debug" type="xs:boolean" default="false" />
+              <xs:attribute name="validation" type="xs:boolean" default="false" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="CommandPool">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandBuffer" />
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="queue" type="xs:IDREF" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="DescriptorPool">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="DescriptorSet" />
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="DescriptorSetLayout" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="PipelineLayout" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="ShaderModule" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="Buffer" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="DescriptorSet" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="Fence" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandBuffer" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="Int32Values" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="UInt32Values" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="UInt16Values" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="UInt8Values" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="FloatValues" type="xs:string" />
+                </xs:choice>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="ComputePipeline">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element ref="Stage" />
+                <xs:element minOccurs="0" ref="PipelineLayout" />
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="layout" type="xs:IDREF" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Image">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" ref="ImageView" />
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="imageType" type="ImageType" default="2D" />
+              <xs:attribute name="format" type="FormatType" use="required" />
+              <xs:attribute name="width" type="xs:string" use="required" />
+              <xs:attribute name="height" type="xs:string" use="required" />
+              <xs:attribute name="depth" type="xs:unsignedInt" default="1" />
+              <xs:attribute name="mipLevels" type="xs:unsignedByte" default="1" />
+              <xs:attribute name="arrayLayers" type="xs:unsignedByte" default="1" />
+              <xs:attribute name="tiling" default="Optimal">
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="Optimal" />
+                    <xs:enumeration value="Linear" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="usage" type="ImageUsageTypeList" default="TransferSrc" />
+              <xs:attribute name="allocFlags" type="MemoryAllocFlagsTypeList" default="DedicatedMemory" />
+              <xs:attribute name="memUsage" type="MemoryUsageType" default="GpuOnly" />
+              <xs:attribute name="initialLayout" type="ImageLayoutType" default="Undefined" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="ImageView" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="RenderPass" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="Framebuffer" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Frame">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="Fence" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="Semaphore" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandBuffer" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="Buffer" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="DescriptorSet" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="QueryPool" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="Event" />
+                  <xs:element minOccurs="0" ref="Framebuffer" />
+                </xs:choice>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="swapchain" type="xs:IDREF" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="GraphicsPipeline">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Stage" />
+                <xs:element name="VertexInputState">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element maxOccurs="unbounded" name="VertexBindingDescription">
+                        <xs:complexType>
+                          <xs:attribute name="binding" type="xs:unsignedByte" default="0" />
+                          <xs:attribute name="stride" type="xs:string" use="required" />
+                          <xs:attribute name="inputRate" default="Vertex">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:token">
+                                <xs:enumeration value="Vertex" />
+                                <xs:enumeration value="Instance" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:attribute>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element maxOccurs="unbounded" name="VertexAttributeDescription">
+                        <xs:complexType>
+                          <xs:attribute name="location" type="xs:unsignedByte" use="required" />
+                          <xs:attribute name="binding" type="xs:unsignedByte" default="0" />
+                          <xs:attribute name="format" type="FormatType" use="required" />
+                          <xs:attribute name="offset" type="xs:string" use="required" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="InputAssemblyState">
+                  <xs:complexType>
+                    <xs:attribute name="topology" type="PrimitiveTopologyType" default="TriangleList" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="ViewportState">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element maxOccurs="unbounded" ref="Viewport" />
+                      <xs:element maxOccurs="unbounded" ref="Scissor" />
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="RasterizationState">
+                  <xs:complexType>
+                    <xs:attribute name="depthClampEnable" type="xs:boolean" default="false" />
+                    <xs:attribute name="rasterizerDiscardEnable" type="xs:boolean" default="false" />
+                    <xs:attribute name="polygonMode" default="Fill">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                          <xs:enumeration value="Fill" />
+                          <xs:enumeration value="Line" />
+                          <xs:enumeration value="Point" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="cullMode" default="None">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                          <xs:enumeration value="None" />
+                          <xs:enumeration value="Front" />
+                          <xs:enumeration value="Back" />
+                          <xs:enumeration value="FrontAndBack" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="frontFace" default="Clockwise">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                          <xs:enumeration value="CounterClockwise" />
+                          <xs:enumeration value="Clockwise" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="depthBiasEnable" type="xs:boolean" default="false" />
+                    <xs:attribute name="lineWidth" type="xs:decimal" default="1.0" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="MultisampleState">
+                  <xs:complexType>
+                    <xs:attribute name="rasterizationSamples" default="1">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                          <xs:enumeration value="1" />
+                          <xs:enumeration value="2" />
+                          <xs:enumeration value="4" />
+                          <xs:enumeration value="8" />
+                          <xs:enumeration value="16" />
+                          <xs:enumeration value="32" />
+                          <xs:enumeration value="64" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="sampleShadingEnable" type="xs:boolean" default="false" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="DepthStencilState">
+                  <xs:complexType>
+                    <xs:attribute name="depthTestEnable" type="xs:boolean" default="false" />
+                    <xs:attribute name="depthWriteEnable" type="xs:boolean" default="false" />
+                    <xs:attribute name="depthCompareOp" default="LessOrEqual">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                          <xs:enumeration value="Never" />
+                          <xs:enumeration value="Less" />
+                          <xs:enumeration value="Equal" />
+                          <xs:enumeration value="LessOrEqual" />
+                          <xs:enumeration value="Greater" />
+                          <xs:enumeration value="NotEqual" />
+                          <xs:enumeration value="GreaterOrEqual" />
+                          <xs:enumeration value="Always" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>                    
+                    <xs:attribute name="depthBoundsTestEnable" type="xs:boolean" default="false" />
+                    <xs:attribute name="stencilTestEnable" type="xs:boolean" default="false" />                    
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="ColorBlendState">
+                  <xs:complexType>
+                    <xs:sequence maxOccurs="unbounded">
+                      <xs:element name="Attachment">
+                        <xs:complexType>
+                          <xs:attribute name="blendEnable" type="xs:boolean" default="false" />
+                          <xs:attribute name="colorWriteMask" type="ColorComponentTypeList" default="R G B A" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="DynamicState">
+                  <xs:complexType>
+                    <xs:attribute name="state" use="required">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:token">
+                          <xs:enumeration value="Viewport" />
+                          <xs:enumeration value="Scissor" />
+                          <xs:enumeration value="LineWidth" />
+                          <xs:enumeration value="DepthBias" />
+                          <xs:enumeration value="BlendConstants" />
+                          <xs:enumeration value="DepthBounds" />
+                          <xs:enumeration value="StencilCompareMask" />
+                          <xs:enumeration value="StencilWriteMask" />
+                          <xs:enumeration value="StencilReference" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" ref="PipelineLayout" />
+                <xs:element minOccurs="0" ref="RenderPass" />
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="layout" type="xs:IDREF" />
+              <xs:attribute name="renderPass" type="xs:IDREF" />
+              <xs:attribute name="subpass" type="xs:IDREF" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="QueryPool" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="Event" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Sampler">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="magFilter" type="FilterType" default="Nearest" />
+              <xs:attribute name="minFilter" type="FilterType" default="Nearest" />
+              <xs:attribute name="mipmapMode" default="Nearest">
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="Nearest" />
+                    <xs:enumeration value="Linear" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="anisotropyEnable" type="xs:boolean" default="false" />
+              <xs:attribute name="maxAnisotropy" type="xs:decimal" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="ImageLoader">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="image" type="xs:IDREF" use="required" />
+              <xs:attribute name="queue" type="xs:IDREF" use="required" />
+              <xs:attribute name="file" type="xs:string" use="required" />
+              <xs:attribute name="accessMask" type="AccessFlagsTypeList" default="ShaderRead" />
+              <xs:attribute name="layout" type="ImageLayoutType" default="ShaderReadOnlyOptimal" />
+              <xs:attribute name="stageMask" type="PipelineStageFlagsTypeList" default="FragmentShader" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandList" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="CommandGroup">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandList" />
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="CommandGroup">
+                    <xs:complexType>
+                      <xs:attribute name="commandGroup" type="xs:IDREF" use="required" />
+                    </xs:complexType>
+                  </xs:element>
+                </xs:choice>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Camera">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Perspective">
+                  <xs:complexType>
+                    <xs:attribute name="fovy" type="xs:decimal" use="required" />
+                    <xs:attribute name="aspect" type="xs:string" use="required" />
+                    <xs:attribute name="zNear" type="xs:decimal" use="required" />
+                    <xs:attribute name="zFar" type="xs:decimal" use="required" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="LookAt">
+                  <xs:complexType>
+                    <xs:attribute name="eye" type="xs:string" use="required" />
+                    <xs:attribute name="center" type="xs:string" use="required" />
+                    <xs:attribute name="up" type="xs:string" use="required" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="BufferLoader">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="buffer" type="xs:IDREF" use="required" />
+              <xs:attribute name="queue" type="xs:IDREF" use="required" />
+              <xs:attribute name="file" type="xs:string" />
+              <xs:attribute name="srcOffset" type="xs:unsignedInt" default="0" />
+              <xs:attribute name="dstOffset" type="xs:unsignedInt" default="0" />
+              <xs:attribute name="size" type="xs:unsignedInt" default="0" />
+              <xs:attribute name="accessMask" type="AccessFlagsTypeList" default="MemoryRead" />
+              <xs:attribute name="stageMask" type="PipelineStageFlagsTypeList" default="AllCommands" />
+              <xs:attribute name="data" type="xs:IDREF" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandContext" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="QueueSubmit" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="QueuePresent" />
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Viewer">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandContext" />
+                  <xs:element minOccurs="0" name="AcquireNextImage">
+                    <xs:complexType>
+                      <xs:attribute name="id" type="xs:ID" />
+                      <xs:attribute name="waitFence" type="xs:IDREF" />
+                      <xs:attribute name="timeout" type="xs:unsignedLong" />
+                      <xs:attribute name="semaphore" type="xs:IDREF" />
+                      <xs:attribute name="fence" type="xs:IDREF" />
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="QueueSubmit" />
+                  <xs:element minOccurs="0" ref="QueuePresent" />
+                  <xs:element minOccurs="0" name="Resizer">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:choice maxOccurs="unbounded">
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="Image">
+                            <xs:complexType>
+                              <xs:attribute name="image" type="xs:IDREF" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="ImageView">
+                            <xs:complexType>
+                              <xs:attribute name="imageView" type="xs:IDREF" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="GraphicsPipeline">
+                            <xs:complexType>
+                              <xs:attribute name="graphicsPipeline" type="xs:IDREF" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="Framebuffer">
+                            <xs:complexType>
+                              <xs:attribute name="framebuffer" type="xs:IDREF" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:choice>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element minOccurs="0" name="Updater">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="Buffer">
+                          <xs:complexType>
+                            <xs:attribute name="buffer" type="xs:IDREF" use="required" />
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>                  
+                </xs:choice>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:string" use="required" />
+              <xs:attribute name="window" type="xs:IDREF" use="required" />
+              <xs:attribute name="frame" type="xs:IDREF" use="required" />
+              <xs:attribute name="camera" type="xs:IDREF" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

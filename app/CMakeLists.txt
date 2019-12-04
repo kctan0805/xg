@@ -1,0 +1,7 @@
+add_subdirectory(hello_world)
+add_subdirectory(multiview)
+add_subdirectory(multiwin)
+add_subdirectory(change_layout)
+add_subdirectory(headless)
+add_subdirectory(serialize_layout)
+add_subdirectory(embed_layout)

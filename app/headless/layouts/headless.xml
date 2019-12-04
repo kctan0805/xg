@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Engine>
+  <Constant id="elementCount" value="32"/>
+
+  <Renderer appName="headless" debug="true">
+    <Device>
+      <Queue id="mainQueue" queueFamily="Compute"/>
+    </Device>
+  </Renderer>
+
+  <CommandPool id="mainCommandPool" queue="mainQueue"/>
+  <DescriptorPool id="mainDescriptorPool"/>
+
+  <DescriptorSetLayout id="computeDescriptorSetLayout">
+    <DescriptorSetLayoutBinding binding="0" descriptorType="StorageBuffer" stageFlags="Compute"/>
+  </DescriptorSetLayout>
+
+  <PipelineLayout id="computePipelineLayout">
+    <SetLayout descriptorSetLayout="computeDescriptorSetLayout"/>
+  </PipelineLayout>
+
+  <ShaderModule id="computeShader" file="headless.comp.spv"/>
+
+  <Data id="computeConstants">
+    <UInt32Values>elementCount</UInt32Values>
+  </Data>
+
+  <ComputePipeline id="computePipeline" layout="computePipelineLayout">
+    <Stage stage="Compute" module="computeShader">
+      <SpecializationInfo dataSize="4" data="computeConstants">
+        <MapEntry constantID="0" offset="0" size="4"/>
+      </SpecializationInfo>
+    </Stage>
+  </ComputePipeline>
+
+  <Buffer id="deviceBuffer" size="4*elementCount" usage="TransferSrc TransferDst StorageBuffer"/>
+  <BufferLoader id="deviceBufferLoader" buffer="deviceBuffer" accessMask="ShaderRead" queue="mainQueue" stageMask="ComputeShader"/>
+
+  <Buffer id="hostBuffer" size="4*elementCount" usage="TransferDst" allocFlags="Undefined" memUsage="CpuOnly"/>
+
+  <DescriptorSet id="computeDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="computeDescriptorSetLayout">
+    <Descriptor binding="0" descriptorType="StorageBuffer" buffer="deviceBuffer"/>
+  </DescriptorSet>
+
+  <CommandBuffer id="mainCommandBuffer" commandPool="mainCommandPool"/>
+
+  <CommandGroup id="mainCommandGroup">
+    <CommandList>
+      <BindDescriptorSets pipelineBindPoint="Compute" layout="computePipelineLayout">
+        <DescriptorSet descriptorSet="computeDescriptorSet"/>
+      </BindDescriptorSets>
+
+      <BindPipeline pipeline="computePipeline"/>
+
+      <Dispatch groupCountX="elementCount"/>
+
+      <PipelineBarrier srcStageMask="ComputeShader" dstStageMask="Transfer">
+        <BufferMemoryBarrier buffer="deviceBuffer">
+          <Source accessMask="ShaderWrite" queue="mainQueue"/>
+          <Destination accessMask="TransferRead" queue="mainQueue"/>
+        </BufferMemoryBarrier>
+      </PipelineBarrier>
+
+      <CopyBuffer srcBuffer="deviceBuffer" dstBuffer="hostBuffer"/>
+
+      <PipelineBarrier srcStageMask="Transfer" dstStageMask="Host">
+        <BufferMemoryBarrier buffer="hostBuffer">
+          <Source accessMask="TransferWrite" queue="mainQueue"/>
+          <Destination accessMask="HostRead" queue="mainQueue"/>
+        </BufferMemoryBarrier>
+      </PipelineBarrier>
+
+    </CommandList>
+  </CommandGroup>
+
+  <Fence id="computeCompleteFence"/>
+
+  <CommandContext id="mainCommandContext" commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
+  <QueueSubmit id="mainQueueSubmit" queue="mainQueue" fence="computeCompleteFence">
+    <Submit>
+      <CommandBuffer commandBuffer="mainCommandBuffer"/>
+    </Submit>
+  </QueueSubmit>
+
+</Engine>
