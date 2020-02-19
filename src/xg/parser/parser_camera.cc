@@ -27,10 +27,13 @@ bool ParserSingleton<ParserCamera>::ParseElement(
     const char* name = child->Name();
 
     if (strcmp(name, "Perspective") == 0) {
-      child->QueryFloatAttribute("fovy", &node->fovy);
+      child->QueryFloatAttribute("fov", &node->fov);
 
-      const char* value = child->Attribute("aspect");
-      if (value) node->aspect = Expression::Get().Evaluate(value);
+      const char* value = child->Attribute("width");
+      if (value) node->width = Expression::Get().Evaluate(value);
+
+      value = child->Attribute("height");
+      if (value) node->height = Expression::Get().Evaluate(value);
 
       child->QueryFloatAttribute("zNear", &node->z_near);
       child->QueryFloatAttribute("zFar", &node->z_far);

@@ -26,28 +26,27 @@ class Frustum {
 
 class Camera {
  public:
-  void Perspective(float fovy, float aspect, float z_near, float z_far);
+  void Perspective(float fov, float width, float height, float z_near,
+                   float z_far);
   void LookAt(const glm::vec3& eye, const glm::vec3& center,
               const glm::vec3& up);
-
-  void Zoom(float factor);
-  void Pan(const glm::vec2& factor);
-  void Rotate(const glm::vec2& angle);
 
   const glm::mat4& GetPerspectiveMatrix() const { return perspective_; }
   const glm::mat4& GetViewMatrix() const { return view_; }
   const glm::vec3& GetPosition() const { return eye_; }
+  const glm::vec3& GetCenter() const { return center_; }
+  const glm::vec3& GetUp() const { return up_; }
+  float GetWidth() const { return width_; }
+  float GetHeight() const { return height_; }
 
  protected:
-  void Update();
-
   glm::vec3 eye_ = glm::vec3();
   glm::vec3 center_ = glm::vec3();
   glm::vec3 up_ = glm::vec3();
-  glm::vec3 front_ = glm::vec3();
-  glm::vec3 right_ = glm::vec3();
   glm::mat4 perspective_;
   glm::mat4 view_;
+  float width_ = 0.0f;
+  float height_ = 0.0f;
 };
 
 }  // namespace xg

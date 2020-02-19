@@ -38,6 +38,7 @@ class Window {
 
   virtual const void* GetHandle() const = 0;
   virtual void GetFramebufferSize(int* width, int* height) const = 0;
+  virtual void GetCursorPos(double* xpos, double* ypos) const = 0;
   virtual int GetAttrib(WindowAttrib attrib) const = 0;
   virtual bool ShouldClose() const = 0;
   virtual void PollEvents() = 0;

@@ -8,9 +8,6 @@
 
 #include "xg/camera.h"
 
-#include <array>
-#include <cmath>
-
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -61,9 +58,13 @@ Frustum::Frustum(const glm::mat4& matrix) {
   }
 }
 
-void Camera::Perspective(float fovy, float aspect, float z_near, float z_far) {
-  perspective_ = glm::perspective(glm::radians(fovy), aspect, z_near, z_far);
+void Camera::Perspective(float fov, float width, float height, float z_near,
+                         float z_far) {
+  perspective_ =
+      glm::perspectiveFov(glm::radians(fov), width, height, z_near, z_far);
   perspective_[1][1] *= -1;
+  width_ = width;
+  height_ = height;
 }
 
 void Camera::LookAt(const glm::vec3& eye, const glm::vec3& center,
@@ -71,44 +72,6 @@ void Camera::LookAt(const glm::vec3& eye, const glm::vec3& center,
   eye_ = eye;
   center_ = center;
   up_ = up;
-  Update();
-}
-
-void Camera::Zoom(float factor) {
-  const auto& zoom = front_ * factor;
-  eye_ += zoom;
-  center_ += zoom;
-  Update();
-}
-
-void Camera::Pan(const glm::vec2& factor) {
-  const auto& x = right_ * factor.x;
-  const auto& y = up_ * factor.y;
-  eye_ += x + y;
-  center_ += x + y;
-  Update();
-}
-
-void Camera::Rotate(const glm::vec2& angle) {
-  const auto& rot_x =
-      glm::rotate(glm::mat4(1.0f), glm::radians(-angle.x), glm::normalize(up_));
-
-  const auto& rot_y = glm::rotate(glm::mat4(1.0f), glm::radians(angle.y),
-                                  glm::normalize(right_));
-
-  const auto& trans = glm::translate(glm::mat4(1.0f), center_) * rot_y * rot_x *
-                      glm::translate(glm::mat4(1.0f), -center_);
-
-  eye_ = glm::vec3(trans * glm::vec4(eye_, 1));
-  center_ = glm::vec3(trans * glm::vec4(center_, 1));
-
-  Update();
-}
-
-void Camera::Update() {
-  front_ = glm::normalize(center_ - eye_);
-  right_ = glm::normalize(glm::cross(up_, front_));
-  up_ = glm::normalize(glm::cross(front_, right_));
   view_ = glm::lookAt(eye_, center_, up_);
 }
 

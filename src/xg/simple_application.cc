@@ -15,6 +15,7 @@
 #include "glm/glm.hpp"
 #include "xg/camera.h"
 #include "xg/engine.h"
+#include "xg/trackball.h"
 #include "xg/viewer.h"
 #include "xg/window.h"
 
@@ -47,6 +48,11 @@ bool SimpleApplication::Init(xg::Engine* engine) {
 
     ViewerData viewer_data = {};
     viewer_data.viewer_index = i;
+
+    TrackballInfo trackball_info = {};
+    trackball_info.camera = viewer->GetCamera();
+    viewer_data.trackball.Init(trackball_info);
+
     viewer_data_map_.insert(std::make_pair(viewer, viewer_data));
     ++i;
   }
@@ -57,57 +63,15 @@ void SimpleApplication::OnMouseButton(std::shared_ptr<Viewer> viewer,
                                       MouseButton button, ButtonAction action,
                                       ModifierKey mods) {
   auto& viewer_data = viewer_data_map_[viewer];
-
-  switch (action) {
-    case ButtonAction::kPress:
-      switch (button) {
-        case MouseButton::kLeft:
-          viewer_data.mouse_pressed.left = true;
-          break;
-        case MouseButton::kRight:
-          viewer_data.mouse_pressed.right = true;
-          break;
-        case MouseButton::kMiddle:
-          viewer_data.mouse_pressed.middle = true;
-          break;
-      }
-      break;
-
-    case ButtonAction::kRelease:
-      switch (button) {
-        case MouseButton::kLeft:
-          viewer_data.mouse_pressed.left = false;
-          break;
-        case MouseButton::kRight:
-          viewer_data.mouse_pressed.right = false;
-          break;
-        case MouseButton::kMiddle:
-          viewer_data.mouse_pressed.middle = false;
-          break;
-      }
-      break;
-  }
+  double posx, posy;
+  viewer->GetWindow()->GetCursorPos(&posx, &posy);
+  viewer_data.trackball.OnMouseButton(button, action, posx, posy);
 }
 
 void SimpleApplication::OnMouseMove(std::shared_ptr<Viewer> viewer, double posx,
                                     double posy) {
   auto& viewer_data = viewer_data_map_[viewer];
-  auto& camera = viewer->GetCamera();
-  const auto& new_pos = glm::vec2(posx, posy);
-  const auto& delta = viewer_data.mouse_pos - new_pos;
-  if (delta == glm::vec2()) return;
-
-  if (viewer_data.mouse_pressed.left) {
-    camera->Rotate({-delta.x, -delta.y});
-  }
-  if (viewer_data.mouse_pressed.right) {
-    camera->Pan({-delta.x * viewer_data.camera_factor,
-                 delta.y * viewer_data.camera_factor});
-  }
-  if (viewer_data.mouse_pressed.middle) {
-    camera->Zoom(delta.y * viewer_data.camera_factor);
-  }
-  viewer_data.mouse_pos = new_pos;
+  viewer_data.trackball.OnMouseMove(posx, posy);
 }
 
 }  // namespace xg

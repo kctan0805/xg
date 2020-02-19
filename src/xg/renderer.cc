@@ -248,8 +248,8 @@ std::shared_ptr<Camera> Renderer::CreateCamera(const LayoutCamera& lcamera) {
     XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
     return nullptr;
   }
-  camera->Perspective(lcamera.fovy, lcamera.aspect, lcamera.z_near,
-                      lcamera.z_far);
+  camera->Perspective(lcamera.fov, lcamera.width, lcamera.height,
+                      lcamera.z_near, lcamera.z_far);
   camera->LookAt(lcamera.eye, lcamera.center, lcamera.up);
 
   return camera;

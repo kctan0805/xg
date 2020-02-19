@@ -15,6 +15,7 @@
 #include "glm/glm.hpp"
 #include "xg/camera.h"
 #include "xg/engine.h"
+#include "xg/trackball.h"
 #include "xg/types.h"
 #include "xg/viewer.h"
 #include "xg/window.h"
@@ -44,15 +45,8 @@ class SimpleApplication {
   }
 
   struct ViewerData {
-    struct {
-      bool left = false;
-      bool right = false;
-      bool middle = false;
-    } mouse_pressed;
-
-    glm::vec2 mouse_pos = {0, 0};
-    float camera_factor = 1.0f;
     int viewer_index = 0;
+    Trackball trackball;
   };
 
   std::unordered_map<std::shared_ptr<Viewer>, ViewerData> viewer_data_map_;

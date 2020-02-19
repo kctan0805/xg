@@ -30,10 +30,6 @@ bool Application::Init(xg::Engine* engine) {
   auto& viewers = engine->GetViewers();
 
   for (const auto& viewer : viewers) {
-    auto& viewer_data = viewer_data_map_[viewer];
-    auto& camera = viewer->GetCamera();
-
-    viewer_data.camera_factor = 0.01f;
     view_update_data_[viewer.get()] = &viewer->GetUpdateData(0);
   }
   return true;

@@ -28,10 +28,7 @@ bool Application::Init(xg::Engine* engine) {
   if (!SimpleApplication::Init(engine)) return false;
 
   auto& viewer = engine->GetViewers()[0];
-  auto& viewer_data = viewer_data_map_[viewer];
   auto& camera = viewer->GetCamera();
-
-  viewer_data.camera_factor = 0.01f;
 
   sub_camera_ = std::static_pointer_cast<xg::Camera>(engine->Find("subCamera"));
   if (!sub_camera_) return false;

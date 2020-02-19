@@ -263,12 +263,12 @@
   </CommandGroup>
 
   <Camera id="mainCamera">
-    <Perspective fovy="60" aspect="1.33" zNear="0.1" zFar="10.0"/>
+    <Perspective fov="60" width="winWidth" height="winHeight" zNear="0.1" zFar="10.0"/>
     <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
 
   <Camera id="subCamera">
-    <Perspective fovy="60" aspect="winWidth/winHeight" zNear="0.1" zFar="10.0"/>
+    <Perspective fov="60" width="winWidth" height="winHeight" zNear="0.1" zFar="10.0"/>
     <LookAt eye="-2.5 -2.5 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
 

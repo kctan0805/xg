@@ -1109,8 +1109,9 @@ struct LayoutEvent : LayoutBase {
 struct LayoutCamera : LayoutBase {
   LayoutCamera() : LayoutBase{LayoutType::kCamera} {}
 
-  float fovy = 0.0f;
-  float aspect = 0.0f;
+  float fov = 0.0f;
+  float width = 0.0f;
+  float height = 0.0f;
   float z_near = 0.0f;
   float z_far = 0.0f;
   glm::vec3 eye = glm::vec3(0.0f);
@@ -1119,8 +1120,8 @@ struct LayoutCamera : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), fovy, aspect, z_near, z_far,
-            eye, center, up);
+    archive(cereal::base_class<LayoutBase>(this), fov, width, height, z_near,
+            z_far, eye, center, up);
   }
 };
 
@@ -1802,7 +1803,8 @@ struct Layout : std::enable_shared_from_this<Layout> {
 
   bool Serialize(const std::string& filepath);
   static std::shared_ptr<Layout> Deserialize(const std::string& filepath);
-  static std::shared_ptr<Layout> Deserialize(const uint8_t* data, size_t length);
+  static std::shared_ptr<Layout> Deserialize(const uint8_t* data,
+                                             size_t length);
 };
 
 }  // namespace xg

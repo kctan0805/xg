@@ -33,6 +33,10 @@ class WindowGLFW : public Window {
     glfwGetFramebufferSize(window_, width, height);
   }
 
+  void GetCursorPos(double* xpos, double* ypos) const override {
+    glfwGetCursorPos(window_, xpos, ypos);
+  }
+
   int GetAttrib(WindowAttrib attrib) const override {
     return glfwGetWindowAttrib(window_, static_cast<int>(attrib));
   }
