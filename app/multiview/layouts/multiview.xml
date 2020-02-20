@@ -88,7 +88,7 @@
     <Descriptor binding="0" descriptorType="UniformBuffer" buffer="drawCommonUniformBuffer"/>
   </DescriptorSet>
 
-  <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass" width="winWidth/2" height="winHeight" layers="2">
+  <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass" width="winWidth/2" height="winHeight">
     <Attachment imageView="mainColorBufferImageView"/>
     <Attachment imageView="mainDepthBufferImageView"/>
   </Framebuffer>

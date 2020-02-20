@@ -99,6 +99,8 @@ bool ParserSingleton<ParserBlitImage>::ParseElement(
           if (value) {
             region.src_offsets[1].z =
                 static_cast<int>(Expression::Get().Evaluate(value));
+          } else {
+            region.src_offsets[1].z = 1;
           }
 
         } else if (strcmp(name, "Destination") == 0) {
@@ -148,6 +150,8 @@ bool ParserSingleton<ParserBlitImage>::ParseElement(
           if (value) {
             region.dst_offsets[1].z =
                 static_cast<int>(Expression::Get().Evaluate(value));
+          } else {
+            region.dst_offsets[1].z = 1;
           }
         }
       }
