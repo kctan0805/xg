@@ -18,7 +18,7 @@ Logger Logger::logger_ = Logger();
 Logger::Logger() {
   spdlog::set_level(
       static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
-  spdlog::set_pattern("[%t]%+");
+  spdlog::set_pattern("[%t:%s:%#] %v");
 }
 
 Logger::~Logger() { spdlog::drop_all(); }

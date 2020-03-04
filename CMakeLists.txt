@@ -24,7 +24,7 @@ if(WIN32)
         -DVK_USE_PLATFORM_WIN32_KHR
         -DVMA_RECORDING_ENABLED=0
     )
-    add_compile_options(-bigobj)
+    add_compile_options(/bigobj /utf-8)
 endif()
 
 project(xg)

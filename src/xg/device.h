@@ -33,6 +33,11 @@
 #include "xg/shader_module.h"
 #include "xg/swapchain.h"
 
+#ifdef _WIN32  // workaround build fail bug
+#undef CreateEvent
+#undef CreateSemaphore
+#endif
+
 namespace xg {
 
 class Device {

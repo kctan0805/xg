@@ -20,6 +20,10 @@
 #include "xg/vulkan/device_vk.h"
 #include "xg/window.h"
 
+#ifdef _WIN32  // workaround build fail bug
+#undef CreateWindow
+#endif
+
 namespace xg {
 
 class RendererVK : public Renderer {
