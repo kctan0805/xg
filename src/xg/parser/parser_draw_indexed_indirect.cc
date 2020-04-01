@@ -49,7 +49,10 @@ bool ParserSingleton<ParserDrawIndexedIndirect>::ParseElement(
     node->draw_count = static_cast<int>(Expression::Get().Evaluate(value));
   }
 
-  element->QueryIntAttribute("stride", &node->stride);
+  value = element->Attribute("stride");
+  if (value) {
+    node->stride = static_cast<int>(Expression::Get().Evaluate(value));
+  }
 
   status->node = node;
 
