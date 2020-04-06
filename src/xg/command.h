@@ -300,6 +300,7 @@ class CommandDrawIndexedIndirect : public CommandBase {
 
   void Init(const LayoutDrawIndexedIndirect& ldraw_indexed_indirect);
   void Build(const CommandInfo& cmd_info) const override;
+  DrawIndexedIndirectInfo* GetInfo() { return &info_; };
 
  protected:
   DrawIndexedIndirectInfo info_ = {};
