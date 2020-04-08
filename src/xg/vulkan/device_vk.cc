@@ -1499,24 +1499,30 @@ Result DeviceVK::UpdateDescriptorSets(
           }
 
           for (const auto& ldesc_image_info : ldesc->ldesc_image_infos) {
-            const auto& sampler = std::static_pointer_cast<SamplerVK>(
-                ldesc_image_info->lsampler->instance);
-            const auto& image_view = std::static_pointer_cast<ImageViewVK>(
-                ldesc_image_info->limage_view->instance);
             const auto image_layout =
                 static_cast<vk::ImageLayout>(ldesc_image_info->image_layout);
+            auto vk_desc_image_info =
+                vk::DescriptorImageInfo().setImageLayout(image_layout);
 
-            auto vk_desc_image_info = vk::DescriptorImageInfo()
-                                          .setSampler(sampler->sampler_)
-                                          .setImageView(image_view->image_view_)
-                                          .setImageLayout(image_layout);
+            if (ldesc_image_info->limage_view) {
+              const auto& image_view = std::static_pointer_cast<ImageViewVK>(
+                  ldesc_image_info->limage_view->instance);
+              vk_desc_image_info.setImageView(image_view->image_view_);
+            }
+
+            if (ldesc_image_info->lsampler) {
+              const auto& sampler = std::static_pointer_cast<SamplerVK>(
+                  ldesc_image_info->lsampler->instance);
+              vk_desc_image_info.setSampler(sampler->sampler_);
+            }
+
+            XG_TRACE(
+                "    ImageInfo: {} {} {}",
+                static_cast<void*>((VkSampler)vk_desc_image_info.sampler),
+                static_cast<void*>((VkImageView)vk_desc_image_info.imageView),
+                vk::to_string(image_layout));
 
             vk_desc_image_infos->emplace_back(std::move(vk_desc_image_info));
-
-            XG_TRACE("    ImageInfo: {} {} {}",
-                     static_cast<void*>((VkSampler)sampler->sampler_),
-                     static_cast<void*>((VkImageView)image_view->image_view_),
-                     vk::to_string(image_layout));
           }
 
           write.setPImageInfo(vk_desc_image_infos->data());

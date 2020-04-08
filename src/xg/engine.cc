@@ -586,31 +586,33 @@ bool Engine::CreateDescriptorSets(const Layout& layout) {
               return false;
             }
 
-            assert(ldesc_image_info->limage_view);
-            const auto& image_views = std::static_pointer_cast<
-                std::vector<std::shared_ptr<ImageView>>>(
-                ldesc_image_info->limage_view->instance);
-            auto lframe_image_view = std::make_shared<LayoutImageView>(
-                *ldesc_image_info->limage_view);
-            if (!lframe_image_view) {
-              XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
-              return false;
+            if (ldesc_image_info->limage_view) {
+              const auto& image_views = std::static_pointer_cast<
+                  std::vector<std::shared_ptr<ImageView>>>(
+                  ldesc_image_info->limage_view->instance);
+              auto lframe_image_view = std::make_shared<LayoutImageView>(
+                  *ldesc_image_info->limage_view);
+              if (!lframe_image_view) {
+                XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+                return false;
+              }
+              lframe_image_view->instance = (*image_views)[i];
+              lframe_desc_image_info->limage_view = lframe_image_view;
             }
-            lframe_image_view->instance = (*image_views)[i];
-            lframe_desc_image_info->limage_view = lframe_image_view;
 
-            assert(ldesc_image_info->lsampler);
-            const auto& samplers =
-                std::static_pointer_cast<std::vector<std::shared_ptr<Sampler>>>(
-                    ldesc_image_info->lsampler->instance);
-            auto lframe_sampler =
-                std::make_shared<LayoutSampler>(*ldesc_image_info->lsampler);
-            if (!lframe_sampler) {
-              XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
-              return false;
+            if (ldesc_image_info->lsampler) {
+              const auto& samplers = std::static_pointer_cast<
+                  std::vector<std::shared_ptr<Sampler>>>(
+                  ldesc_image_info->lsampler->instance);
+              auto lframe_sampler =
+                  std::make_shared<LayoutSampler>(*ldesc_image_info->lsampler);
+              if (!lframe_sampler) {
+                XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+                return false;
+              }
+              lframe_sampler->instance = (*samplers)[i];
+              lframe_desc_image_info->lsampler = lframe_sampler;
             }
-            lframe_sampler->instance = (*samplers)[i];
-            lframe_desc_image_info->lsampler = lframe_sampler;
 
             lframe_desc->ldesc_image_infos[k++] = lframe_desc_image_info;
           }
