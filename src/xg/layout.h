@@ -169,6 +169,8 @@ enum class LayoutType {
   kDescriptorPool,
   kDescriptorSet,
   kDescriptor,
+  kDescriptorImageInfo,
+  kDescriptorBufferInfo,
   kFrame,
   kFramebuffer,
   kFramebufferAttachment,
@@ -978,25 +980,54 @@ struct LayoutDescriptorSet : LayoutBase {
 
 struct LayoutSampler;
 
-struct LayoutDescriptor : LayoutBase {
-  LayoutDescriptor() : LayoutBase{LayoutType::kDescriptor} {}
+struct LayoutDescriptorImageInfo : LayoutBase {
+  LayoutDescriptorImageInfo() : LayoutBase{LayoutType::kDescriptorImageInfo} {}
 
-  int binding = 0;
-  DescriptorType desc_type = DescriptorType::kSampler;
-  std::shared_ptr<LayoutBuffer> lbuffer;
   std::shared_ptr<LayoutSampler> lsampler;
   std::shared_ptr<LayoutImageView> limage_view;
   ImageLayout image_layout = ImageLayout::kUndefined;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), binding, desc_type, lbuffer,
-            lsampler, limage_view, image_layout);
+    archive(cereal::base_class<LayoutBase>(this), lsampler, limage_view, image_layout);
+  }
+
+  const char* lsampler_id = nullptr;
+  const char* limage_view_id = nullptr;
+};
+
+struct LayoutDescriptorBufferInfo : LayoutBase {
+  LayoutDescriptorBufferInfo()
+      : LayoutBase{LayoutType::kDescriptorBufferInfo} {}
+
+  std::shared_ptr<LayoutBuffer> lbuffer;
+  size_t offset = 0;
+  size_t range = static_cast<size_t>(-1);
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), lbuffer, offset, range);
   }
 
   const char* lbuffer_id = nullptr;
-  const char* lsampler_id = nullptr;
-  const char* limage_view_id = nullptr;
+};
+
+struct LayoutDescriptor : LayoutBase {
+  LayoutDescriptor() : LayoutBase{LayoutType::kDescriptor} {}
+
+  int binding = 0;
+  int desc_count = 0;
+  DescriptorType desc_type = DescriptorType::kSampler;
+  std::vector<std::shared_ptr<LayoutDescriptorImageInfo>>
+      ldesc_image_infos;
+  std::vector<std::shared_ptr<LayoutDescriptorBufferInfo>>
+      ldesc_buffer_infos;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), binding, desc_type,
+            ldesc_image_infos, ldesc_buffer_infos);
+  }
 };
 
 struct LayoutFramebuffer;
@@ -1701,6 +1732,8 @@ struct Layout : std::enable_shared_from_this<Layout> {
   std::vector<std::shared_ptr<LayoutDescriptorPool>> ldesc_pools;
   std::vector<std::shared_ptr<LayoutDescriptorSet>> ldesc_sets;
   std::vector<std::shared_ptr<LayoutDescriptor>> ldescriptors;
+  std::vector<std::shared_ptr<LayoutDescriptorImageInfo>> ldesc_image_infos;
+  std::vector<std::shared_ptr<LayoutDescriptorBufferInfo>> ldesc_buffer_infos;
   std::vector<std::shared_ptr<LayoutFrame>> lframes;
   std::vector<std::shared_ptr<LayoutFramebuffer>> lframebuffers;
   std::vector<std::shared_ptr<LayoutSemaphore>> lsemaphores;
@@ -1768,6 +1801,8 @@ struct Layout : std::enable_shared_from_this<Layout> {
     archive(ldesc_pools);
     archive(ldesc_sets);
     archive(ldescriptors);
+    archive(ldesc_image_infos);
+    archive(ldesc_buffer_infos);
     archive(lframes);
     archive(lframebuffers);
     archive(lsemaphores);

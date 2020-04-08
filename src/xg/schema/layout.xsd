@@ -153,7 +153,7 @@
   <xs:simpleType name="ImageUsageTypeList">
     <xs:list itemType="ImageUsageType"/>
   </xs:simpleType>
-  
+
   <xs:element name="Swapchain">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required" />
@@ -230,8 +230,8 @@
 
   <xs:simpleType name="QueueFamilyTypeList">
     <xs:list itemType="QueueFamilyType"/>
-  </xs:simpleType>  
-  
+  </xs:simpleType>
+
   <xs:simpleType name="DescriptorType">
     <xs:restriction base="xs:token">
       <xs:enumeration value="Sampler" />
@@ -343,19 +343,33 @@
       <xs:enumeration value="PresentSrc" />
       <xs:enumeration value="SharedPresent" />
     </xs:restriction>
-  </xs:simpleType>  
-  
+  </xs:simpleType>
+
   <xs:element name="DescriptorSet">
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" name="Descriptor">
           <xs:complexType>
+            <xs:sequence>
+              <xs:choice maxOccurs="unbounded">
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="ImageInfo">
+                  <xs:complexType>
+                    <xs:attribute name="sampler" type="xs:IDREF" />
+                    <xs:attribute name="imageView" type="xs:IDREF" />
+                    <xs:attribute name="imageLayout" type="ImageLayoutType" default="Undefined" />
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="BufferInfo">
+                  <xs:complexType>
+                    <xs:attribute name="buffer" type="xs:IDREF" use="required" />
+                    <xs:attribute name="offset" type="xs:string" default="0" />
+                    <xs:attribute name="range" type="xs:string" default="-1" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:choice>
+            </xs:sequence>
             <xs:attribute name="binding" type="xs:unsignedByte" use="required" />
             <xs:attribute name="descriptorType" type="DescriptorType" default="Sampler" />
-            <xs:attribute name="buffer" type="xs:IDREF" />
-            <xs:attribute name="sampler" type="xs:IDREF" />
-            <xs:attribute name="imageView" type="xs:IDREF" />
-            <xs:attribute name="imageLayout" type="ImageLayoutType" default="Undefined" />
           </xs:complexType>
         </xs:element>
       </xs:sequence>
@@ -723,8 +737,8 @@
       <xs:attribute name="width" type="xs:string" use="required" />
       <xs:attribute name="height" type="xs:string" use="required" />
     </xs:complexType>
-  </xs:element>  
-  
+  </xs:element>
+
   <xs:simpleType name="ColorComponentType">
     <xs:restriction base="xs:token">
       <xs:enumeration value="R" />
@@ -842,7 +856,7 @@
               <xs:attribute name="srcBuffer" type="xs:IDREF" use="required" />
               <xs:attribute name="dstBuffer" type="xs:IDREF" use="required" />
             </xs:complexType>
-          </xs:element>          
+          </xs:element>
           <xs:element minOccurs="0" maxOccurs="unbounded" name="Dispatch">
             <xs:complexType>
               <xs:attribute name="id" type="xs:ID" />
@@ -896,7 +910,7 @@
             <xs:complexType>
               <xs:sequence>
                 <xs:element maxOccurs="unbounded" ref="Viewport" />
-              </xs:sequence>              
+              </xs:sequence>
               <xs:attribute name="id" type="xs:ID" />
               <xs:attribute name="firstViewport" type="xs:unsignedInt" />
             </xs:complexType>
@@ -1402,9 +1416,9 @@
                           <xs:enumeration value="Always" />
                         </xs:restriction>
                       </xs:simpleType>
-                    </xs:attribute>                    
+                    </xs:attribute>
                     <xs:attribute name="depthBoundsTestEnable" type="xs:boolean" default="false" />
-                    <xs:attribute name="stencilTestEnable" type="xs:boolean" default="false" />                    
+                    <xs:attribute name="stencilTestEnable" type="xs:boolean" default="false" />
                   </xs:complexType>
                 </xs:element>
                 <xs:element name="ColorBlendState">
@@ -1498,8 +1512,9 @@
               <xs:sequence>
                 <xs:element name="Perspective">
                   <xs:complexType>
-                    <xs:attribute name="fovy" type="xs:decimal" use="required" />
-                    <xs:attribute name="aspect" type="xs:string" use="required" />
+                    <xs:attribute name="fov" type="xs:decimal" use="required" />
+                    <xs:attribute name="width" type="xs:string" use="required" />
+                    <xs:attribute name="height" type="xs:string" use="required" />
                     <xs:attribute name="zNear" type="xs:decimal" use="required" />
                     <xs:attribute name="zFar" type="xs:decimal" use="required" />
                   </xs:complexType>
@@ -1586,7 +1601,7 @@
                         </xs:element>
                       </xs:sequence>
                     </xs:complexType>
-                  </xs:element>                  
+                  </xs:element>
                 </xs:choice>
               </xs:sequence>
               <xs:attribute name="id" type="xs:string" use="required" />

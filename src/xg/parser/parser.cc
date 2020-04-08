@@ -128,6 +128,10 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
     return ParserDescriptorSet::Get().ParseElement(element, status);
   } else if (strcmp(name, "Descriptor") == 0) {
     return ParserDescriptor::Get().ParseElement(element, status);
+  } else if (strcmp(name, "ImageInfo") == 0) {
+    return ParserDescriptorImageInfo::Get().ParseElement(element, status);
+  } else if (strcmp(name, "BufferInfo") == 0) {
+    return ParserDescriptorBufferInfo::Get().ParseElement(element, status);
   } else if (strcmp(name, "Frame") == 0) {
     return ParserFrame::Get().ParseElement(element, status);
   } else if (strcmp(name, "Framebuffer") == 0) {
@@ -407,9 +411,20 @@ void Parser::AddLayoutNode(std::shared_ptr<Layout> layout,
       break;
     }
 
-    case LayoutType::kDescriptor:
+    case LayoutType::kDescriptor: {
       layout->ldescriptors.emplace_back(
           std::static_pointer_cast<LayoutDescriptor>(node));
+      break;
+    }
+
+    case LayoutType::kDescriptorImageInfo:
+      layout->ldesc_image_infos.emplace_back(
+          std::static_pointer_cast<LayoutDescriptorImageInfo>(node));
+      break;
+
+    case LayoutType::kDescriptorBufferInfo:
+      layout->ldesc_buffer_infos.emplace_back(
+          std::static_pointer_cast<LayoutDescriptorBufferInfo>(node));
       break;
 
     case LayoutType::kFrame:
@@ -866,26 +881,59 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
   }
 
   for (auto ldesc : layout->ldescriptors) {
-    if (ldesc->lbuffer_id) {
-      const auto it = node_id_map.find(ldesc->lbuffer_id);
-      assert(it != node_id_map.end());
-      ldesc->lbuffer = std::static_pointer_cast<LayoutBuffer>(it->second);
-      assert(ldesc->lbuffer);
-    } else {
-      if (ldesc->lsampler_id) {
-        const auto it = node_id_map.find(ldesc->lsampler_id);
-        assert(it != node_id_map.end());
-        ldesc->lsampler = std::static_pointer_cast<LayoutSampler>(it->second);
-        assert(ldesc->lsampler);
+    if (ldesc->desc_count == 0) {
+      switch (ldesc->desc_type) {
+        case DescriptorType::kSampler:
+        case DescriptorType::kCombinedImageSampler:
+        case DescriptorType::kSampledImage:
+        case DescriptorType::kStorageImage:
+        case DescriptorType::kInputAttachment: {
+          ldesc->desc_count = static_cast<int>(ldesc->ldesc_image_infos.size());
+          break;
+        }
+        case DescriptorType::kUniformBuffer:
+        case DescriptorType::kStorageBuffer:
+        case DescriptorType::kUniformBufferDynamic:
+        case DescriptorType::kStorageBufferDynamic: {
+          ldesc->desc_count =
+              static_cast<int>(ldesc->ldesc_buffer_infos.size());
+          break;
+        }
+        case DescriptorType::kUniformTexelBuffer:
+        case DescriptorType::kStorageTexelBuffer: {
+          assert(0);  // TODO(kctan): IMPLEMENT
+        }
+        default:
+          assert(0);
       }
+    }
+  }
 
-      if (ldesc->limage_view_id) {
-        const auto it = node_id_map.find(ldesc->limage_view_id);
-        assert(it != node_id_map.end());
-        ldesc->limage_view =
-            std::static_pointer_cast<LayoutImageView>(it->second);
-        assert(ldesc->limage_view);
-      }
+  for (auto ldesc_image_info : layout->ldesc_image_infos) {
+    if (ldesc_image_info->lsampler_id) {
+      const auto it = node_id_map.find(ldesc_image_info->lsampler_id);
+      assert(it != node_id_map.end());
+      ldesc_image_info->lsampler =
+          std::static_pointer_cast<LayoutSampler>(it->second);
+      assert(ldesc_image_info->lsampler);
+    }
+
+    if (ldesc_image_info->limage_view_id) {
+      const auto it = node_id_map.find(ldesc_image_info->limage_view_id);
+      assert(it != node_id_map.end());
+      ldesc_image_info->limage_view =
+          std::static_pointer_cast<LayoutImageView>(it->second);
+      assert(ldesc_image_info->limage_view);
+    }
+  }
+
+  for (auto ldesc_buffer_info : layout->ldesc_buffer_infos) {
+    if (ldesc_buffer_info->lbuffer_id) {
+      const auto it = node_id_map.find(ldesc_buffer_info->lbuffer_id);
+      assert(it != node_id_map.end());
+      ldesc_buffer_info->lbuffer =
+          std::static_pointer_cast<LayoutBuffer>(it->second);
+      assert(ldesc_buffer_info->lbuffer);
     }
   }
 
@@ -1204,8 +1252,7 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     if (lset_event->levent_id) {
       const auto it = node_id_map.find(lset_event->levent_id);
       assert(it != node_id_map.end());
-      lset_event->levent =
-          std::static_pointer_cast<LayoutEvent>(it->second);
+      lset_event->levent = std::static_pointer_cast<LayoutEvent>(it->second);
       assert(lset_event->levent);
     }
   }
@@ -1214,8 +1261,7 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     if (lreset_event->levent_id) {
       const auto it = node_id_map.find(lreset_event->levent_id);
       assert(it != node_id_map.end());
-      lreset_event->levent =
-          std::static_pointer_cast<LayoutEvent>(it->second);
+      lreset_event->levent = std::static_pointer_cast<LayoutEvent>(it->second);
       assert(lreset_event->levent);
     }
   }
@@ -1238,8 +1284,7 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     if (lviewer->lcamera_id) {
       const auto it = node_id_map.find(lviewer->lcamera_id);
       assert(it != node_id_map.end());
-      lviewer->lcamera =
-          std::static_pointer_cast<LayoutCamera>(it->second);
+      lviewer->lcamera = std::static_pointer_cast<LayoutCamera>(it->second);
       assert(lviewer->lcamera);
     }
 

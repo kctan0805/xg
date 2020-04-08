@@ -39,7 +39,7 @@
   <Buffer id="hostBuffer" size="4*elementCount" usage="TransferDst" allocFlags="Undefined" memUsage="CpuOnly"/>
 
   <DescriptorSet id="computeDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="computeDescriptorSetLayout">
-    <Descriptor binding="0" descriptorType="StorageBuffer" buffer="deviceBuffer"/>
+    <Descriptor binding="0" descriptorType="StorageBuffer"><BufferInfo buffer="deviceBuffer"/></Descriptor>
   </DescriptorSet>
 
   <CommandBuffer id="mainCommandBuffer" commandPool="mainCommandPool"/>

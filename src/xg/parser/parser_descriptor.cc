@@ -23,27 +23,20 @@ bool ParserSingleton<ParserDescriptor>::ParseElement(
   if (!node) return false;
 
   assert(status->parent->layout_type == LayoutType::kDescriptorSet);
-  auto ldesc_set =
-      static_cast<LayoutDescriptorSet*>(status->parent.get());
+  auto ldesc_set = static_cast<LayoutDescriptorSet*>(status->parent.get());
   ldesc_set->ldescriptors.emplace_back(node);
 
   element->QueryIntAttribute("binding", &node->binding);
 
-  const char* value = element->Attribute("descriptorType");
+  const char* value = element->Attribute("descriptorCount");
+  if (value)
+    node->desc_count = static_cast<int>(Expression::Get().Evaluate(value));
+
+  value = element->Attribute("descriptorType");
   if (value) node->desc_type = StringToDescriptorType(value);
 
-  value = element->Attribute("buffer");
-  if (value) {
-    node->lbuffer_id = value;
-  } else {
-    node->lsampler_id = element->Attribute("sampler");
-    node->limage_view_id = element->Attribute("imageView");
-
-    value = element->Attribute("imageLayout");
-    if (value) node->image_layout = StringToImageLayout(value);
-  }
-
   status->node = node;
+  status->child_element = element->FirstChildElement();
 
   return ParserBase::Get().ParseElement(element, status);
 }

@@ -1461,8 +1461,10 @@ Result DeviceVK::UpdateDescriptorSets(
     return Result::kSuccess;
   }
   std::vector<vk::WriteDescriptorSet> writes;
-  std::vector<std::shared_ptr<vk::DescriptorImageInfo>> desc_image_infos;
-  std::vector<std::shared_ptr<vk::DescriptorBufferInfo>> desc_buffer_infos;
+  std::vector<std::shared_ptr<std::vector<vk::DescriptorImageInfo>>>
+      desc_image_infos;
+  std::vector<std::shared_ptr<std::vector<vk::DescriptorBufferInfo>>>
+      desc_buffer_infos;
 
   XG_TRACE("updateDescriptorSets");
 
@@ -1472,15 +1474,16 @@ Result DeviceVK::UpdateDescriptorSets(
 
     for (auto ldesc : ldesc_set->ldescriptors) {
       const auto desc_type = static_cast<vk::DescriptorType>(ldesc->desc_type);
-      auto& write = vk::WriteDescriptorSet()
-                        .setDstSet(desc_set->desc_set_)
-                        .setDstBinding(static_cast<uint32_t>(ldesc->binding))
-                        .setDescriptorType(desc_type)
-                        .setDescriptorCount(1);
+      auto write =
+          vk::WriteDescriptorSet()
+              .setDstSet(desc_set->desc_set_)
+              .setDstBinding(static_cast<uint32_t>(ldesc->binding))
+              .setDescriptorCount(static_cast<uint32_t>(ldesc->desc_count))
+              .setDescriptorType(desc_type);
 
-      XG_TRACE("  descriptorWrite: {} {} {} {}", ldesc_set->id,
+      XG_TRACE("  descriptorWrite: {} {} {} {} {}", ldesc_set->id,
                static_cast<void*>((VkDescriptorSet)desc_set->desc_set_),
-               ldesc->binding, vk::to_string(desc_type));
+               ldesc->binding, ldesc->desc_count, vk::to_string(desc_type));
 
       switch (ldesc->desc_type) {
         case DescriptorType::kSampler:
@@ -1488,52 +1491,66 @@ Result DeviceVK::UpdateDescriptorSets(
         case DescriptorType::kSampledImage:
         case DescriptorType::kStorageImage:
         case DescriptorType::kInputAttachment: {
-          const auto& desc_image_info =
-              std::make_shared<vk::DescriptorImageInfo>();
-          if (!desc_image_info) {
+          const auto& vk_desc_image_infos =
+              std::make_shared<std::vector<vk::DescriptorImageInfo>>();
+          if (!vk_desc_image_infos) {
             XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
             return Result::kErrorOutOfHostMemory;
           }
-          const auto& sampler =
-              std::static_pointer_cast<SamplerVK>(ldesc->lsampler->instance);
-          const auto& image_view = std::static_pointer_cast<ImageViewVK>(
-              ldesc->limage_view->instance);
-          const auto image_layout =
-              static_cast<vk::ImageLayout>(ldesc->image_layout);
-          desc_image_info->setSampler(sampler->sampler_);
-          desc_image_info->setImageView(image_view->image_view_);
-          desc_image_info->setImageLayout(image_layout);
 
-          write.setPImageInfo(desc_image_info.get());
-          desc_image_infos.emplace_back(desc_image_info);
+          for (const auto& ldesc_image_info : ldesc->ldesc_image_infos) {
+            const auto& sampler = std::static_pointer_cast<SamplerVK>(
+                ldesc_image_info->lsampler->instance);
+            const auto& image_view = std::static_pointer_cast<ImageViewVK>(
+                ldesc_image_info->limage_view->instance);
+            const auto image_layout =
+                static_cast<vk::ImageLayout>(ldesc_image_info->image_layout);
 
-          XG_TRACE("    ImageInfo: {} {} {}",
-                   static_cast<void*>((VkSampler)sampler->sampler_),
-                   static_cast<void*>((VkImageView)image_view->image_view_),
-                   vk::to_string(image_layout));
+            auto vk_desc_image_info = vk::DescriptorImageInfo()
+                                          .setSampler(sampler->sampler_)
+                                          .setImageView(image_view->image_view_)
+                                          .setImageLayout(image_layout);
+
+            vk_desc_image_infos->emplace_back(std::move(vk_desc_image_info));
+
+            XG_TRACE("    ImageInfo: {} {} {}",
+                     static_cast<void*>((VkSampler)sampler->sampler_),
+                     static_cast<void*>((VkImageView)image_view->image_view_),
+                     vk::to_string(image_layout));
+          }
+
+          write.setPImageInfo(vk_desc_image_infos->data());
+          desc_image_infos.emplace_back(std::move(vk_desc_image_infos));
           break;
         }
         case DescriptorType::kUniformBuffer:
         case DescriptorType::kStorageBuffer:
         case DescriptorType::kUniformBufferDynamic:
         case DescriptorType::kStorageBufferDynamic: {
-          const auto& desc_buffer_info =
-              std::make_shared<vk::DescriptorBufferInfo>();
-          if (!desc_buffer_info) {
+          const auto& vk_desc_buffer_infos =
+              std::make_shared<std::vector<vk::DescriptorBufferInfo>>();
+          if (!vk_desc_buffer_infos) {
             XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
             return Result::kErrorOutOfHostMemory;
           }
-          const auto& buffer =
-              std::static_pointer_cast<BufferVK>(ldesc->lbuffer->instance);
 
-          desc_buffer_info->setBuffer(buffer->buffer_);
-          desc_buffer_info->setRange(VK_WHOLE_SIZE);
+          for (const auto& ldesc_buffer_info : ldesc->ldesc_buffer_infos) {
+            const auto& buffer = std::static_pointer_cast<BufferVK>(
+                ldesc_buffer_info->lbuffer->instance);
 
-          write.setPBufferInfo(desc_buffer_info.get());
-          desc_buffer_infos.emplace_back(desc_buffer_info);
+            auto vk_desc_buffer_info = vk::DescriptorBufferInfo()
+                                           .setBuffer(buffer->buffer_)
+                                           .setOffset(ldesc_buffer_info->offset)
+                                           .setRange(ldesc_buffer_info->range);
 
-          XG_TRACE("    BufferInfo: {}",
-                   static_cast<void*>((VkBuffer)buffer->buffer_));
+            vk_desc_buffer_infos->emplace_back(std::move(vk_desc_buffer_info));
+
+            XG_TRACE("    BufferInfo: {} {} {}",
+                     static_cast<void*>((VkBuffer)buffer->buffer_),
+                     ldesc_buffer_info->offset, ldesc_buffer_info->range);
+          }
+          write.setPBufferInfo(vk_desc_buffer_infos->data());
+          desc_buffer_infos.emplace_back(std::move(vk_desc_buffer_infos));
           break;
         }
         case DescriptorType::kUniformTexelBuffer:
@@ -1607,8 +1624,7 @@ std::shared_ptr<Event> DeviceVK::CreateEvent(const LayoutEvent& levent) const {
   }
   event->device_ = device_;
 
-  XG_TRACE("createEvent: {} {}",
-           static_cast<void*>((VkEvent)event->event_),
+  XG_TRACE("createEvent: {} {}", static_cast<void*>((VkEvent)event->event_),
            levent.id);
 
   return event;

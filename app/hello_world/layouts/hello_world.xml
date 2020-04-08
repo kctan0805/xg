@@ -86,7 +86,7 @@
     <Buffer id="drawCommonUniformBuffer" size="4*16" usage="UniformBuffer" allocFlags="Undefined" memUsage="CpuToGpu"/> <!-- perspective * view matrix of camera -->
 
     <DescriptorSet id="drawCommonDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawCommonDescriptorSetLayout">
-      <Descriptor binding="0" descriptorType="UniformBuffer" buffer="drawCommonUniformBuffer"/>
+      <Descriptor binding="0" descriptorType="UniformBuffer"><BufferInfo buffer="drawCommonUniformBuffer"/></Descriptor>
     </DescriptorSet>
   </Frame>
 
@@ -98,7 +98,7 @@
   <Sampler id="drawTextureSampler" magFilter="Linear" minFilter="Linear" mipmapMode="Linear" anisotropyEnable="true"/>
 
   <DescriptorSet id="drawMaterialDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawMaterialDescriptorSetLayout">
-    <Descriptor binding="0" descriptorType="CombinedImageSampler" sampler="drawTextureSampler" imageView="drawTextureImageView" imageLayout="ShaderReadOnlyOptimal"/>
+    <Descriptor binding="0" descriptorType="CombinedImageSampler"><ImageInfo sampler="drawTextureSampler" imageView="drawTextureImageView" imageLayout="ShaderReadOnlyOptimal"/></Descriptor>
   </DescriptorSet>
 
   <!-- Geometry -->

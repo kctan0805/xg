@@ -577,45 +577,70 @@ bool Engine::CreateDescriptorSets(const Layout& layout) {
             return false;
           }
 
-          if (l_desc->lbuffer) {
-            const auto& buffers =
-                std::static_pointer_cast<std::vector<std::shared_ptr<Buffer>>>(
-                    l_desc->lbuffer->instance);
-            auto lframe_buffer =
-                std::make_shared<LayoutBuffer>(*l_desc->lbuffer);
-            if (!lframe_buffer) {
+          int k = 0;
+          for (auto& ldesc_image_info : l_desc->ldesc_image_infos) {
+            auto lframe_desc_image_info =
+                std::make_shared<LayoutDescriptorImageInfo>(*ldesc_image_info);
+            if (!lframe_desc_image_info) {
               XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
               return false;
             }
-            lframe_buffer->instance = (*buffers)[i];
-            lframe_desc->lbuffer = lframe_buffer;
-          } else {
-            assert(l_desc->limage_view);
+
+            assert(ldesc_image_info->limage_view);
             const auto& image_views = std::static_pointer_cast<
                 std::vector<std::shared_ptr<ImageView>>>(
-                l_desc->limage_view->instance);
-            auto lframe_image_view =
-                std::make_shared<LayoutImageView>(*l_desc->limage_view);
+                ldesc_image_info->limage_view->instance);
+            auto lframe_image_view = std::make_shared<LayoutImageView>(
+                *ldesc_image_info->limage_view);
             if (!lframe_image_view) {
               XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
               return false;
             }
             lframe_image_view->instance = (*image_views)[i];
-            lframe_desc->limage_view = lframe_image_view;
+            lframe_desc_image_info->limage_view = lframe_image_view;
 
-            assert(l_desc->lsampler);
+            assert(ldesc_image_info->lsampler);
             const auto& samplers =
                 std::static_pointer_cast<std::vector<std::shared_ptr<Sampler>>>(
-                    l_desc->lsampler->instance);
+                    ldesc_image_info->lsampler->instance);
             auto lframe_sampler =
-                std::make_shared<LayoutSampler>(*l_desc->lsampler);
+                std::make_shared<LayoutSampler>(*ldesc_image_info->lsampler);
             if (!lframe_sampler) {
               XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
               return false;
             }
             lframe_sampler->instance = (*samplers)[i];
-            lframe_desc->lsampler = lframe_sampler;
+            lframe_desc_image_info->lsampler = lframe_sampler;
+
+            lframe_desc->ldesc_image_infos[k++] = lframe_desc_image_info;
           }
+
+          k = 0;
+          for (auto& ldesc_buffer_info : l_desc->ldesc_buffer_infos) {
+            auto lframe_desc_buffer_info =
+                std::make_shared<LayoutDescriptorBufferInfo>(
+                    *ldesc_buffer_info);
+            if (!lframe_desc_buffer_info) {
+              XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+              return false;
+            }
+
+            assert(ldesc_buffer_info->lbuffer);
+            const auto& buffers =
+                std::static_pointer_cast<std::vector<std::shared_ptr<Buffer>>>(
+                    ldesc_buffer_info->lbuffer->instance);
+            auto lframe_buffer =
+                std::make_shared<LayoutBuffer>(*ldesc_buffer_info->lbuffer);
+            if (!lframe_buffer) {
+              XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+              return false;
+            }
+            lframe_buffer->instance = (*buffers)[i];
+            lframe_desc_buffer_info->lbuffer = lframe_buffer;
+
+            lframe_desc->ldesc_buffer_infos[k++] = lframe_desc_buffer_info;
+          }
+
           lframe_desc_set->ldescriptors[j++] = lframe_desc;
         }
 

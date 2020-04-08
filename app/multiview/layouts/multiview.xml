@@ -85,7 +85,7 @@
   <Buffer id="drawCommonUniformBuffer" size="64" usage="UniformBuffer" allocFlags="Undefined" memUsage="CpuToGpu"/>
 
   <DescriptorSet id="drawCommonDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawCommonDescriptorSetLayout">
-    <Descriptor binding="0" descriptorType="UniformBuffer" buffer="drawCommonUniformBuffer"/>
+    <Descriptor binding="0" descriptorType="UniformBuffer"><BufferInfo buffer="drawCommonUniformBuffer"/></Descriptor>
   </DescriptorSet>
 
   <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass" width="winWidth/2" height="winHeight">
@@ -102,7 +102,7 @@
     <Buffer id="drawInstanceUniformBuffer" size="128" usage="UniformBuffer" allocFlags="CreateMapped" memUsage="CpuToGpu"/>
 
     <DescriptorSet id="drawInstanceDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawInstanceDescriptorSetLayout">
-      <Descriptor binding="0" descriptorType="UniformBufferDynamic" buffer="drawInstanceUniformBuffer"/>
+      <Descriptor binding="0" descriptorType="UniformBufferDynamic"><BufferInfo buffer="drawInstanceUniformBuffer"/></Descriptor>
     </DescriptorSet>
   </Frame>
 
@@ -114,7 +114,7 @@
   <Sampler id="drawTextureSampler" magFilter="Linear" minFilter="Linear" mipmapMode="Linear" anisotropyEnable="true"/>
 
   <DescriptorSet id="drawMaterialDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawMaterialDescriptorSetLayout">
-    <Descriptor binding="0" descriptorType="CombinedImageSampler" sampler="drawTextureSampler" imageView="drawTextureImageView" imageLayout="ShaderReadOnlyOptimal"/>
+    <Descriptor binding="0" descriptorType="CombinedImageSampler"><ImageInfo sampler="drawTextureSampler" imageView="drawTextureImageView" imageLayout="ShaderReadOnlyOptimal"/></Descriptor>
   </DescriptorSet>
 
   <CommandList id="mainModelMaterialCommandList">

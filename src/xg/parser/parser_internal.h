@@ -125,6 +125,10 @@ class ParserDescriptorSetLayoutBinding
 class ParserDescriptorPool : public ParserSingleton<ParserDescriptorPool> {};
 class ParserDescriptorSet : public ParserSingleton<ParserDescriptorSet> {};
 class ParserDescriptor : public ParserSingleton<ParserDescriptor> {};
+class ParserDescriptorImageInfo
+    : public ParserSingleton<ParserDescriptorImageInfo> {};
+class ParserDescriptorBufferInfo
+    : public ParserSingleton<ParserDescriptorBufferInfo> {};
 class ParserFrame : public ParserSingleton<ParserFrame> {};
 class ParserFramebuffer : public ParserSingleton<ParserFramebuffer> {};
 class ParserSemaphore : public ParserSingleton<ParserSemaphore> {};
