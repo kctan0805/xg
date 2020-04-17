@@ -1170,16 +1170,22 @@ Result DeviceVK::InitGraphicsPipelines(
         ldepth_stencil_state->stencil_test_enable ? VK_TRUE : VK_FALSE);
     depth_stencil_state_create_info->setFront(vk::StencilOpState());
     depth_stencil_state_create_info->setBack(vk::StencilOpState());
+    depth_stencil_state_create_info->setMinDepthBounds(
+        ldepth_stencil_state->min_depth_bounds);
+    depth_stencil_state_create_info->setMaxDepthBounds(
+        ldepth_stencil_state->max_depth_bounds);
 
     pipeline_depth_stencil_state_create_infos.emplace_back(
         depth_stencil_state_create_info);
 
-    XG_TRACE("  DepthStencilState: {} {} {} {} {}",
+    XG_TRACE("  DepthStencilState: {} {} {} {} {} {} {}",
              ldepth_stencil_state->depth_test_enable,
              ldepth_stencil_state->depth_write_enable,
              vk::to_string(depth_compare_op),
              ldepth_stencil_state->depth_bounds_test_enable,
-             ldepth_stencil_state->stencil_test_enable);
+             ldepth_stencil_state->stencil_test_enable,
+             ldepth_stencil_state->min_depth_bounds,
+             ldepth_stencil_state->max_depth_bounds);
 
     // color blend state
     auto color_blend_attachments =

@@ -1419,6 +1419,8 @@
                     </xs:attribute>
                     <xs:attribute name="depthBoundsTestEnable" type="xs:boolean" default="false" />
                     <xs:attribute name="stencilTestEnable" type="xs:boolean" default="false" />
+                    <xs:attribute name="minDepthBounds" type="xs:decimal" default="0.0" />
+                    <xs:attribute name="maxDepthBounds" type="xs:decimal" default="1.0" />
                   </xs:complexType>
                 </xs:element>
                 <xs:element name="ColorBlendState">

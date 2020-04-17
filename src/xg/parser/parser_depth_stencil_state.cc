@@ -35,6 +35,8 @@ bool ParserSingleton<ParserDepthStencilState>::ParseElement(
 
   element->QueryBoolAttribute("depthBoundsTestEnable", &node->depth_bounds_test_enable);
   element->QueryBoolAttribute("stencilTestEnable", &node->stencil_test_enable);
+  element->QueryFloatAttribute("minDepthBounds", &node->min_depth_bounds);
+  element->QueryFloatAttribute("maxDepthBounds", &node->max_depth_bounds);
 
   status->node = node;
   status->child_element = element->FirstChildElement();

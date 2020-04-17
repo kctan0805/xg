@@ -896,12 +896,14 @@ struct LayoutDepthStencilState : LayoutBase {
   CompareOp depth_compare_op = CompareOp::kLessOrEqual;
   bool depth_bounds_test_enable = false;
   bool stencil_test_enable = false;
+  float min_depth_bounds = 0.0f;
+  float max_depth_bounds = 1.0f;
 
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), depth_test_enable,
             depth_write_enable, depth_compare_op, depth_bounds_test_enable,
-            stencil_test_enable);
+            stencil_test_enable, min_depth_bounds, max_depth_bounds);
   }
 };
 
@@ -989,7 +991,8 @@ struct LayoutDescriptorImageInfo : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lsampler, limage_view, image_layout);
+    archive(cereal::base_class<LayoutBase>(this), lsampler, limage_view,
+            image_layout);
   }
 
   const char* lsampler_id = nullptr;
@@ -1018,10 +1021,8 @@ struct LayoutDescriptor : LayoutBase {
   int binding = 0;
   int desc_count = 0;
   DescriptorType desc_type = DescriptorType::kSampler;
-  std::vector<std::shared_ptr<LayoutDescriptorImageInfo>>
-      ldesc_image_infos;
-  std::vector<std::shared_ptr<LayoutDescriptorBufferInfo>>
-      ldesc_buffer_infos;
+  std::vector<std::shared_ptr<LayoutDescriptorImageInfo>> ldesc_image_infos;
+  std::vector<std::shared_ptr<LayoutDescriptorBufferInfo>> ldesc_buffer_infos;
 
   template <class Archive>
   void serialize(Archive& archive) {
