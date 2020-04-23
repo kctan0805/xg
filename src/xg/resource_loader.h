@@ -63,12 +63,12 @@ class ResourceLoader : public Task {
 
   virtual ResourceLoaderStatus GetStatus();
   void* Finish() override;
-  int GetResult() const { return result_; }
+  int GetResult() const { return res_result_; }
 
  protected:
   ResourceLoaderContext* context_ = nullptr;
   ResourceLoaderStatus status_ = ResourceLoaderStatus::kUndefined;
-  int result_ = -1;
+  int res_result_ = -1;
   std::mutex mutex_;
 
 private:

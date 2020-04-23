@@ -177,7 +177,7 @@ void BufferLoader::Run(std::shared_ptr<Task> self) {
     return;
   }
 
-  result_ = 0;
+  res_result_ = 0;
 }
 
 }  // namespace xg
