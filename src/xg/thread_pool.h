@@ -33,8 +33,8 @@ class Task {
   virtual void Run(std::shared_ptr<Task> self) {}
 
   virtual void* Finish() {
-    if (finished_) return result_;
     std::lock_guard<std::mutex> lock(mutex_);
+    if (finished_) return result_;
     auto& future = barrier_.get_future();
     future.wait();
     result_ = future.get();
