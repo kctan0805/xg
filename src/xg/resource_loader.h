@@ -42,7 +42,6 @@ enum class ResourceLoaderStatus {
   kRunning,
   kEnded,
   kCompleted,
-  kFinishing,
   kFinished
 };
 
@@ -62,13 +61,13 @@ class ResourceLoader : public Task {
   static ResourceLoaderContext* AcquireNextContext(std::shared_ptr<Task> task);
 
   virtual ResourceLoaderStatus GetStatus();
-  void* Finish() override;
-  int GetResult() const { return res_result_; }
+  void Finish() override;
+  int GetResult() const { return result_; }
 
  protected:
   ResourceLoaderContext* context_ = nullptr;
   ResourceLoaderStatus status_ = ResourceLoaderStatus::kUndefined;
-  int res_result_ = -1;
+  int result_ = -1;
   std::mutex mutex_;
 
 private:

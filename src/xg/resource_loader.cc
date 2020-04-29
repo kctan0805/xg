@@ -117,29 +117,27 @@ ResourceLoaderContext* ResourceLoader::AcquireNextContext(
 ResourceLoaderStatus ResourceLoader::GetStatus() {
   if (status_ == ResourceLoaderStatus::kEnded) {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (context_ && context_->load_complete_fence->IsSignaled())
-      status_ = ResourceLoaderStatus::kCompleted;
+
+    if (!context_)
+      return ResourceLoaderStatus::kFinished;
+    else if (context_->load_complete_fence->IsSignaled())
+      return ResourceLoaderStatus::kCompleted;
   }
   return status_;
 }
 
-void* ResourceLoader::Finish() {
-  const auto& ret = Task::Finish();
+void ResourceLoader::Finish() {
+  if (!context_ && status_ == ResourceLoaderStatus::kEnded) return;
 
-  if (status_ == ResourceLoaderStatus::kFinishing ||
-      status_ == ResourceLoaderStatus::kFinished)
-    return ret;
+  std::lock_guard<std::mutex> lock(mutex_);
 
-  if (status_ != ResourceLoaderStatus::kCompleted) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (context_) {
-      status_ = ResourceLoaderStatus::kFinishing;
-      context_->load_complete_fence->Wait();
-    }
+  auto& future = barrier_.get_future();
+  future.wait();
+
+  if (context_) {
+    context_->load_complete_fence->Wait();
+    context_ = nullptr;
   }
-  context_ = nullptr;
-  status_ = ResourceLoaderStatus::kFinished;
-  return ret;
 }
 
 }  // namespace xg

@@ -157,7 +157,7 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
     return;
   }
 
-  res_result_ = 0;
+  result_ = 0;
 }
 
 }  // namespace xg

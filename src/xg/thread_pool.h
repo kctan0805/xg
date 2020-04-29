@@ -32,21 +32,15 @@ class Task {
 
   virtual void Run(std::shared_ptr<Task> self) {}
 
-  virtual void* Finish() {
+  virtual void Finish() {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (finished_) return result_;
     auto& future = barrier_.get_future();
     future.wait();
-    result_ = future.get();
-    finished_ = true;
-    return result_;
   }
 
  protected:
   std::mutex mutex_;
   std::promise<void*> barrier_;
-  void* result_ = nullptr;
-  bool finished_ = false;
 };
 
 class ThreadPool {
