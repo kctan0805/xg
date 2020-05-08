@@ -354,6 +354,7 @@ bool DeviceVK::CreateMemoryAllocator(const LayoutDevice& ldevice) {
   const auto renderer =
       std::static_pointer_cast<RendererVK>(ldevice.lrenderer->instance);
   VmaAllocatorCreateInfo allocator_info = {};
+  allocator_info.instance = renderer->instance_;
   allocator_info.physicalDevice = physical_device_;
   allocator_info.device = device_;
 

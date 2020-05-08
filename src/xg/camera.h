@@ -15,15 +15,6 @@
 
 namespace xg {
 
-class Frustum {
- public:
-  Frustum(const glm::mat4& matrix);
-  const std::array<glm::vec4, 6>& GetPlanes() const { return planes_; }
-
- protected:
-  std::array<glm::vec4, 6> planes_;
-};
-
 class Camera {
  public:
   void Perspective(float fov, float width, float height, float z_near,

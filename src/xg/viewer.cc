@@ -282,7 +282,7 @@ void Viewer::UpdateUpdaterData() {
   int i = 0;
   for (const auto& lbuffer : updater_.lbuffers) {
     if (lbuffer->lframe) {
-      auto& buffers =
+      const auto& buffers =
           std::static_pointer_cast<std::vector<std::shared_ptr<Buffer>>>(
               lbuffer->instance);
       updater_.update_data_[i].buffer_ = (*buffers)[curr_frame_].get();

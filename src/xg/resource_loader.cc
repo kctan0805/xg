@@ -75,13 +75,10 @@ ResourceLoaderContext* ResourceLoader::AcquireNextContext(
   auto find_ctxt_func = [](std::shared_ptr<ResourceLoaderContext> ctxt) {
     auto loader = std::static_pointer_cast<ResourceLoader>(ctxt->loader);
     if (loader) {
-      auto status = loader->GetStatus();
-      if (status == ResourceLoaderStatus::kFinished) {
-        ctxt->loader.reset();
-        return true;
-      } else if (status == ResourceLoaderStatus::kCompleted) {
+      const auto status = loader->GetStatus();
+      assert(status != ResourceLoaderStatus::kFinished);
+      if (status == ResourceLoaderStatus::kCompleted) {
         loader->Finish();
-        ctxt->loader.reset();
         return true;
       }
       return false;
@@ -92,19 +89,19 @@ ResourceLoaderContext* ResourceLoader::AcquireNextContext(
 
   {
     std::lock_guard<std::mutex> lock(context_mutex_);
-    auto it = std::find_if(contexts_lru_.begin(), contexts_lru_.end(),
-                           find_ctxt_func);
-    if (it == contexts_lru_.end()) {
-      it = contexts_lru_.begin();
-      auto ctxt = *it;
-      if (ctxt->loader) {
-        ctxt->loader->Finish();
-        ctxt->loader.reset();
-      }
+    for (;;) {
+      auto it = std::find_if(contexts_lru_.begin(), contexts_lru_.end(),
+                             find_ctxt_func);
+      if (it == contexts_lru_.end()) continue;
+
+      assert((*it)->loader == nullptr);
+
+      contexts_lru_.splice(contexts_lru_.end(), contexts_lru_,
+                           it);  // move to the end
+      context = it->get();
+      break;
     }
-    contexts_lru_.splice(contexts_lru_.end(), contexts_lru_,
-                         it);  // move to the end
-    context = it->get();
+
     context->loader = task;
   }
   context->load_complete_fence->Reset();
@@ -127,17 +124,17 @@ ResourceLoaderStatus ResourceLoader::GetStatus() {
 }
 
 void ResourceLoader::Finish() {
-  if (!context_ && status_ == ResourceLoaderStatus::kEnded) return;
+  if (GetStatus() == ResourceLoaderStatus::kFinished) return;
 
   std::lock_guard<std::mutex> lock(mutex_);
 
   auto& future = barrier_.get_future();
   future.wait();
 
-  if (context_) {
-    context_->load_complete_fence->Wait();
-    context_ = nullptr;
-  }
+  assert(context_);
+  context_->load_complete_fence->Wait();
+  context_->loader.reset();
+  context_ = nullptr;
 }
 
 }  // namespace xg
