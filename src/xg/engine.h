@@ -57,7 +57,7 @@ class Engine {
   void Unload();
 
   std::shared_ptr<void> Find(const std::string& id) const;
-  void Set(const std::string& id, const std::shared_ptr<void>& instance);
+  void Set(const LayoutBase& lbase);
   std::shared_ptr<Device> GetDevice() const { return device_; }
   const std::vector<std::shared_ptr<Viewer>>& GetViewers() const { return viewers_; }
 

@@ -1133,8 +1133,9 @@ std::shared_ptr<void> Engine::Find(const std::string& id) const {
   return nullptr;
 }
 
-void Engine::Set(const std::string& id, const std::shared_ptr<void>& instance) {
-  instance_id_map_.insert_or_assign(id, instance);
+void Engine::Set(const LayoutBase& lbase) {
+  instance_id_map_.insert_or_assign(lbase.id, lbase.instance);
+  renderer_->DebugMarkerSetObjectName(lbase);
 }
 
 }  // namespace xg
