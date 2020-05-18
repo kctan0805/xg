@@ -1040,7 +1040,7 @@ Result Engine::QueuePresents() {
 Result Engine::Run() {
   Result result = Result::kSuccess;
   for (;;) {
-    for (auto& it = viewers_.begin(); it != viewers_.end();) {
+    for (auto it = viewers_.begin(); it != viewers_.end();) {
       auto& viewer = *it;
 
       if (viewer->should_exit_handler_()) {
