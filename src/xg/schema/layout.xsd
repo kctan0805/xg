@@ -748,6 +748,40 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="BlendFactorType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Zero" />
+      <xs:enumeration value="One" />
+      <xs:enumeration value="SrcColor" />
+      <xs:enumeration value="OneMinusSrcColor" />
+      <xs:enumeration value="DstColor" />
+      <xs:enumeration value="OneMinusDstColor" />
+      <xs:enumeration value="SrcAlpha" />
+      <xs:enumeration value="OneMinusSrcAlpha" />
+      <xs:enumeration value="DstAlpha" />
+      <xs:enumeration value="OneMinusDstAlpha" />
+      <xs:enumeration value="ConstantColor" />
+      <xs:enumeration value="OneMinusConstantColor" />
+      <xs:enumeration value="ConstantAlpha" />
+      <xs:enumeration value="OneMinusConstantAlpha" />
+      <xs:enumeration value="SrcAlphaSaturate" />
+      <xs:enumeration value="Src1Color" />
+      <xs:enumeration value="OneMinusSrc1Color" />
+      <xs:enumeration value="Src1Alpha" />
+      <xs:enumeration value="OneMinusSrc1Alpha" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BlendOpType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Add" />
+      <xs:enumeration value="Subtract" />
+      <xs:enumeration value="ReverseSubtract" />
+      <xs:enumeration value="Min" />
+      <xs:enumeration value="Max" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="ColorComponentTypeList">
     <xs:list itemType="ColorComponentType"/>
   </xs:simpleType>
@@ -1429,6 +1463,12 @@
                       <xs:element name="Attachment">
                         <xs:complexType>
                           <xs:attribute name="blendEnable" type="xs:boolean" default="false" />
+                          <xs:attribute name="srcColorBlendFactor" type="BlendFactorType" default="Zero" />
+                          <xs:attribute name="dstColorBlendFactor" type="BlendFactorType" default="Zero" />
+                          <xs:attribute name="colorBlendOp" type="BlendOpType" default="Add" />
+                          <xs:attribute name="srcAlphaBlendFactor" type="BlendFactorType" default="Zero" />
+                          <xs:attribute name="dstAlphaBlendFactor" type="BlendFactorType" default="Zero" />
+                          <xs:attribute name="alphaBlendOp" type="BlendOpType" default="Add" />
                           <xs:attribute name="colorWriteMask" type="ColorComponentTypeList" default="R G B A" />
                         </xs:complexType>
                       </xs:element>

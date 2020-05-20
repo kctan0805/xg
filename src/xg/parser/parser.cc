@@ -238,7 +238,7 @@ std::shared_ptr<Layout> Parser::ParseFile(const std::string& xmlPath) {
   status.element = doc.RootElement();
   tree_stack.push(status);
 
-  // non-recursive paring xml
+  // non-recursive parsing xml
   while (!tree_stack.empty()) {
     status = tree_stack.top();
     tree_stack.pop();

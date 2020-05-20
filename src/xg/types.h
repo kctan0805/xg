@@ -583,6 +583,30 @@ enum class CompareOp {
   kAlways
 };
 
+enum class BlendFactor {
+  kZero,
+  kOne,
+  kSrcColor,
+  kOneMinusSrcColor,
+  kDstColor,
+  kOneMinusDstColor,
+  kSrcAlpha,
+  kOneMinusSrcAlpha,
+  kDstAlpha,
+  kOneMinusDstAlpha,
+  kConstantColor,
+  kOneMinusConstantColor,
+  kConstantAlpha,
+  kOneMinusConstantAlpha,
+  kSrcAlphaSaturate,
+  kSrc1Color,
+  kOneMinusSrc1Color,
+  kSrc1Alpha,
+  kOneMinusSrc1Alpha
+};
+
+enum class BlendOp { kAdd, kSubtract, kReverseSubtract, kMin, kMax };
+
 enum class ColorComponent {
   kUndefined = 0x0,
   kR = 0x1,

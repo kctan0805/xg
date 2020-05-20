@@ -1197,16 +1197,41 @@ Result DeviceVK::InitGraphicsPipelines(
     assert(lcolor_blend_state);
     for (const auto& lcolor_blend_attachment :
          lcolor_blend_state->lcolor_blend_attachments) {
+      const auto src_color_blend_factor = static_cast<vk::BlendFactor>(
+          lcolor_blend_attachment.src_color_blend_factor);
+      const auto dst_color_blend_factor = static_cast<vk::BlendFactor>(
+          lcolor_blend_attachment.dst_color_blend_factor);
+      const auto color_blend_op =
+          static_cast<vk::BlendOp>(lcolor_blend_attachment.color_blend_op);
+
+      const auto src_alpha_blend_factor = static_cast<vk::BlendFactor>(
+          lcolor_blend_attachment.src_alpha_blend_factor);
+      const auto dst_alpha_blend_factor = static_cast<vk::BlendFactor>(
+          lcolor_blend_attachment.dst_alpha_blend_factor);
+      const auto alpha_blend_op =
+          static_cast<vk::BlendOp>(lcolor_blend_attachment.alpha_blend_op);
+
       const auto color_write_mask = static_cast<vk::ColorComponentFlagBits>(
           lcolor_blend_attachment.color_write_mask);
       color_blend_attachments->emplace_back(
           vk::PipelineColorBlendAttachmentState()
+              .setSrcColorBlendFactor(src_color_blend_factor)
+              .setDstColorBlendFactor(dst_color_blend_factor)
+              .setColorBlendOp(color_blend_op)
+              .setSrcAlphaBlendFactor(src_alpha_blend_factor)
+              .setDstAlphaBlendFactor(dst_alpha_blend_factor)
+              .setAlphaBlendOp(alpha_blend_op)
               .setColorWriteMask(color_write_mask)
               .setBlendEnable(lcolor_blend_attachment.blend_enable ? VK_TRUE
                                                                    : VK_FALSE));
 
-      XG_TRACE("  ColorBlendState: Attachment: {} {}",
-               vk::to_string(color_write_mask),
+      XG_TRACE("  ColorBlendState: Attachment: {} {} {} {} {} {} {} {}",
+               vk::to_string(src_color_blend_factor),
+               vk::to_string(dst_color_blend_factor),
+               vk::to_string(color_blend_op),
+               vk::to_string(src_alpha_blend_factor),
+               vk::to_string(dst_alpha_blend_factor),
+               vk::to_string(alpha_blend_op), vk::to_string(color_write_mask),
                lcolor_blend_attachment.blend_enable);
     }
     pipeline_color_blend_attachment_states.emplace_back(

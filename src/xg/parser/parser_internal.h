@@ -205,6 +205,8 @@ PolygonMode StringToPolygonMode(const char* value);
 CullMode StringToCullMode(const char* value);
 FrontFace StringToFrontFace(const char* value);
 CompareOp StringToCompareOp(const char* value);
+BlendFactor StringToBlendFactor(const char* value);
+BlendOp StringToBlendOp(const char* value);
 ColorComponent StringToColorComponent(const char* value);
 DynamicState StringToDynamicState(const char* value);
 Filter StringToFilter(const char* value);

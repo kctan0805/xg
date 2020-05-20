@@ -786,6 +786,53 @@ CompareOp StringToCompareOp(const char* value) {
   return CompareOp::kNever;
 }
 
+BlendFactor StringToBlendFactor(const char* value) {
+  static std::unordered_map<std::string, BlendFactor> mapping{
+#define ENTRY(s) {#s, BlendFactor::k##s}
+      ENTRY(Zero),
+      ENTRY(One),
+      ENTRY(SrcColor),
+      ENTRY(OneMinusSrcColor),
+      ENTRY(DstColor),
+      ENTRY(OneMinusDstColor),
+      ENTRY(SrcAlpha),
+      ENTRY(OneMinusSrcAlpha),
+      ENTRY(DstAlpha),
+      ENTRY(OneMinusDstAlpha),
+      ENTRY(ConstantColor),
+      ENTRY(OneMinusConstantColor),
+      ENTRY(ConstantAlpha),
+      ENTRY(OneMinusConstantAlpha),
+      ENTRY(SrcAlphaSaturate),
+      ENTRY(Src1Color),
+      ENTRY(OneMinusSrc1Color),
+      ENTRY(Src1Alpha),
+      ENTRY(OneMinusSrc1Alpha)
+#undef ENTRY
+  };
+  const auto x = mapping.find(value);
+  if (x != std::end(mapping)) {
+    return x->second;
+  }
+  XG_ERROR("unknown blend factor: {}", value);
+  return BlendFactor::kZero;
+}
+
+BlendOp StringToBlendOp(const char* value) {
+  static std::unordered_map<std::string, BlendOp> mapping{
+#define ENTRY(s) {#s, BlendOp::k##s}
+      ENTRY(Add), ENTRY(Subtract), ENTRY(ReverseSubtract), ENTRY(Min),
+      ENTRY(Max)
+#undef ENTRY
+  };
+  const auto x = mapping.find(value);
+  if (x != std::end(mapping)) {
+    return x->second;
+  }
+  XG_ERROR("unknown blend op: {}", value);
+  return BlendOp::kAdd;
+}
+
 ColorComponent StringToColorComponent(const char* value) {
   static std::unordered_map<std::string, ColorComponent> mapping{
 #define ENTRY(s) {#s, ColorComponent::k##s}

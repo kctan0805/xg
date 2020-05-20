@@ -925,12 +925,20 @@ struct LayoutColorBlendAttachmentState : LayoutBase {
       : LayoutBase{LayoutType::kColorBlendAttachmentState} {}
 
   bool blend_enable = false;
+  BlendFactor src_color_blend_factor = BlendFactor::kZero;
+  BlendFactor dst_color_blend_factor = BlendFactor::kZero;
+  BlendOp color_blend_op = BlendOp::kAdd;
+  BlendFactor src_alpha_blend_factor = BlendFactor::kZero;
+  BlendFactor dst_alpha_blend_factor = BlendFactor::kZero;
+  BlendOp alpha_blend_op = BlendOp::kAdd;
   ColorComponent color_write_mask = ColorComponent::kR | ColorComponent::kG |
                                     ColorComponent::kB | ColorComponent::kA;
 
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), blend_enable,
+            src_color_blend_factor, dst_color_blend_factor, color_blend_op,
+            src_alpha_blend_factor, dst_alpha_blend_factor, alpha_blend_op,
             color_write_mask);
   }
 };
