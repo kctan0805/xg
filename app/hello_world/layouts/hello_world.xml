@@ -92,7 +92,7 @@
 
   <!-- Model -->
   <!-- Material -->
-  <Image id="drawTextureImage" format="Bc3UnormBlock" width="512" height="512" usage="TransferDst Sampled"/>
+  <Image id="drawTextureImage" format="Bc3UnormBlock" usage="TransferDst Sampled"/>
   <ImageLoader image="drawTextureImage" file="texture.ktx" queue="mainQueue"/>
   <ImageView id="drawTextureImageView" image="drawTextureImage" format="Bc3UnormBlock"/>
   <Sampler id="drawTextureSampler" magFilter="Linear" minFilter="Linear" mipmapMode="Linear" anisotropyEnable="true"/>

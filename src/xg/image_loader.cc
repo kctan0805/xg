@@ -43,17 +43,27 @@ static inline bool ends_with(std::string const& value,
 }
 
 void ImageLoader::Run(std::shared_ptr<Task> self) {
+  ktxTexture* ktx_texture = nullptr;
+
   const auto deleter = [&](void*) {
     barrier_.set_value(nullptr);
     status_ = ResourceLoaderStatus::kEnded;
-    if (!info_.file_path.empty()) stbi_image_free(info_.src_ptr);
+    if (!info_.file_path.empty()) {
+      if (ktx_texture) {
+        ktxTexture_Destroy(ktx_texture);
+      } else {
+        stbi_image_free(info_.src_ptr);
+      }
+      info_.src_ptr = nullptr;
+    }
   };
   std::unique_ptr<void, decltype(deleter)> raii(static_cast<void*>(this),
                                                 deleter);
 
   LayoutBuffer lbuffer;
   lbuffer.size = info_.size;
-  ktxTexture* ktx_texture = nullptr;
+  auto device = ResourceLoader::GetDevice();
+  auto limage = info_.limage;
 
   if (info_.src_ptr == nullptr) {
     assert(!info_.file_path.empty());
@@ -67,15 +77,24 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
         return;
       }
 
-      assert(ktx_texture->baseWidth == info_.width);
-      assert(ktx_texture->baseHeight == info_.height);
-
       info_.src_ptr = ktx_texture->pData;
       lbuffer.size = ktx_texture->dataSize;
 
+      if (limage->instance) {
+        assert(ktx_texture->baseWidth == limage->extent.width);
+        assert(ktx_texture->baseHeight == limage->extent.height);
+      } else {
+        limage->extent.width = ktx_texture->baseWidth;
+        limage->extent.height = ktx_texture->baseHeight;
+
+        auto image = device->CreateImage(*limage);
+        if (!image) return;
+
+        limage->instance = image;
+      }
     } else {
       int width, height, channels;
-      int req_comp = FormatToSize(info_.format);
+      int req_comp = FormatToSize(limage->format);
       info_.src_ptr = stbi_load(info_.file_path.c_str(), &width, &height,
                                 &channels, req_comp);
       if (!info_.src_ptr) {
@@ -83,13 +102,23 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
         return;
       }
 
-      assert(width == info_.width);
-      assert(height == info_.height);
+      if (limage->instance) {
+        assert(width == limage->extent.width);
+        assert(height == limage->extent.height);
+      } else {
+        limage->extent.width = width;
+        limage->extent.height = height;
 
+        auto image = device->CreateImage(*limage);
+        if (!image) return;
+
+        limage->instance = image;
+      }
       lbuffer.size = width * height * req_comp;
     }
   }
 
+  auto dst_image = static_cast<Image*>(limage->instance.get());
   lbuffer.usage = BufferUsage::kTransferSrc;
   lbuffer.alloc_flags = MemoryAllocFlags::kCreateMapped;
   lbuffer.mem_usage = MemoryUsage::kCpuToGpu;
@@ -98,7 +127,7 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
   assert(context_);
   status_ = ResourceLoaderStatus::kRunning;
 
-  context_->staging_buffer = ResourceLoader::GetDevice()->CreateBuffer(lbuffer);
+  context_->staging_buffer = device->CreateBuffer(lbuffer);
   if (!context_->staging_buffer) return;
 
   const auto& staging_data =
@@ -109,6 +138,7 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
   if (!info_.file_path.empty()) {
     if (ktx_texture) {
       ktxTexture_Destroy(ktx_texture);
+      ktx_texture = nullptr;
     } else {
       stbi_image_free(info_.src_ptr);
     }
@@ -136,7 +166,7 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
   image_barrier->src_queue_family_index =
       context_->queue->GetQueueFamilyIndex();
   image_barrier->dst_queue_family_index = image_barrier->src_queue_family_index;
-  image_barrier->image = info_.dst_image;
+  image_barrier->image = dst_image;
   image_barrier->subresource_range.aspect_mask = ImageAspectFlags::kColor;
   image_barrier->subresource_range.level_count = 1;
   image_barrier->subresource_range.layer_count = 1;
@@ -145,14 +175,14 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
 
   CopyBufferToImageInfo copy_image_info = {};
   copy_image_info.src_buffer = context_->staging_buffer.get();
-  copy_image_info.dst_image = info_.dst_image;
+  copy_image_info.dst_image = dst_image;
   copy_image_info.dst_image_layout = ImageLayout::kTransferDstOptimal;
   copy_image_info.regions.resize(1);
   auto buf_image_copy = &copy_image_info.regions[0];
   buf_image_copy->image_subresource.aspect_mask = ImageAspectFlags::kColor;
   buf_image_copy->image_subresource.layer_count = 1;
-  buf_image_copy->image_extent.width = info_.width;
-  buf_image_copy->image_extent.height = info_.height;
+  buf_image_copy->image_extent.width = limage->extent.width;
+  buf_image_copy->image_extent.height = limage->extent.height;
   buf_image_copy->image_extent.depth = 1;
 
   cmd->CopyBufferToImage(copy_image_info);
@@ -173,7 +203,7 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
     image_barrier->src_queue_family_index = -1;
     image_barrier->dst_queue_family_index = -1;
   }
-  image_barrier->image = info_.dst_image;
+  image_barrier->image = dst_image;
 
   cmd->PipelineBarrier(pipeline_barrier_info);
 

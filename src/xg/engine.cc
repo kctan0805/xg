@@ -79,21 +79,24 @@ bool Engine::PostInit(const std::shared_ptr<Layout>& layout) {
   if (!CreateBufferLoaders(*layout)) return false;
   if (!CreateImages(*layout)) return false;
   if (!CreateImageLoaders(*layout)) return false;
-  if (!CreateImageViews(*layout)) return false;
   if (!CreateSamplers(*layout)) return false;
   if (!CreateDescriptorSetLayouts(*layout)) return false;
   if (!CreateDescriptorPools(layout.get())) return false;
-  if (!CreateDescriptorSets(*layout)) return false;
   if (!CreateRenderPasses(*layout)) return false;
   if (!CreateShaderModules(*layout)) return false;
   if (!CreatePipelineLayouts(*layout)) return false;
   if (!CreateComputePipelines(*layout)) return false;
   if (!CreateGraphicsPipelines(*layout)) return false;
   if (!CreateSemaphores(*layout)) return false;
-  if (!CreateFramebuffers(*layout)) return false;
   if (!CreateQueryPools(*layout)) return false;
   if (!CreateEvents(*layout)) return false;
   if (!CreateCameras(*layout)) return false;
+
+  FinishResourceLoaders();
+
+  if (!CreateImageViews(*layout)) return false;
+  if (!CreateDescriptorSets(*layout)) return false;
+  if (!CreateFramebuffers(*layout)) return false;
   if (!CreateCommandLists(*layout)) return false;
   if (!CreateCommandGroups(*layout)) return false;
   if (!CreateCommandContexts(*layout)) return false;
@@ -102,7 +105,6 @@ bool Engine::PostInit(const std::shared_ptr<Layout>& layout) {
   if (!CreateViewers(*layout)) return false;
 
   CreateDebugMarkers(*layout);
-  FinishResourceLoaders();
 
   return true;
 }
@@ -417,6 +419,8 @@ bool Engine::CreateBufferLoaders(const Layout& layout) {
 
 bool Engine::CreateImages(const Layout& layout) {
   for (const auto& limage : layout.limages) {
+    if (limage->extent.width == 0 || limage->extent.height == 0) continue;
+
     auto image = device_->CreateImage(*limage);
     if (!image) return false;
 
@@ -435,10 +439,7 @@ bool Engine::CreateImageLoaders(const Layout& layout) {
 
       ImageLoaderInfo info = {};
       info.file_path = limage_loader->file;
-      info.dst_image = static_cast<Image*>(limage->instance.get());
-      info.width = limage->extent.width;
-      info.height = limage->extent.height;
-      info.format = limage->format;
+      info.limage = limage.get();
       info.dst_access_mask = limage_loader->access_mask;
       info.new_layout = limage_loader->layout;
 
@@ -1008,6 +1009,10 @@ void Engine::FinishResourceLoaders() {
 
   for (auto& loader : image_loaders_) {
     loader->Finish();
+
+    const auto& limage = loader->GetInfo().limage;
+    if (limage->instance && !limage->id.empty())
+      instance_id_map_.insert_or_assign(limage->id, limage->instance);
   }
   image_loaders_.clear();
 }
