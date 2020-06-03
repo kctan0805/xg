@@ -11,6 +11,7 @@
 #include <cassert>
 #include <memory>
 
+#include "ktx.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 #include "xg/device.h"
@@ -35,6 +36,12 @@ std::shared_ptr<ImageLoader> ImageLoader::Load(const ImageLoaderInfo& info) {
   return task;
 }
 
+static inline bool ends_with(std::string const& value,
+                             std::string const& ending) {
+  if (ending.size() > value.size()) return false;
+  return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
 void ImageLoader::Run(std::shared_ptr<Task> self) {
   const auto deleter = [&](void*) {
     barrier_.set_value(nullptr);
@@ -46,23 +53,41 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
 
   LayoutBuffer lbuffer;
   lbuffer.size = info_.size;
+  ktxTexture* ktx_texture = nullptr;
 
   if (info_.src_ptr == nullptr) {
-    int width, height, channels;
     assert(!info_.file_path.empty());
 
-    int req_comp = FormatToSize(info_.format);
-    info_.src_ptr = stbi_load(info_.file_path.c_str(), &width, &height,
-                              &channels, req_comp);
-    if (!info_.src_ptr) {
-      XG_ERROR("load image fail: {}", info_.file_path);
-      return;
+    if (ends_with(info_.file_path, "ktx")) {
+      auto result = ktxTexture_CreateFromNamedFile(
+          info_.file_path.c_str(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
+          &ktx_texture);
+      if (result != KTX_SUCCESS) {
+        XG_ERROR("load ktx image fail: {} result: {}", info_.file_path, result);
+        return;
+      }
+
+      assert(ktx_texture->baseWidth == info_.width);
+      assert(ktx_texture->baseHeight == info_.height);
+
+      info_.src_ptr = ktx_texture->pData;
+      lbuffer.size = ktx_texture->dataSize;
+
+    } else {
+      int width, height, channels;
+      int req_comp = FormatToSize(info_.format);
+      info_.src_ptr = stbi_load(info_.file_path.c_str(), &width, &height,
+                                &channels, req_comp);
+      if (!info_.src_ptr) {
+        XG_ERROR("load stb image fail: {}", info_.file_path);
+        return;
+      }
+
+      assert(width == info_.width);
+      assert(height == info_.height);
+
+      lbuffer.size = width * height * req_comp;
     }
-
-    assert(width == info_.width);
-    assert(height == info_.height);
-
-    if (info_.size == -1) lbuffer.size = width * height * req_comp;
   }
 
   lbuffer.usage = BufferUsage::kTransferSrc;
@@ -82,7 +107,11 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
   std::copy(src_ptr, src_ptr + lbuffer.size, staging_data);
 
   if (!info_.file_path.empty()) {
-    stbi_image_free(info_.src_ptr);
+    if (ktx_texture) {
+      ktxTexture_Destroy(ktx_texture);
+    } else {
+      stbi_image_free(info_.src_ptr);
+    }
     info_.src_ptr = nullptr;
   }
 

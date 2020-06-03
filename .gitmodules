@@ -28,3 +28,9 @@
 [submodule "third_party/embed"]
 	path = third_party/embed
 	url = https://github.com/magcks/embed.git
+[submodule "third_party/KTX-Software"]
+	path = third_party/KTX-Software
+	url = https://github.com/KhronosGroup/KTX-Software.git
+[submodule "third_party/zstd"]
+	path = third_party/zstd
+	url = https://github.com/facebook/zstd.git

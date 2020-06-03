@@ -1,5 +1,6 @@
 file(GLOB image_files
     images/*.jpg
+    images/*.ktx
 )
 source_group(images FILES ${image_files})
 

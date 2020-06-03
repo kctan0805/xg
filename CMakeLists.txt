@@ -4,12 +4,15 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
+option(BUILD_TESTING "" OFF)
 option(XG_BUILD_APPS "Build the XG example applications" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(
+    -DGLM_ENABLE_EXPERIMENTAL
     -DGLM_FORCE_DEPTH_ZERO_TO_ONE
+    -DKHRONOS_STATIC
     #-DSPDLOG_ACTIVE_LEVEL=0
     -DSPDLOG_NO_DATETIME
     -DVULKAN_HPP_TYPESAFE_CONVERSION
@@ -35,6 +38,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/third_party/embed
 include_directories(
     third_party
     third_party/cereal/include
+    third_party/KTX-Software/include
+    third_party/KTX-Software/other_include
     third_party/spdlog/include
     third_party/thread-pool-cpp/include
     src

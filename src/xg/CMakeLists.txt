@@ -26,6 +26,7 @@ add_library(xg
 target_link_libraries(xg
     glfw
     glm
+    ktx
     spdlog
     tinyxml2
 )
