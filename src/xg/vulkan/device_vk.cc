@@ -221,12 +221,12 @@ bool DeviceVK::CreateDevice(const LayoutDevice& ldevice) {
   std::vector<const char*> extensions;
 
   for (const auto wanted : wanted_extensions) {
-    for (auto& found : found_extensions) {
-      if (std::string(found.extensionName) == wanted) {
-        if (std::string(found.extensionName) ==
+    for (const auto& found : found_extensions) {
+      if (std::string(found.extensionName.data()) == wanted) {
+        if (std::string(found.extensionName.data()) ==
             VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME) {
           get_mem_req2_ext_enabled = true;
-        } else if (std::string(found.extensionName) ==
+        } else if (std::string(found.extensionName.data()) ==
                    VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME) {
           dedicated_alloc_ext_enabled = true;
         }

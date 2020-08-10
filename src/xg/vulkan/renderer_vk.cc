@@ -93,7 +93,7 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
 
   for (auto i = 0; i < win_extension_count; ++i) {
     for (const auto& found : found_extensions) {
-      if (std::string(found.extensionName) == win_extensions[i]) {
+      if (std::string(found.extensionName.data()) == win_extensions[i]) {
         extensions.emplace_back(win_extensions[i]);
         break;
       }
@@ -102,7 +102,7 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
 
   for (const char* wanted : wanted_extensions) {
     for (const auto& found : found_extensions) {
-      if (std::string(found.extensionName) == wanted) {
+      if (std::string(found.extensionName.data()) == wanted) {
         extensions.emplace_back(wanted);
         break;
       }
@@ -114,7 +114,7 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
 
   for (auto i = 0; i < wanted_layers.size(); ++i) {
     for (const auto& found : found_layers) {
-      if (std::string(found.layerName) == wanted_layers[i]) {
+      if (std::string(found.layerName.data()) == wanted_layers[i]) {
         layers.emplace_back(wanted_layers[i]);
         break;
       }
