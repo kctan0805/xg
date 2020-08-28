@@ -31,6 +31,15 @@ bool ParserSingleton<ParserSampler>::ParseElement(
   value = element->Attribute("mipmapMode");
   if (value) node->mipmap_mode = StringToSamplerMipmapMode(value);
 
+  value = element->Attribute("addressModeU");
+  if (value) node->address_mode_u = StringToSamplerAddressMode(value);
+
+  value = element->Attribute("addressModeV");
+  if (value) node->address_mode_v = StringToSamplerAddressMode(value);
+
+  value = element->Attribute("addressModeW");
+  if (value) node->address_mode_w = StringToSamplerAddressMode(value);
+
   element->QueryBoolAttribute("anisotropyEnable", &node->anisotropy_enable);
   element->QueryFloatAttribute("maxAnisotropy", &node->max_anisotropy);
 

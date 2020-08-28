@@ -77,15 +77,20 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
         return;
       }
 
-      info_.src_ptr = ktx_texture->pData;
-      lbuffer.size = ktx_texture->dataSize;
+      info_.src_ptr = ktxTexture_GetData(ktx_texture);
+      lbuffer.size = ktxTexture_GetDataSize(ktx_texture);
 
       if (limage->instance) {
         assert(ktx_texture->baseWidth == limage->extent.width);
         assert(ktx_texture->baseHeight == limage->extent.height);
+        assert(ktx_texture->numLevels == limage->mip_levels);
+        assert(ktx_texture->numLayers * ktx_texture->numFaces ==
+               limage->array_layers);
       } else {
         limage->extent.width = ktx_texture->baseWidth;
         limage->extent.height = ktx_texture->baseHeight;
+        limage->mip_levels = ktx_texture->numLevels;
+        limage->array_layers = ktx_texture->numFaces * ktx_texture->numLayers;
 
         auto image = device->CreateImage(*limage);
         if (!image) return;
@@ -135,16 +140,6 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
   const auto& src_ptr = static_cast<const uint8_t*>(info_.src_ptr);
   std::copy(src_ptr, src_ptr + lbuffer.size, staging_data);
 
-  if (!info_.file_path.empty()) {
-    if (ktx_texture) {
-      ktxTexture_Destroy(ktx_texture);
-      ktx_texture = nullptr;
-    } else {
-      stbi_image_free(info_.src_ptr);
-    }
-    info_.src_ptr = nullptr;
-  }
-
   context_->staging_buffer->UnmapMemory();
 
   CommandBufferBeginInfo begin_info = {};
@@ -168,8 +163,8 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
   image_barrier->dst_queue_family_index = image_barrier->src_queue_family_index;
   image_barrier->image = dst_image;
   image_barrier->subresource_range.aspect_mask = ImageAspectFlags::kColor;
-  image_barrier->subresource_range.level_count = 1;
-  image_barrier->subresource_range.layer_count = 1;
+  image_barrier->subresource_range.level_count = limage->mip_levels;
+  image_barrier->subresource_range.layer_count = limage->array_layers;
 
   cmd->PipelineBarrier(pipeline_barrier_info);
 
@@ -177,13 +172,44 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
   copy_image_info.src_buffer = context_->staging_buffer.get();
   copy_image_info.dst_image = dst_image;
   copy_image_info.dst_image_layout = ImageLayout::kTransferDstOptimal;
-  copy_image_info.regions.resize(1);
-  auto buf_image_copy = &copy_image_info.regions[0];
-  buf_image_copy->image_subresource.aspect_mask = ImageAspectFlags::kColor;
-  buf_image_copy->image_subresource.layer_count = 1;
-  buf_image_copy->image_extent.width = limage->extent.width;
-  buf_image_copy->image_extent.height = limage->extent.height;
-  buf_image_copy->image_extent.depth = 1;
+  copy_image_info.regions.reserve(limage->array_layers * limage->mip_levels);
+
+  if (ktx_texture) {
+    for (ktx_uint32_t layer = 0; layer < ktx_texture->numLayers; ++layer) {
+      for (ktx_uint32_t face = 0; face < ktx_texture->numFaces; ++face) {
+        for (ktx_uint32_t level = 0; level < ktx_texture->numLevels; ++level) {
+          ktx_size_t offset;
+          auto ret = ktxTexture_GetImageOffset(ktx_texture, level, layer, face,
+                                               &offset);
+          assert(ret == KTX_SUCCESS);
+
+          BufferImageCopy buf_image_copy = {};
+          buf_image_copy.image_subresource.aspect_mask =
+              ImageAspectFlags::kColor;
+          buf_image_copy.image_subresource.mip_level = static_cast<int>(level);
+          buf_image_copy.image_subresource.base_array_layer =
+              static_cast<int>(layer * ktx_texture->numFaces + face);
+          buf_image_copy.image_subresource.layer_count = 1;
+          buf_image_copy.image_extent.width = limage->extent.width >> level;
+          buf_image_copy.image_extent.height = limage->extent.height >> level;
+          buf_image_copy.image_extent.depth = 1;
+          buf_image_copy.buffer_offset = offset;
+
+          copy_image_info.regions.emplace_back(buf_image_copy);
+        }
+      }
+    }
+
+  } else {
+    BufferImageCopy buf_image_copy = {};
+    buf_image_copy.image_subresource.aspect_mask = ImageAspectFlags::kColor;
+    buf_image_copy.image_subresource.layer_count = 1;
+    buf_image_copy.image_extent.width = limage->extent.width;
+    buf_image_copy.image_extent.height = limage->extent.height;
+    buf_image_copy.image_extent.depth = 1;
+
+    copy_image_info.regions.emplace_back(buf_image_copy);
+  }
 
   cmd->CopyBufferToImage(copy_image_info);
 

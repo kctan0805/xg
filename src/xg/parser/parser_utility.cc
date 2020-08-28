@@ -441,6 +441,40 @@ BufferUsage StringToBufferUsage(const char* value) {
   return result;
 }
 
+ImageCreateFlags StringToImageCreateFlags(const char* value) {
+  static std::unordered_map<std::string, ImageCreateFlags> mapping{
+#define ENTRY(s) {#s, ImageCreateFlags::k##s}
+      ENTRY(Undefined),
+      ENTRY(SparseBinding),
+      ENTRY(SparseResidency),
+      ENTRY(SparseAliased),
+      ENTRY(MutableFormat),
+      ENTRY(CubeCompatible),
+      ENTRY(Alias),
+      ENTRY(SplitInstanceBindRegions),
+      ENTRY(2DArrayCompatible),
+      ENTRY(BlockTexelViewCompatible),
+      ENTRY(ExtendedUsage),
+      ENTRY(Protected),
+      ENTRY(Disjoint),
+      ENTRY(CornerSampled),
+      ENTRY(SampleLocationsCompatibleDepth),
+      ENTRY(Subsampled)
+#undef ENTRY
+  };
+  std::stringstream ss(value);
+  std::string token;
+  auto result = ImageCreateFlags::kUndefined;
+
+  while (ss >> token) {
+    const auto x = mapping.find(token.c_str());
+    if (x != std::end(mapping)) {
+      result = result | x->second;
+    }
+  }
+  return result;
+}
+
 ImageType StringToImageType(const char* value) {
   static std::unordered_map<std::string, ImageType> mapping{
 #define ENTRY(s) {#s, ImageType::k##s}
@@ -575,6 +609,46 @@ ImageViewType StringToImageViewType(const char* value) {
   return ImageViewType::k2D;
 }
 
+ComponentMapping StringToComponentMapping(const char* value) {
+  static std::unordered_map<std::string, ComponentSwizzle> mapping{
+#define ENTRY(s) {#s, ComponentSwizzle::k##s}
+      ENTRY(Identity), ENTRY(Zero), ENTRY(One), ENTRY(R),
+      ENTRY(G),        ENTRY(B),    ENTRY(A)
+#undef ENTRY
+  };
+  std::stringstream ss(value);
+  std::string token;
+  ComponentMapping result = {
+      ComponentSwizzle::kIdentity, ComponentSwizzle::kIdentity,
+      ComponentSwizzle::kIdentity, ComponentSwizzle::kIdentity};
+
+  if (ss >> token) {
+    const auto x = mapping.find(token.c_str());
+    if (x != std::end(mapping)) {
+      result.r = x->second;
+    }
+  }
+  if (ss >> token) {
+    const auto x = mapping.find(token.c_str());
+    if (x != std::end(mapping)) {
+      result.g = x->second;
+    }
+  }
+  if (ss >> token) {
+    const auto x = mapping.find(token.c_str());
+    if (x != std::end(mapping)) {
+      result.b = x->second;
+    }
+  }
+  if (ss >> token) {
+    const auto x = mapping.find(token.c_str());
+    if (x != std::end(mapping)) {
+      result.a = x->second;
+    }
+  }
+  return result;
+}
+
 ImageAspectFlags StringToImageAspectFlags(const char* value) {
   static std::unordered_map<std::string, ImageAspectFlags> mapping{
 #define ENTRY(s) {#s, ImageAspectFlags::k##s}
@@ -603,6 +677,21 @@ ImageAspectFlags StringToImageAspectFlags(const char* value) {
     }
   }
   return result;
+}
+
+SamplerAddressMode StringToSamplerAddressMode(const char* value) {
+  static std::unordered_map<std::string, SamplerAddressMode> mapping{
+#define ENTRY(s) {#s, SamplerAddressMode::k##s}
+      ENTRY(Repeat), ENTRY(MirroredRepeat), ENTRY(ClampToEdge),
+      ENTRY(ClampToBorder), ENTRY(MirrorClampToEdge)
+#undef ENTRY
+  };
+  const auto x = mapping.find(value);
+  if (x != std::end(mapping)) {
+    return x->second;
+  }
+  XG_ERROR("unknown sampler address mode: {}", value);
+  return SamplerAddressMode::kRepeat;
 }
 
 SampleCountFlags StringToSampleCountFlags(const char* value) {

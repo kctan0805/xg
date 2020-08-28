@@ -267,8 +267,9 @@ bool DeviceVK::CreateDevice(const LayoutDevice& ldevice) {
 }
 
 bool DeviceVK::CreatePipelineCache() {
-  const auto& result = device_.createPipelineCache(
-      &vk::PipelineCacheCreateInfo(), 0, &pipeline_cache_);
+  const auto& create_info = vk::PipelineCacheCreateInfo();
+  const auto& result =
+      device_.createPipelineCache(&create_info, 0, &pipeline_cache_);
   if (result != vk::Result::eSuccess) {
     XG_ERROR(ResultString(static_cast<Result>(result)));
     return false;
@@ -1425,10 +1426,19 @@ std::shared_ptr<Sampler> DeviceVK::CreateSampler(
   const auto min_filter = static_cast<vk::Filter>(lsampler.min_filter);
   const auto mipmap_mode =
       static_cast<vk::SamplerMipmapMode>(lsampler.mipmap_mode);
+  const auto address_mode_u =
+      static_cast<vk::SamplerAddressMode>(lsampler.address_mode_u);
+  const auto address_mode_v =
+      static_cast<vk::SamplerAddressMode>(lsampler.address_mode_v);
+  const auto address_mode_w =
+      static_cast<vk::SamplerAddressMode>(lsampler.address_mode_w);
   auto& create_info = vk::SamplerCreateInfo()
                           .setMagFilter(mag_filter)
                           .setMinFilter(min_filter)
-                          .setMipmapMode(mipmap_mode);
+                          .setMipmapMode(mipmap_mode)
+                          .setAddressModeU(address_mode_u)
+                          .setAddressModeV(address_mode_v)
+                          .setAddressModeW(address_mode_w);
 
   if (lsampler.anisotropy_enable &&
       physical_device_features_.samplerAnisotropy) {
@@ -1446,11 +1456,12 @@ std::shared_ptr<Sampler> DeviceVK::CreateSampler(
 
   sampler->device_ = device_;
 
-  XG_TRACE("createSampler: {} {} {} {} {} {} {}",
+  XG_TRACE("createSampler: {} {} {} {} {} {} {} {} {} {}",
            static_cast<void*>((VkSampler)sampler->sampler_), lsampler.id,
            vk::to_string(mag_filter), vk::to_string(min_filter),
-           vk::to_string(mipmap_mode), create_info.anisotropyEnable,
-           create_info.maxAnisotropy);
+           vk::to_string(mipmap_mode), vk::to_string(address_mode_u),
+           vk::to_string(address_mode_v), vk::to_string(address_mode_w),
+           create_info.anisotropyEnable, create_info.maxAnisotropy);
 
   return sampler;
 }

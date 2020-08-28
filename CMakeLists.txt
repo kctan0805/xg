@@ -20,12 +20,10 @@ add_definitions(
 
 if(WIN32)
     add_definitions(
-        -D_CRT_SECURE_NO_WARNINGS
         -D_SCL_SECURE_NO_WARNINGS
         -D_USE_MATH_DEFINES
         -DNOMINMAX
         -DVK_USE_PLATFORM_WIN32_KHR
-        -DVMA_RECORDING_ENABLED=0
     )
     add_compile_options(/bigobj /utf-8)
 endif()

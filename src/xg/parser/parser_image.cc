@@ -22,7 +22,10 @@ bool ParserSingleton<ParserImage>::ParseElement(
   auto node = std::make_shared<LayoutImage>();
   if (!node) return false;
 
-  const char* value = element->Attribute("imageType");
+  const char* value = element->Attribute("flags");
+  if (value) node->flags = StringToImageCreateFlags(value);
+
+  value = element->Attribute("imageType");
   if (value) node->image_type = StringToImageType(value);
 
   value = element->Attribute("format");

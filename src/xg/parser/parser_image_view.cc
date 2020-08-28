@@ -34,18 +34,21 @@ bool ParserSingleton<ParserImageView>::ParseElement(
   value = element->Attribute("format");
   if (value) node->format = StringToFormat(value);
 
+  value = element->Attribute("components");
+  if (value) node->components = StringToComponentMapping(value);
+
   value = element->Attribute("aspectMask");
   if (value)
-    node->image_subresource_range.aspect_mask = StringToImageAspectFlags(value);
+    node->subresource_range.aspect_mask = StringToImageAspectFlags(value);
 
   element->QueryIntAttribute("baseMipLevel",
-                             &node->image_subresource_range.base_mip_level);
+                             &node->subresource_range.base_mip_level);
   element->QueryIntAttribute("levelCount",
-                             &node->image_subresource_range.level_count);
+                             &node->subresource_range.level_count);
   element->QueryIntAttribute("baseArrayLayer",
-                             &node->image_subresource_range.base_array_layer);
+                             &node->subresource_range.base_array_layer);
   element->QueryIntAttribute("layerCount",
-                             &node->image_subresource_range.layer_count);
+                             &node->subresource_range.layer_count);
 
   status->node = node;
 

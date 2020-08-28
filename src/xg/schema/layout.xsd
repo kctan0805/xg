@@ -544,12 +544,54 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:simpleType name="ImageCreateFlagsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Undefined" />
+      <xs:enumeration value="SparseBinding" />
+      <xs:enumeration value="SparseResidency" />
+      <xs:enumeration value="SparseAliased" />
+      <xs:enumeration value="MutableFormat" />
+      <xs:enumeration value="CubeCompatible" />
+      <xs:enumeration value="Alias" />
+      <xs:enumeration value="SplitInstanceBindRegions" />
+      <xs:enumeration value="2DArrayCompatible" />
+      <xs:enumeration value="BlockTexelViewCompatible" />
+      <xs:enumeration value="ExtendedUsage" />
+      <xs:enumeration value="Protected" />
+      <xs:enumeration value="Disjoint" />
+      <xs:enumeration value="CornerSampled" />
+      <xs:enumeration value="SampleLocationsCompatibleDepth" />
+      <xs:enumeration value="Subsampled" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ImageCreateFlagsTypeList">
+    <xs:list itemType="ImageCreateFlagsType"/>
+  </xs:simpleType>
+
+
   <xs:simpleType name="ImageType">
     <xs:restriction base="xs:token">
       <xs:enumeration value="1D" />
       <xs:enumeration value="2D" />
       <xs:enumeration value="3D" />
     </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ComponentSwizzleType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Identity" />
+      <xs:enumeration value="Zero" />
+      <xs:enumeration value="One" />
+      <xs:enumeration value="R" />
+      <xs:enumeration value="G" />
+      <xs:enumeration value="B" />
+      <xs:enumeration value="A" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ComponentSwizzleTypeList">
+    <xs:list itemType="ComponentSwizzleType"/>
   </xs:simpleType>
 
   <xs:simpleType name="ImageViewType">
@@ -590,6 +632,7 @@
       <xs:attribute name="image" type="xs:IDREF" />
       <xs:attribute name="viewType" type="ImageViewType" default="2D" />
       <xs:attribute name="format" type="FormatType" use="required" />
+      <xs:attribute name="components" type="ComponentSwizzleTypeList" default="Identity Identity Identity Identity" />      
       <xs:attribute name="aspectMask" type="ImageAspectFlagsTypeList" default="Color" />
       <xs:attribute name="baseMipLevel" type="xs:unsignedByte" default="0" />
       <xs:attribute name="levelCount" type="xs:unsignedByte" default="1" />
@@ -597,6 +640,16 @@
       <xs:attribute name="layerCount" type="xs:unsignedByte" default="1" />
     </xs:complexType>
   </xs:element>
+
+  <xs:simpleType name="SamplerAddressModeType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Repeat" />
+      <xs:enumeration value="MirroredRepeat" />
+      <xs:enumeration value="ClampToEdge" />
+      <xs:enumeration value="ClampToBorder" />
+      <xs:enumeration value="MirrorClampToEdge" />
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:element name="RenderPass">
     <xs:complexType>
@@ -1381,10 +1434,11 @@
                 <xs:element minOccurs="0" ref="ImageView" />
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="flags" type="ImageCreateFlagsTypeList" default="Undefined" />
               <xs:attribute name="imageType" type="ImageType" default="2D" />
               <xs:attribute name="format" type="FormatType" use="required" />
-              <xs:attribute name="width" type="xs:string" use="required" />
-              <xs:attribute name="height" type="xs:string" use="required" />
+              <xs:attribute name="width" type="xs:string" />
+              <xs:attribute name="height" type="xs:string" />
               <xs:attribute name="depth" type="xs:unsignedInt" default="1" />
               <xs:attribute name="mipLevels" type="xs:unsignedByte" default="1" />
               <xs:attribute name="arrayLayers" type="xs:unsignedByte" default="1" />
@@ -1606,6 +1660,9 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:attribute>
+              <xs:attribute name="addressModeU" type="SamplerAddressModeType" default="Repeat" />
+              <xs:attribute name="addressModeV" type="SamplerAddressModeType" default="Repeat" />
+              <xs:attribute name="addressModeW" type="SamplerAddressModeType" default="Repeat" />
               <xs:attribute name="anisotropyEnable" type="xs:boolean" default="false" />
               <xs:attribute name="maxAnisotropy" type="xs:decimal" />
             </xs:complexType>

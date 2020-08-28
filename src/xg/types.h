@@ -289,7 +289,7 @@ enum class ColorSpace {
   kDisplayNative = 1000213000
 };
 
-enum class SurfaceTransformFlags {
+enum class SurfaceTransformFlags : unsigned int {
   kIdentity = 0x1,
   kRotate90 = 0x2,
   kRotate180 = 0x4,
@@ -370,6 +370,35 @@ inline BufferUsage operator&(BufferUsage lhs, BufferUsage rhs) {
       static_cast<std::underlying_type_t<BufferUsage>>(rhs));
 }
 
+enum class ImageCreateFlags : unsigned int {
+  kUndefined = 0x0,
+  kSparseBinding = 0x1,
+  kSparseResidency = 0x2,
+  kSparseAliased = 0x4,
+  kMutableFormat = 0x8,
+  kCubeCompatible = 0x10,
+  kAlias = 0x400,
+  kSplitInstanceBindRegions = 0x40,
+  k2DArrayCompatible = 0x20,
+  kBlockTexelViewCompatible = 0x80,
+  kExtendedUsage = 0x100,
+  kProtected = 0x800,
+  kDisjoint = 0x200,
+  kCornerSampled = 0x2000,
+  kSampleLocationsCompatibleDepth = 0x1000,
+  kSubsampled = 0x4000
+};
+inline ImageCreateFlags operator|(ImageCreateFlags lhs, ImageCreateFlags rhs) {
+  return static_cast<ImageCreateFlags>(
+      static_cast<std::underlying_type_t<ImageCreateFlags>>(lhs) |
+      static_cast<std::underlying_type_t<ImageCreateFlags>>(rhs));
+}
+inline ImageCreateFlags operator&(ImageCreateFlags lhs, ImageCreateFlags rhs) {
+  return static_cast<ImageCreateFlags>(
+      static_cast<std::underlying_type_t<ImageCreateFlags>>(lhs) &
+      static_cast<std::underlying_type_t<ImageCreateFlags>>(rhs));
+}
+
 enum class ImageType { k1D, k2D, k3D };
 
 enum class ImageTiling { kOptimal, kLinear };
@@ -432,6 +461,23 @@ inline MemoryAllocFlags operator&(MemoryAllocFlags lhs, MemoryAllocFlags rhs) {
 }
 
 enum class MemoryUsage { kUnknown, kGpuOnly, kCpuOnly, kCpuToGpu, kGpuToCpu };
+
+enum class ComponentSwizzle {
+  kIdentity,
+  kZero,
+  kOne,
+  kR,
+  kG,
+  kB,
+  kA
+};
+
+struct ComponentMapping {
+  ComponentSwizzle r;
+  ComponentSwizzle g;
+  ComponentSwizzle b;
+  ComponentSwizzle a;
+};
 
 enum class ImageViewType {
   k1D,
@@ -556,6 +602,14 @@ inline PipelineStageFlags operator&(PipelineStageFlags lhs,
       static_cast<std::underlying_type_t<PipelineStageFlags>>(rhs));
 }
 
+enum class SamplerAddressMode {
+  kRepeat,
+  kMirroredRepeat,
+  kClampToEdge,
+  kClampToBorder,
+  kMirrorClampToEdge
+};
+
 enum class SampleCountFlags : unsigned int {
   kUndefined = 0x0,
   k1 = 0x1,
@@ -595,7 +649,7 @@ enum class DescriptorType {
   kInputAttachment
 };
 
-enum class ShaderStageFlags {
+enum class ShaderStageFlags : unsigned int {
   kUndefined = 0x0,
   kVertex = 0x1,
   kTessellationControl = 0x2,
@@ -641,7 +695,7 @@ enum class PrimitiveTopology {
 
 enum class PolygonMode { kFill, kLine, kPoint };
 
-enum class CullMode {
+enum class CullMode : unsigned int {
   kNone = 0x0,
   kFront = 0x1,
   kBack = 0x2,
@@ -695,7 +749,7 @@ enum class BlendFactor {
 
 enum class BlendOp { kAdd, kSubtract, kReverseSubtract, kMin, kMax };
 
-enum class ColorComponent {
+enum class ColorComponent : unsigned int {
   kUndefined = 0x0,
   kR = 0x1,
   kG = 0x2,

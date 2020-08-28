@@ -219,7 +219,7 @@ void CommandBufferVK::CopyBufferToImage(
     const auto& subresource =
         vk::ImageSubresourceLayers()
             .setAspectMask(aspect_mask)
-            .setLayerCount(
+            .setMipLevel(
                 static_cast<uint32_t>(region.image_subresource.mip_level))
             .setBaseArrayLayer(static_cast<uint32_t>(
                 region.image_subresource.base_array_layer))

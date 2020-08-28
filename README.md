@@ -24,6 +24,7 @@ and has following features :
 - [change layout](app/change_layout/) change layout runtime example.
 - [serialize layout](app/serialize_layout/) serialize layout example.
 - [embedded layout](app/embed_layout/) embedded serialized layout to execute file.
+- [skybox](app/skybox/) skybox example.
 
 
 ## Dependencies

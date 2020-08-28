@@ -25,6 +25,7 @@ Result ImageVK::Init(const LayoutImage& limage) {
   assert(!image_);
   assert(!alloc_);
 
+  const auto flags = static_cast<vk::ImageCreateFlagBits>(limage.flags);
   const auto image_type = static_cast<vk::ImageType>(limage.image_type);
   const auto format = static_cast<vk::Format>(limage.format);
   const auto tiling = static_cast<vk::ImageTiling>(limage.tiling);
@@ -34,6 +35,7 @@ Result ImageVK::Init(const LayoutImage& limage) {
 
   const auto& image_create_info =
       vk::ImageCreateInfo()
+          .setFlags(flags)
           .setImageType(image_type)
           .setFormat(format)
           .setExtent(vk::Extent3D()
@@ -63,12 +65,13 @@ Result ImageVK::Init(const LayoutImage& limage) {
     return static_cast<Result>(result);
   }
 
-  XG_TRACE("vmaCreateImage: {} {} {} {} {} {} {} {} {} {} {} {} {} {}",
-           static_cast<void*>(image_), limage.id, vk::to_string(image_type),
-           vk::to_string(format), limage.extent.width, limage.extent.height,
-           limage.extent.depth, limage.mip_levels, limage.array_layers,
-           vk::to_string(tiling), vk::to_string(usage),
-           vk::to_string(initial_layout), static_cast<int>(limage.alloc_flags),
+  XG_TRACE("vmaCreateImage: {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}",
+           static_cast<void*>(image_), limage.id, vk::to_string(flags),
+           vk::to_string(image_type), vk::to_string(format),
+           limage.extent.width, limage.extent.height, limage.extent.depth,
+           limage.mip_levels, limage.array_layers, vk::to_string(tiling),
+           vk::to_string(usage), vk::to_string(initial_layout),
+           static_cast<int>(limage.alloc_flags),
            static_cast<int>(limage.mem_usage));
 
   return Result::kSuccess;

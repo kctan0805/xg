@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Engine>
+  <Constant id="winWidth" value="640"/>
+  <Constant id="winHeight" value="480"/>
+
+  <Renderer appName="hello_world" debug="true">
+    <Window id="mainWindow" width="winWidth" height="winHeight" title="Skybox" resizable="true"/>
+    <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
+
+    <Device>
+      <Queue id="mainQueue" queueFamily="Graphics Transfer" presentable="true"/>
+    </Device>
+  </Renderer>
+
+  <CommandPool id="mainCommandPool" queue="mainQueue"/>
+  <DescriptorPool id="mainDescriptorPool"/>
+
+  <Image id="mainDepthBufferImage" format="D32Sfloat" width="winWidth" height="winHeight" usage="DepthStencilAttachment"/>
+  <ImageView id="mainDepthBufferImageView" image="mainDepthBufferImage" format="D32Sfloat" aspectMask="Depth"/>
+
+  <RenderPass id="mainRenderPass">
+    <Attachment id="mainColorAttachment" format="B8G8R8A8Unorm" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc"/>
+    <Attachment id="mainDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
+    <Subpass id="mainSubpass">
+      <ColorAttachment attachment="mainColorAttachment" layout="ColorAttachmentOptimal"/>
+      <DepthStencilAttachment attachment="mainDepthAttachment" layout="DepthStencilAttachmentOptimal"/>
+    </Subpass>
+    <Dependency>
+      <Source stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+      <Destination subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentRead ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentRead ColorAttachmentWrite"/>
+      <Destination stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+    </Dependency>
+  </RenderPass>
+
+  <DescriptorSetLayout id="drawCommonDescriptorSetLayout">
+    <DescriptorSetLayoutBinding binding="0" descriptorType="UniformBuffer" stageFlags="Vertex"/>
+  </DescriptorSetLayout>
+  <DescriptorSetLayout id="drawMaterialDescriptorSetLayout">
+    <DescriptorSetLayoutBinding binding="0" descriptorType="CombinedImageSampler" stageFlags="Fragment"/>
+  </DescriptorSetLayout>
+
+  <PipelineLayout id="drawPipelineLayout">
+    <SetLayout descriptorSetLayout="drawCommonDescriptorSetLayout"/>
+    <SetLayout descriptorSetLayout="drawMaterialDescriptorSetLayout"/>
+  </PipelineLayout>
+
+  <ShaderModule id="drawVertexShader" file="skybox.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="skybox.frag.spv"/>
+
+  <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
+    <Stage stage="Vertex" module="drawVertexShader"/>
+    <Stage stage="Fragment" module="drawFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="3*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32B32Sfloat" offset="0"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleList"/>
+    <ViewportState>
+      <Viewport width="winWidth" height="winHeight" maxDepth="1.0"/>
+      <Scissor width="winWidth" height="winHeight"/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="Back" frontFace="Clockwise"/>
+    <MultisampleState/>
+    <DepthStencilState/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <Frame id="mainFrame" swapchain="mainSwapchain">
+    <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass">
+      <Attachment swapchain="mainSwapchain"/>
+      <Attachment imageView="mainDepthBufferImageView"/>
+    </Framebuffer>
+    <Fence id="renderCompleteFence" signaled="true"/>
+    <Semaphore id="imageAvailableSemaphore"/>
+    <Semaphore id="renderCompleteSemaphore"/>
+    <CommandBuffer id="mainCommandBuffer" commandPool="mainCommandPool"/>
+
+    <Buffer id="drawCommonUniformBuffer" size="4*16" usage="UniformBuffer" allocFlags="Undefined" memUsage="CpuToGpu"/> <!-- perspective * view matrix of camera -->
+
+    <DescriptorSet id="drawCommonDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawCommonDescriptorSetLayout">
+      <Descriptor binding="0" descriptorType="UniformBuffer"><BufferInfo buffer="drawCommonUniformBuffer"/></Descriptor>
+    </DescriptorSet>
+  </Frame>
+
+  <!-- Model -->
+  <!-- Material -->
+  <Image id="drawTextureImage" flags="CubeCompatible" format="R8G8B8A8Unorm" usage="TransferDst Sampled"/>
+  <ImageLoader image="drawTextureImage" file="skybox.ktx" queue="mainQueue"/>
+  <ImageView id="drawTextureImageView" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" levelCount="10" layerCount="6"/>
+  <Sampler id="drawTextureSampler" magFilter="Linear" minFilter="Linear" mipmapMode="Linear" addressModeU="ClampToEdge" addressModeV="ClampToEdge" addressModeW="ClampToEdge" anisotropyEnable="true"/>
+
+  <DescriptorSet id="drawMaterialDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawMaterialDescriptorSetLayout">
+    <Descriptor binding="0" descriptorType="CombinedImageSampler"><ImageInfo sampler="drawTextureSampler" imageView="drawTextureImageView" imageLayout="ShaderReadOnlyOptimal"/></Descriptor>
+  </DescriptorSet>
+
+  <!-- Geometry -->
+  <Data id="drawVertexData">
+    <FloatValues>-5 -5 5</FloatValues>
+    <FloatValues>-5 -5 -5</FloatValues>
+    <FloatValues>5 -5 -5</FloatValues>
+    <FloatValues>5 -5 5</FloatValues>
+    <FloatValues>-5 5 5</FloatValues>
+    <FloatValues>5 5 5</FloatValues>
+    <FloatValues>5 5 -5</FloatValues>
+    <FloatValues>-5 5 -5</FloatValues>
+    <FloatValues>-5 -5 5</FloatValues>
+    <FloatValues>5 -5 5</FloatValues>
+    <FloatValues>5 5 5</FloatValues>
+    <FloatValues>-5 5 5</FloatValues>
+    <FloatValues>5 -5 5</FloatValues>
+    <FloatValues>5 -5 -5</FloatValues>
+    <FloatValues>5 5 -5</FloatValues>
+    <FloatValues>5 5 5</FloatValues>    
+    <FloatValues>5 -5 -5</FloatValues>
+    <FloatValues>-5 -5 -5</FloatValues>
+    <FloatValues>-5 5 -5</FloatValues>
+    <FloatValues>5 5 -5</FloatValues>
+    <FloatValues>-5 -5 -5</FloatValues>
+    <FloatValues>-5 -5 5</FloatValues>
+    <FloatValues>-5 5 5</FloatValues>
+    <FloatValues>-5 5 -5</FloatValues>    
+  </Data>
+
+  <Buffer id="drawVertexBuffer" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
+
+  <Data id="drawIndexData">
+    <UInt32Values>0 1 2 2 3 0 4 5 6 6 7 4 8 9 10 10 11 8 12 13 14 14 15 12 16 17 18 18 19 16 20 21 22 22 23 20</UInt32Values>
+  </Data>
+
+  <Buffer id="drawIndexBuffer" usage="TransferSrc TransferDst IndexBuffer StorageBuffer"/>
+  <BufferLoader buffer="drawIndexBuffer" accessMask="IndexRead" queue="mainQueue" stageMask="VertexInput" data="drawIndexData"/>
+
+  <!-- Scene -->
+  <CommandGroup id="mainCommandGroup">
+    <CommandList>
+      <BeginRenderPass renderPass="mainRenderPass" framebuffer="mainFramebuffer">
+        <ClearValues>
+          <ClearColorValue value="0.0 0.0 0.0 1.0"/>
+          <ClearDepthStencilValue depth="1.0" stencil="0"/>
+        </ClearValues>
+      </BeginRenderPass>
+
+      <BindDescriptorSets layout="drawPipelineLayout" firstSet="0">
+        <DescriptorSet descriptorSet="drawCommonDescriptorSet"/>
+        <DescriptorSet descriptorSet="drawMaterialDescriptorSet"/>        
+      </BindDescriptorSets>
+
+      <BindPipeline pipeline="drawPipeline"/>
+      
+      <BindVertexBuffers firstBinding="0">
+        <Buffer buffer="drawVertexBuffer" offset="0"/>
+      </BindVertexBuffers>
+      <BindIndexBuffer buffer="drawIndexBuffer" indexType="Uint32"/>
+      <DrawIndexed indexCount="36" instanceCount="1"/>      
+
+      <EndRenderPass/>
+    </CommandList>
+  </CommandGroup>
+
+  <Camera id="mainCamera">
+    <Perspective fov="60" width="winWidth" height="winHeight" zNear="0.1" zFar="256.0"/>
+    <LookAt eye="0.0 0.0 -4.0" center="0 0 0" up="0 -1 0"/>
+  </Camera>
+
+  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
+    <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
+    <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
+    <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
+      <Submit>
+        <Wait semaphore="imageAvailableSemaphore" dstStageMask="ColorAttachmentOutput"/>
+        <CommandBuffer commandBuffer="mainCommandBuffer"/>
+        <SignalSemaphore semaphore="renderCompleteSemaphore"/>
+      </Submit>
+    </QueueSubmit>
+    <QueuePresent queue="mainQueue">
+      <WaitSemaphore semaphore="renderCompleteSemaphore"/>
+    </QueuePresent>
+    <Resizer>
+      <Image image="mainDepthBufferImage"/>
+      <ImageView imageView="mainDepthBufferImageView"/>
+      <GraphicsPipeline graphicsPipeline="drawPipeline"/>
+      <Framebuffer framebuffer="mainFramebuffer"/>
+    </Resizer>
+    <Updater>
+      <Buffer buffer="drawCommonUniformBuffer"/>
+    </Updater>
+  </Viewer>
+</Engine>

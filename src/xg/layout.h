@@ -57,6 +57,12 @@ void serialize(Archive& archive, Extent3D& extent) {
 }
 
 template <class Archive>
+void serialize(Archive& archive, ComponentMapping& component_mapping) {
+  archive(component_mapping.r, component_mapping.g, component_mapping.b,
+          component_mapping.a);
+}
+
+template <class Archive>
 void serialize(Archive& archive,
                ImageSubresourceRange& image_subresource_range) {
   archive(image_subresource_range.aspect_mask,
@@ -408,6 +414,7 @@ struct LayoutBufferLoader : LayoutBase {
 struct LayoutImage : LayoutBase {
   LayoutImage() : LayoutBase{LayoutType::kImage} {}
 
+  ImageCreateFlags flags = ImageCreateFlags::kUndefined;
   ImageType image_type = ImageType::k2D;
   Format format = Format::kUndefined;
   Extent3D extent = {0, 0, 1};
@@ -421,9 +428,9 @@ struct LayoutImage : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), image_type, format, extent,
-            mip_levels, array_layers, tiling, usage, alloc_flags, mem_usage,
-            initial_layout);
+    archive(cereal::base_class<LayoutBase>(this), flags, image_type, format,
+            extent, mip_levels, array_layers, tiling, usage, alloc_flags,
+            mem_usage, initial_layout);
   }
 };
 
@@ -453,12 +460,15 @@ struct LayoutImageView : LayoutBase {
   std::shared_ptr<LayoutImage> limage;
   ImageViewType view_type = ImageViewType::k2D;
   Format format = Format::kUndefined;
-  ImageSubresourceRange image_subresource_range = {ImageAspectFlags::kColor, 0,
-                                                   1, 0, 1};
+  ComponentMapping components = {
+      ComponentSwizzle::kIdentity, ComponentSwizzle::kIdentity,
+      ComponentSwizzle::kIdentity, ComponentSwizzle::kIdentity};
+  ImageSubresourceRange subresource_range = {ImageAspectFlags::kColor, 0, 1, 0,
+                                             1};
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), limage, view_type, format,
-            image_subresource_range);
+            components, subresource_range);
   }
 
   const char* limage_id = nullptr;
@@ -1111,6 +1121,9 @@ struct LayoutSampler : LayoutBase {
   Filter mag_filter = Filter::kNearest;
   Filter min_filter = Filter::kNearest;
   SamplerMipmapMode mipmap_mode = SamplerMipmapMode::kNearest;
+  SamplerAddressMode address_mode_u = SamplerAddressMode::kRepeat;
+  SamplerAddressMode address_mode_v = SamplerAddressMode::kRepeat;
+  SamplerAddressMode address_mode_w = SamplerAddressMode::kRepeat;
   bool anisotropy_enable = false;
   float max_anisotropy = std::numeric_limits<float>::max();
 
