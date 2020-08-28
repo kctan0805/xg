@@ -1139,7 +1139,7 @@ PipelineBindPoint StringToPipelineBindPoint(const char* value) {
 IndexType StringToIndexType(const char* value) {
   static std::unordered_map<std::string, IndexType> mapping{
 #define ENTRY(s) {#s, IndexType::k##s}
-      ENTRY(Uint16), ENTRY(Uint32)
+      ENTRY(Uint16), ENTRY(Uint32), ENTRY(None), ENTRY(Uint8)
 #undef ENTRY
   };
   const auto x = mapping.find(value);

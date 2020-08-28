@@ -1155,6 +1155,8 @@
                   <xs:restriction base="xs:token">
                     <xs:enumeration value="Uint16" />
                     <xs:enumeration value="Uint32" />
+                    <xs:enumeration value="None" />
+                    <xs:enumeration value="Uint8" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:attribute>

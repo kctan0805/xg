@@ -794,7 +794,12 @@ struct ClearDepthStencilValue {
 
 enum class PipelineBindPoint { kGraphics, kCompute };
 
-enum class IndexType { kUint16, kUint32 };
+enum class IndexType : unsigned int {
+  kUint16 = 0,
+  kUint32 = 1,
+  kNone = 1000165000,
+  kUint8 = 1000265000
+};
 
 struct Viewport {
   float x;

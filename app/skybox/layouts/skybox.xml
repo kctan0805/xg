@@ -130,7 +130,7 @@
   <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
 
   <Data id="drawIndexData">
-    <UInt32Values>0 1 2 2 3 0 4 5 6 6 7 4 8 9 10 10 11 8 12 13 14 14 15 12 16 17 18 18 19 16 20 21 22 22 23 20</UInt32Values>
+    <UInt8Values>0 1 2 2 3 0 4 5 6 6 7 4 8 9 10 10 11 8 12 13 14 14 15 12 16 17 18 18 19 16 20 21 22 22 23 20</UInt8Values>
   </Data>
 
   <Buffer id="drawIndexBuffer" usage="TransferSrc TransferDst IndexBuffer StorageBuffer"/>
@@ -156,7 +156,7 @@
       <BindVertexBuffers firstBinding="0">
         <Buffer buffer="drawVertexBuffer" offset="0"/>
       </BindVertexBuffers>
-      <BindIndexBuffer buffer="drawIndexBuffer" indexType="Uint32"/>
+      <BindIndexBuffer buffer="drawIndexBuffer" indexType="Uint8"/>
       <DrawIndexed indexCount="36" instanceCount="1"/>      
 
       <EndRenderPass/>
