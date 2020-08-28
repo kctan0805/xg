@@ -33,12 +33,14 @@ and has following features :
 - [Embed](https://github.com/magcks/embed)
 - [C++ Mathematical Expression Toolkit Library Documentation](https://github.com/ArashPartow/exprtk)
 - [GLFW](https://github.com/glfw/glfw)
+- [KTX](https://github.com/KhronosGroup/KTX-Software)
 - [OpenGL Mathematics](https://github.com/g-truc/glm)
 - [spdlog](https://github.com/gabime/spdlog)
 - [stb](https://github.com/nothings/stb)
 - [thread-pool-cpp](https://github.com/inkooboo/thread-pool-cpp)
 - [TinyXML-2](https://github.com/leethomason/tinyxml2)
 - [Vulkan Memory Allocator](https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator)
+- [Zstandard](https://github.com/facebook/zstd)
 
 
 ## Install
