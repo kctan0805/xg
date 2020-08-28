@@ -15,15 +15,10 @@
   <CommandPool id="mainCommandPool" queue="mainQueue"/>
   <DescriptorPool id="mainDescriptorPool"/>
 
-  <Image id="mainDepthBufferImage" format="D32Sfloat" width="winWidth" height="winHeight" usage="DepthStencilAttachment"/>
-  <ImageView id="mainDepthBufferImageView" image="mainDepthBufferImage" format="D32Sfloat" aspectMask="Depth"/>
-
   <RenderPass id="mainRenderPass">
-    <Attachment id="mainColorAttachment" format="B8G8R8A8Unorm" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc"/>
-    <Attachment id="mainDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
+    <Attachment id="mainColorAttachment" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="PresentSrc"/>
     <Subpass id="mainSubpass">
       <ColorAttachment attachment="mainColorAttachment" layout="ColorAttachmentOptimal"/>
-      <DepthStencilAttachment attachment="mainDepthAttachment" layout="DepthStencilAttachmentOptimal"/>
     </Subpass>
     <Dependency>
       <Source stageMask="BottomOfPipe" accessMask="MemoryRead"/>
@@ -57,7 +52,7 @@
       <VertexBindingDescription binding="0" stride="3*4" inputRate="Vertex"/>
       <VertexAttributeDescription location="0" binding="0" format="R32G32B32Sfloat" offset="0"/>
     </VertexInputState>
-    <InputAssemblyState topology="TriangleList"/>
+    <InputAssemblyState topology="TriangleStrip"/>
     <ViewportState>
       <Viewport width="winWidth" height="winHeight" maxDepth="1.0"/>
       <Scissor width="winWidth" height="winHeight"/>
@@ -73,7 +68,6 @@
   <Frame id="mainFrame" swapchain="mainSwapchain">
     <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass">
       <Attachment swapchain="mainSwapchain"/>
-      <Attachment imageView="mainDepthBufferImageView"/>
     </Framebuffer>
     <Fence id="renderCompleteFence" signaled="true"/>
     <Semaphore id="imageAvailableSemaphore"/>
@@ -100,37 +94,21 @@
 
   <!-- Geometry -->
   <Data id="drawVertexData">
-    <FloatValues>-5 -5 5</FloatValues>
-    <FloatValues>-5 -5 -5</FloatValues>
     <FloatValues>5 -5 -5</FloatValues>
+    <FloatValues>-5 -5 -5</FloatValues>
     <FloatValues>5 -5 5</FloatValues>
-    <FloatValues>-5 5 5</FloatValues>
-    <FloatValues>5 5 5</FloatValues>
+    <FloatValues>-5 -5 5</FloatValues>
     <FloatValues>5 5 -5</FloatValues>
     <FloatValues>-5 5 -5</FloatValues>
-    <FloatValues>-5 -5 5</FloatValues>
-    <FloatValues>5 -5 5</FloatValues>
+    <FloatValues>-5 5 5</FloatValues>
     <FloatValues>5 5 5</FloatValues>
-    <FloatValues>-5 5 5</FloatValues>
-    <FloatValues>5 -5 5</FloatValues>
-    <FloatValues>5 -5 -5</FloatValues>
-    <FloatValues>5 5 -5</FloatValues>
-    <FloatValues>5 5 5</FloatValues>    
-    <FloatValues>5 -5 -5</FloatValues>
-    <FloatValues>-5 -5 -5</FloatValues>
-    <FloatValues>-5 5 -5</FloatValues>
-    <FloatValues>5 5 -5</FloatValues>
-    <FloatValues>-5 -5 -5</FloatValues>
-    <FloatValues>-5 -5 5</FloatValues>
-    <FloatValues>-5 5 5</FloatValues>
-    <FloatValues>-5 5 -5</FloatValues>    
   </Data>
 
   <Buffer id="drawVertexBuffer" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
   <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
 
   <Data id="drawIndexData">
-    <UInt8Values>0 1 2 2 3 0 4 5 6 6 7 4 8 9 10 10 11 8 12 13 14 14 15 12 16 17 18 18 19 16 20 21 22 22 23 20</UInt8Values>
+    <UInt8Values>3 2 6 7 4 2 0 3 1 6 5 4 1 0</UInt8Values>
   </Data>
 
   <Buffer id="drawIndexBuffer" usage="TransferSrc TransferDst IndexBuffer StorageBuffer"/>
@@ -139,12 +117,7 @@
   <!-- Scene -->
   <CommandGroup id="mainCommandGroup">
     <CommandList>
-      <BeginRenderPass renderPass="mainRenderPass" framebuffer="mainFramebuffer">
-        <ClearValues>
-          <ClearColorValue value="0.0 0.0 0.0 1.0"/>
-          <ClearDepthStencilValue depth="1.0" stencil="0"/>
-        </ClearValues>
-      </BeginRenderPass>
+      <BeginRenderPass renderPass="mainRenderPass" framebuffer="mainFramebuffer"/>
 
       <BindDescriptorSets layout="drawPipelineLayout" firstSet="0">
         <DescriptorSet descriptorSet="drawCommonDescriptorSet"/>
@@ -157,7 +130,7 @@
         <Buffer buffer="drawVertexBuffer" offset="0"/>
       </BindVertexBuffers>
       <BindIndexBuffer buffer="drawIndexBuffer" indexType="Uint8"/>
-      <DrawIndexed indexCount="36" instanceCount="1"/>      
+      <DrawIndexed indexCount="14" instanceCount="1"/>      
 
       <EndRenderPass/>
     </CommandList>
@@ -165,7 +138,7 @@
 
   <Camera id="mainCamera">
     <Perspective fov="60" width="winWidth" height="winHeight" zNear="0.1" zFar="256.0"/>
-    <LookAt eye="0.0 0.0 -4.0" center="0 0 0" up="0 -1 0"/>
+    <LookAt eye="0 0 -1" center="0 0 0" up="0 -1 0"/>
   </Camera>
 
   <Viewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
@@ -182,8 +155,6 @@
       <WaitSemaphore semaphore="renderCompleteSemaphore"/>
     </QueuePresent>
     <Resizer>
-      <Image image="mainDepthBufferImage"/>
-      <ImageView imageView="mainDepthBufferImageView"/>
       <GraphicsPipeline graphicsPipeline="drawPipeline"/>
       <Framebuffer framebuffer="mainFramebuffer"/>
     </Resizer>
