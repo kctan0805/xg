@@ -637,7 +637,7 @@
       <xs:attribute name="baseMipLevel" type="xs:unsignedByte" default="0" />
       <xs:attribute name="levelCount" type="xs:unsignedByte" default="1" />
       <xs:attribute name="baseArrayLayer" type="xs:unsignedByte" default="0" />
-      <xs:attribute name="layerCount" type="xs:unsignedByte" default="1" />
+      <xs:attribute name="layerCount" type="xs:string" default="1" />
     </xs:complexType>
   </xs:element>
 
@@ -1443,7 +1443,7 @@
               <xs:attribute name="height" type="xs:string" />
               <xs:attribute name="depth" type="xs:unsignedInt" default="1" />
               <xs:attribute name="mipLevels" type="xs:unsignedByte" default="1" />
-              <xs:attribute name="arrayLayers" type="xs:unsignedByte" default="1" />
+              <xs:attribute name="arrayLayers" type="xs:string" default="1" />
               <xs:attribute name="tiling" default="Optimal">
                 <xs:simpleType>
                   <xs:restriction base="xs:token">

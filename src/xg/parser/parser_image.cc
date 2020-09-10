@@ -41,7 +41,10 @@ bool ParserSingleton<ParserImage>::ParseElement(
 
   element->QueryIntAttribute("depth", &node->extent.depth);
   element->QueryIntAttribute("mipLevels", &node->mip_levels);
-  element->QueryIntAttribute("arrayLayers", &node->array_layers);
+
+  value = element->Attribute("arrayLayers");
+  if (value)
+    node->array_layers = static_cast<int>(Expression::Get().Evaluate(value));
 
   value = element->Attribute("tiling");
   if (value) node->tiling = StringToImageTiling(value);

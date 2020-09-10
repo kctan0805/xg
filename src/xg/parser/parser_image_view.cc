@@ -47,8 +47,11 @@ bool ParserSingleton<ParserImageView>::ParseElement(
                              &node->subresource_range.level_count);
   element->QueryIntAttribute("baseArrayLayer",
                              &node->subresource_range.base_array_layer);
-  element->QueryIntAttribute("layerCount",
-                             &node->subresource_range.layer_count);
+
+  value = element->Attribute("layerCount");
+  if (value)
+    node->subresource_range.layer_count =
+        static_cast<int>(Expression::Get().Evaluate(value));
 
   status->node = node;
 
