@@ -556,6 +556,17 @@ void CommandBufferVK::BindIndexBuffer(const BindIndexBufferInfo& info) const {
   cmd_buffer_.bindIndexBuffer(buf_vk->buffer_, info.offset, index_type);
 }
 
+void CommandBufferVK::Draw(const DrawInfo& info) const {
+  XG_TRACE("draw: {} {} {} {} {}",
+           static_cast<void*>((VkCommandBuffer)cmd_buffer_), info.vertex_count,
+           info.instance_count, info.first_vertex, info.first_instance);
+
+  cmd_buffer_.draw(static_cast<uint32_t>(info.vertex_count),
+                   static_cast<uint32_t>(info.instance_count),
+                   static_cast<uint32_t>(info.first_vertex),
+                   static_cast<uint32_t>(info.first_instance));
+}
+
 void CommandBufferVK::DrawIndexed(const DrawIndexedInfo& info) const {
   XG_TRACE("drawIndexed: {} {} {} {} {} {}",
            static_cast<void*>((VkCommandBuffer)cmd_buffer_), info.index_count,

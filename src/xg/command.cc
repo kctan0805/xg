@@ -490,6 +490,17 @@ void CommandBindIndexBuffer::Build(const CommandInfo& cmd_info) const {
   cmd_info.cmd_buffer->BindIndexBuffer(info);
 }
 
+void CommandDraw::Init(const LayoutDraw& ldraw) {
+  info_.vertex_count = ldraw.vertex_count;
+  info_.instance_count = ldraw.instance_count;
+  info_.first_vertex = ldraw.first_vertex;
+  info_.first_instance = ldraw.first_instance;
+}
+
+void CommandDraw::Build(const CommandInfo& cmd_info) const {
+  cmd_info.cmd_buffer->Draw(info_);
+}
+
 void CommandDrawIndexed::Init(const LayoutDrawIndexed& ldraw_indexed) {
   info_.index_count = ldraw_indexed.index_count;
   info_.instance_count = ldraw_indexed.instance_count;

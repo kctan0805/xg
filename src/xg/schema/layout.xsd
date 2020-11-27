@@ -1162,6 +1162,15 @@
               </xs:attribute>
             </xs:complexType>
           </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Draw">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="vertexCount" type="xs:unsignedInt" use="required" />
+              <xs:attribute name="instanceCount" type="xs:unsignedInt" default="1" />
+              <xs:attribute name="firstVertex" type="xs:unsignedInt" default="0" />
+              <xs:attribute name="firstInstance" type="xs:unsignedInt" default="0" />
+            </xs:complexType>
+          </xs:element>          
           <xs:element minOccurs="0" maxOccurs="unbounded" name="DrawIndexed">
             <xs:complexType>
               <xs:attribute name="id" type="xs:ID" />

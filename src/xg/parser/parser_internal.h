@@ -157,6 +157,7 @@ class ParserBindPipeline : public ParserSingleton<ParserBindPipeline> {};
 class ParserBindVertexBuffers
     : public ParserSingleton<ParserBindVertexBuffers> {};
 class ParserBindIndexBuffer : public ParserSingleton<ParserBindIndexBuffer> {};
+class ParserDraw : public ParserSingleton<ParserDraw> {};
 class ParserDrawIndexed : public ParserSingleton<ParserDrawIndexed> {};
 class ParserDrawIndexedIndirect
     : public ParserSingleton<ParserDrawIndexedIndirect> {};

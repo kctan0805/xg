@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Engine>
+  <Constant id="winWidth" value="512"/>
+  <Constant id="winHeight" value="512"/>
+
+  <Renderer appName="triangle" debug="true">
+    <Window id="mainWindow" width="winWidth" height="winHeight" title="Triangle" resizable="true"/>
+    <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
+
+    <Device>
+      <Queue id="mainQueue" queueFamily="Graphics Transfer" presentable="true"/>
+    </Device>
+  </Renderer>
+
+  <CommandPool id="mainCommandPool" queue="mainQueue"/>
+
+  <RenderPass id="mainRenderPass">
+    <Attachment id="mainColorAttachment" format="B8G8R8A8Unorm" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc"/>
+    <Subpass id="mainSubpass">
+      <ColorAttachment attachment="mainColorAttachment" layout="ColorAttachmentOptimal"/>
+    </Subpass>
+    <Dependency>
+      <Source stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+      <Destination subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+    </Dependency>
+  </RenderPass>
+
+  <PipelineLayout id="drawPipelineLayout"/>
+  <ShaderModule id="drawVertexShader" file="triangle.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="triangle.frag.spv"/>
+
+  <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
+    <Stage stage="Vertex" module="drawVertexShader"/>
+    <Stage stage="Fragment" module="drawFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="(2+3)*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32Sfloat" offset="0"/>
+      <VertexAttributeDescription location="1" binding="0" format="R32G32B32Sfloat" offset="2*4"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleList"/>
+    <ViewportState>
+      <Viewport width="winWidth" height="winHeight" maxDepth="1.0"/>
+      <Scissor width="winWidth" height="winHeight"/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise" lineWidth="1.0"/>
+    <MultisampleState/>
+    <DepthStencilState/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <Frame id="mainFrame" swapchain="mainSwapchain">
+    <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass">
+      <Attachment swapchain="mainSwapchain"/>
+    </Framebuffer>
+    <Fence id="renderCompleteFence" signaled="true"/>
+    <Semaphore id="imageAvailableSemaphore"/>
+    <Semaphore id="renderCompleteSemaphore"/>
+    <CommandBuffer id="mainCommandBuffer" commandPool="mainCommandPool"/>
+  </Frame>
+
+  <!-- Model -->
+  <!-- Geometry -->
+  <Data id="drawVertexData">
+    <FloatValues>0.0 -1.0 1.0 0.0 0.0</FloatValues>
+    <FloatValues>1.0 1.0 0.0 1.0 0.0</FloatValues>
+    <FloatValues>-1.0 1.0 0.0 0.0 1.0</FloatValues>
+  </Data>
+
+  <Buffer id="drawVertexBuffer" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
+
+  <!-- Scene -->
+  <CommandGroup id="mainCommandGroup">
+    <CommandList>
+      <BeginRenderPass renderPass="mainRenderPass" framebuffer="mainFramebuffer">
+        <ClearValues>
+          <ClearColorValue value="0.0 0.0 0.0 1.0"/>
+        </ClearValues>
+      </BeginRenderPass>
+
+      <BindPipeline pipeline="drawPipeline"/>
+
+      <!-- geometry -->
+      <BindVertexBuffers firstBinding="0">
+        <Buffer buffer="drawVertexBuffer" offset="0"/>
+      </BindVertexBuffers>
+      <Draw vertexCount="3" instanceCount="1"/>
+
+      <EndRenderPass/>
+    </CommandList>
+  </CommandGroup>
+
+  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame">
+    <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
+    <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
+    <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
+      <Submit>
+        <Wait semaphore="imageAvailableSemaphore" dstStageMask="ColorAttachmentOutput"/>
+        <CommandBuffer commandBuffer="mainCommandBuffer"/>
+        <SignalSemaphore semaphore="renderCompleteSemaphore"/>
+      </Submit>
+    </QueueSubmit>
+    <QueuePresent queue="mainQueue">
+      <WaitSemaphore semaphore="renderCompleteSemaphore"/>
+    </QueuePresent>
+    <Resizer>
+      <GraphicsPipeline graphicsPipeline="drawPipeline"/>
+      <Framebuffer framebuffer="mainFramebuffer"/>
+    </Resizer>
+  </Viewer>
+</Engine>

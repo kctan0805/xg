@@ -55,10 +55,13 @@ bool Viewer::Init(const LayoutViewer& lviewer) {
     XG_ERROR("frame not found");
     return false;
   }
-  camera_ = std::static_pointer_cast<Camera>(lviewer.lcamera->instance);
-  if (!camera_) {
-    XG_ERROR("camera not found");
-    return false;
+
+  if (lviewer.lcamera) {
+    camera_ = std::static_pointer_cast<Camera>(lviewer.lcamera->instance);
+    if (!camera_) {
+      XG_ERROR("camera not found");
+      return false;
+    }
   }
 
   for (const auto& lcmd_context : lviewer.lcmd_contexts) {

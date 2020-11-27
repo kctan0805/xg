@@ -37,6 +37,7 @@ class CommandBufferVK : public CommandBuffer {
   void BindPipeline(const Pipeline& pipeline) const override;
   void BindVertexBuffers(const BindVertexBuffersInfo& info) const override;
   void BindIndexBuffer(const BindIndexBufferInfo& info) const override;
+  void Draw(const DrawInfo& info) const override;
   void DrawIndexed(const DrawIndexedInfo& info) const override;
   void DrawIndexedIndirect(const DrawIndexedIndirectInfo& info) const override;
   void ResetQueryPool(const ResetQueryPoolInfo& info) const override;

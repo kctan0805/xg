@@ -180,6 +180,8 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
     return ParserBindVertexBuffers::Get().ParseElement(element, status);
   } else if (strcmp(name, "BindIndexBuffer") == 0) {
     return ParserBindIndexBuffer::Get().ParseElement(element, status);
+  } else if (strcmp(name, "Draw") == 0) {
+    return ParserDraw::Get().ParseElement(element, status);
   } else if (strcmp(name, "DrawIndexed") == 0) {
     return ParserDrawIndexed::Get().ParseElement(element, status);
   } else if (strcmp(name, "DrawIndexedIndirect") == 0) {

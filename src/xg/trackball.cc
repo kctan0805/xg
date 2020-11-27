@@ -18,6 +18,7 @@
 namespace xg {
 
 void Trackball::Init(const TrackballInfo& info) {
+  if (!info.camera) return;
   camera_ = info.camera;
   width_ = camera_->GetWidth();
   height_ = camera_->GetHeight();
@@ -45,6 +46,7 @@ void Trackball::ComputeCoordinates(double mouse_x, double mouse_y,
 
 void Trackball::OnMouseButton(MouseButton button, ButtonAction action,
                               double posx, double posy) {
+  if (!camera_) return;
   switch (action) {
     case ButtonAction::kPress:
       ComputeCoordinates(posx, posy, &prev_ndc_, &prev_tbc_);
@@ -81,10 +83,9 @@ void Trackball::OnMouseButton(MouseButton button, ButtonAction action,
 }
 
 void Trackball::OnMouseMove(double posx, double posy) {
+  if (!camera_) return;
   if (!mouse_pressed_.left && !mouse_pressed_.right && !mouse_pressed_.middle)
     return;
-
-  assert(camera_);
 
   glm::dvec2 new_ndc;
   glm::dvec3 new_tbc;

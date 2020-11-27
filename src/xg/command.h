@@ -281,6 +281,19 @@ class CommandBindIndexBuffer : public CommandBase {
   friend class Renderer;
 };
 
+class CommandDraw : public CommandBase {
+ public:
+  virtual ~CommandDraw() = default;
+
+  void Init(const LayoutDraw& ldraw);
+  void Build(const CommandInfo& cmd_info) const override;
+
+ protected:
+  DrawInfo info_ = {};
+
+  friend class Renderer;
+};
+
 class CommandDrawIndexed : public CommandBase {
  public:
   virtual ~CommandDrawIndexed() = default;

@@ -24,10 +24,10 @@
     </Subpass>
     <Dependency>
       <Source stageMask="BottomOfPipe" accessMask="MemoryRead"/>
-      <Destination subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentRead ColorAttachmentWrite"/>
+      <Destination subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
     </Dependency>
     <Dependency>
-      <Source subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentRead ColorAttachmentWrite"/>
+      <Source subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
       <Destination stageMask="BottomOfPipe" accessMask="MemoryRead"/>
     </Dependency>
   </RenderPass>

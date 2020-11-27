@@ -148,6 +148,13 @@ struct BindIndexBufferInfo {
   IndexType index_type;
 };
 
+struct DrawInfo {
+  int vertex_count;
+  int instance_count;
+  int first_vertex;
+  int first_instance;
+};
+
 struct DrawIndexedInfo {
   int index_count;
   int instance_count;
@@ -213,6 +220,7 @@ class CommandBuffer {
   virtual void BindPipeline(const Pipeline& pipeline) const = 0;
   virtual void BindVertexBuffers(const BindVertexBuffersInfo& info) const = 0;
   virtual void BindIndexBuffer(const BindIndexBufferInfo& info) const = 0;
+  virtual void Draw(const DrawInfo& info) const = 0;
   virtual void DrawIndexed(const DrawIndexedInfo& info) const = 0;
   virtual void DrawIndexedIndirect(
       const DrawIndexedIndirectInfo& info) const = 0;

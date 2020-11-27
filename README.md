@@ -17,6 +17,7 @@ and has following features :
 
 ## Examples
 
+- [triangle](app/triangle/) triangle example.
 - [hello world](app/hello_world/) simple example.
 - [headless](app/headless/) compute-only example.
 - [multiview](app/multiview/) simple multi-view example.

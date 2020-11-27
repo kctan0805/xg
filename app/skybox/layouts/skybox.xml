@@ -3,7 +3,7 @@
   <Constant id="winWidth" value="640"/>
   <Constant id="winHeight" value="480"/>
 
-  <Renderer appName="hello_world" debug="true">
+  <Renderer appName="skybox" debug="true">
     <Window id="mainWindow" width="winWidth" height="winHeight" title="Skybox" resizable="true"/>
     <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
 
@@ -22,10 +22,10 @@
     </Subpass>
     <Dependency>
       <Source stageMask="BottomOfPipe" accessMask="MemoryRead"/>
-      <Destination subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentRead ColorAttachmentWrite"/>
+      <Destination subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
     </Dependency>
     <Dependency>
-      <Source subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentRead ColorAttachmentWrite"/>
+      <Source subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
       <Destination stageMask="BottomOfPipe" accessMask="MemoryRead"/>
     </Dependency>
   </RenderPass>

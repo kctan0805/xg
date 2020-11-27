@@ -1,3 +1,4 @@
+add_subdirectory(triangle)
 add_subdirectory(hello_world)
 add_subdirectory(multiview)
 add_subdirectory(multiwin)

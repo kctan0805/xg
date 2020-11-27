@@ -202,6 +202,7 @@ enum class LayoutType {
   kBindPipeline,
   kBindVertexBuffers,
   kBindIndexBuffer,
+  kDraw,
   kDrawIndexed,
   kDrawIndexedIndirect,
   kBlitImage,
@@ -1389,6 +1390,21 @@ struct LayoutBindIndexBuffer : LayoutBase {
   }
 
   const char* lbuffer_id = nullptr;
+};
+
+struct LayoutDraw : LayoutBase {
+  LayoutDraw() : LayoutBase{LayoutType::kDraw} {}
+
+  int vertex_count = 0;
+  int instance_count = 1;
+  int first_vertex = 0;
+  int first_instance = 0;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), vertex_count, instance_count,
+            first_vertex, first_instance);
+  }
 };
 
 struct LayoutDrawIndexed : LayoutBase {

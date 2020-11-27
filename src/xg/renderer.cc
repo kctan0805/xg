@@ -445,6 +445,20 @@ std::shared_ptr<CommandList> Renderer::CreateCommandList(
         break;
       }
 
+      case LayoutType::kDraw: {
+        auto cmd = std::make_shared<CommandDraw>();
+        if (!cmd) {
+          XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+          return nullptr;
+        }
+        auto ldraw = std::static_pointer_cast<LayoutDraw>(lcmd);
+        cmd->Init(*ldraw);
+
+        cmd_list->commands_.emplace_back(cmd);
+        lcmd->instance = std::move(cmd);
+        break;
+      }
+
       case LayoutType::kDrawIndexed: {
         auto cmd = std::make_shared<CommandDrawIndexed>();
         if (!cmd) {
