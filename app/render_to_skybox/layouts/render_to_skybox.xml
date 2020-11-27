@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Engine>
+  <Constant id="winWidth" value="640"/>
+  <Constant id="winHeight" value="480"/>
+
+  <Renderer appName="render_to_skybox" debug="true">
+    <Window id="mainWindow" width="winWidth" height="winHeight" title="Skybox" resizable="true"/>
+    <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
+
+    <Device>
+      <Queue id="mainQueue" queueFamily="Graphics Transfer" presentable="true"/>
+    </Device>
+  </Renderer>
+
+  <CommandPool id="mainCommandPool" queue="mainQueue"/>
+  <DescriptorPool id="mainDescriptorPool"/>
+
+  <!-- Main -->
+  <RenderPass id="mainRenderPass">
+    <Attachment id="mainColorAttachment" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="PresentSrc"/>
+    <Subpass id="mainSubpass">
+      <ColorAttachment attachment="mainColorAttachment" layout="ColorAttachmentOptimal"/>
+    </Subpass>
+    <Dependency>
+      <Source stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+      <Destination subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+    </Dependency>
+  </RenderPass>
+
+  <DescriptorSetLayout id="drawCommonDescriptorSetLayout">
+    <DescriptorSetLayoutBinding binding="0" descriptorType="UniformBuffer" stageFlags="Vertex"/>
+  </DescriptorSetLayout>
+  <DescriptorSetLayout id="drawMaterialDescriptorSetLayout">
+    <DescriptorSetLayoutBinding binding="0" descriptorType="CombinedImageSampler" stageFlags="Fragment"/>
+  </DescriptorSetLayout>
+
+  <PipelineLayout id="drawPipelineLayout">
+    <SetLayout descriptorSetLayout="drawCommonDescriptorSetLayout"/>
+    <SetLayout descriptorSetLayout="drawMaterialDescriptorSetLayout"/>
+  </PipelineLayout>
+
+  <ShaderModule id="drawVertexShader" file="skybox.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="skybox.frag.spv"/>
+
+  <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
+    <Stage stage="Vertex" module="drawVertexShader"/>
+    <Stage stage="Fragment" module="drawFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="3*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32B32Sfloat" offset="0"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleStrip"/>
+    <ViewportState>
+      <Viewport width="winWidth" height="winHeight" maxDepth="1.0"/>
+      <Scissor width="winWidth" height="winHeight"/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="Back" frontFace="Clockwise"/>
+    <MultisampleState/>
+    <DepthStencilState/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <Frame id="mainFrame" swapchain="mainSwapchain">
+    <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass">
+      <Attachment swapchain="mainSwapchain"/>
+    </Framebuffer>
+    <Fence id="renderCompleteFence" signaled="true"/>
+    <Semaphore id="imageAvailableSemaphore"/>
+    <Semaphore id="renderCompleteSemaphore"/>
+    <CommandBuffer id="mainCommandBuffer" commandPool="mainCommandPool"/>
+
+    <Buffer id="drawCommonUniformBuffer" size="4*16" usage="UniformBuffer" allocFlags="Undefined" memUsage="CpuToGpu"/> <!-- perspective * view matrix of camera -->
+
+    <DescriptorSet id="drawCommonDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawCommonDescriptorSetLayout">
+      <Descriptor binding="0" descriptorType="UniformBuffer"><BufferInfo buffer="drawCommonUniformBuffer"/></Descriptor>
+    </DescriptorSet>
+  </Frame>
+
+  <!-- Cubemap -->
+  <RenderPass id="cubemapRenderPass">
+    <Attachment id="cubemapColorAttachment0" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment1" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment2" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment3" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment4" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment5" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Subpass id="cubemapSubpass0">
+      <ColorAttachment attachment="cubemapColorAttachment0" layout="ColorAttachmentOptimal"/>
+    </Subpass>
+    <Subpass id="cubemapSubpass1">
+      <ColorAttachment attachment="cubemapColorAttachment1" layout="ColorAttachmentOptimal"/>
+    </Subpass>
+    <Subpass id="cubemapSubpass2">
+      <ColorAttachment attachment="cubemapColorAttachment2" layout="ColorAttachmentOptimal"/>
+    </Subpass>    
+    <Subpass id="cubemapSubpass3">
+      <ColorAttachment attachment="cubemapColorAttachment3" layout="ColorAttachmentOptimal"/>
+    </Subpass>    
+    <Subpass id="cubemapSubpass4">
+      <ColorAttachment attachment="cubemapColorAttachment4" layout="ColorAttachmentOptimal"/>
+    </Subpass>    
+    <Subpass id="cubemapSubpass5">
+      <ColorAttachment attachment="cubemapColorAttachment5" layout="ColorAttachmentOptimal"/>
+    </Subpass>    
+    <Dependency>
+      <Source stageMask="FragmentShader" accessMask="ShaderRead"/>
+      <Destination subpass="cubemapSubpass0" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="cubemapSubpass0" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="FragmentShader" accessMask="ShaderRead"/>
+    </Dependency>
+    <Dependency>
+      <Source stageMask="FragmentShader" accessMask="ShaderRead"/>
+      <Destination subpass="cubemapSubpass1" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="cubemapSubpass1" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="FragmentShader" accessMask="ShaderRead"/>
+    </Dependency>    
+    <Dependency>
+      <Source stageMask="FragmentShader" accessMask="ShaderRead"/>
+      <Destination subpass="cubemapSubpass2" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="cubemapSubpass2" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="FragmentShader" accessMask="ShaderRead"/>
+    </Dependency>    
+    <Dependency>
+      <Source stageMask="FragmentShader" accessMask="ShaderRead"/>
+      <Destination subpass="cubemapSubpass3" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="cubemapSubpass3" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="FragmentShader" accessMask="ShaderRead"/>
+    </Dependency>    
+    <Dependency>
+      <Source stageMask="FragmentShader" accessMask="ShaderRead"/>
+      <Destination subpass="cubemapSubpass4" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="cubemapSubpass4" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="FragmentShader" accessMask="ShaderRead"/>
+    </Dependency>    
+    <Dependency>
+      <Source stageMask="FragmentShader" accessMask="ShaderRead"/>
+      <Destination subpass="cubemapSubpass5" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="cubemapSubpass5" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="FragmentShader" accessMask="ShaderRead"/>
+    </Dependency>    
+  </RenderPass>
+
+  <PipelineLayout id="cubemapPipelineLayout"/>
+  <ShaderModule id="cubemapVertexShader" file="cubemap.vert.spv"/>
+  <ShaderModule id="cubemapFragmentShader" file="cubemap.frag.spv"/>
+
+  <GraphicsPipeline id="cubemapPipeline" layout="cubemapPipelineLayout" renderPass="cubemapRenderPass" subpass="cubemapSubpass0">
+    <Stage stage="Vertex" module="cubemapVertexShader"/>
+    <Stage stage="Fragment" module="cubemapFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="(2+3)*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32Sfloat" offset="0"/>
+      <VertexAttributeDescription location="1" binding="0" format="R32G32B32Sfloat" offset="2*4"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleList"/>
+    <ViewportState>
+      <Viewport width="512" height="512" maxDepth="1.0"/>
+      <Scissor width="512" height="512"/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise"/>
+    <MultisampleState/>
+    <DepthStencilState/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <ImageView id="cubemapImageView0" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="0" layerCount="1"/>
+  <ImageView id="cubemapImageView1" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="1" layerCount="1"/>
+  <ImageView id="cubemapImageView2" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="2" layerCount="1"/>
+  <ImageView id="cubemapImageView3" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="3" layerCount="1"/>
+  <ImageView id="cubemapImageView4" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="4" layerCount="1"/>
+  <ImageView id="cubemapImageView5" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="5" layerCount="1"/>
+  
+  <Framebuffer id="cubemapFramebuffer" renderPass="cubemapRenderPass" width="512" height="512">
+    <Attachment imageView="cubemapImageView0"/>
+    <Attachment imageView="cubemapImageView1"/>
+    <Attachment imageView="cubemapImageView2"/>
+    <Attachment imageView="cubemapImageView3"/>
+    <Attachment imageView="cubemapImageView4"/>
+    <Attachment imageView="cubemapImageView5"/>
+  </Framebuffer>  
+
+  <Data id="cubemapVertexData0">
+    <FloatValues>0.0 -1.0 1.0 0.0 0.0</FloatValues>
+    <FloatValues>1.0 1.0 1.0 0.0 0.0</FloatValues>
+    <FloatValues>-1.0 1.0 1.0 0.0 0.0</FloatValues>
+  </Data>
+  <Buffer id="cubemapVertexBuffer0" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <BufferLoader buffer="cubemapVertexBuffer0" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData0"/>
+  
+  <Data id="cubemapVertexData1">
+    <FloatValues>0.0 -1.0 0.0 1.0 0.0</FloatValues>
+    <FloatValues>1.0 1.0 0.0 1.0 0.0</FloatValues>
+    <FloatValues>-1.0 1.0 0.0 1.0 0.0</FloatValues>
+  </Data>
+  <Buffer id="cubemapVertexBuffer1" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <BufferLoader buffer="cubemapVertexBuffer1" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData1"/>
+
+  <Data id="cubemapVertexData2">
+    <FloatValues>0.0 -1.0 0.0 0.0 1.0</FloatValues>
+    <FloatValues>1.0 1.0 0.0 0.0 1.0</FloatValues>
+    <FloatValues>-1.0 1.0 0.0 0.0 1.0</FloatValues>
+  </Data>
+  <Buffer id="cubemapVertexBuffer2" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <BufferLoader buffer="cubemapVertexBuffer2" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData2"/>
+
+  <Data id="cubemapVertexData3">
+    <FloatValues>0.0 -1.0 1.0 1.0 0.0</FloatValues>
+    <FloatValues>1.0 1.0 1.0 1.0 0.0</FloatValues>
+    <FloatValues>-1.0 1.0 1.0 1.0 0.0</FloatValues>
+  </Data>
+  <Buffer id="cubemapVertexBuffer3" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <BufferLoader buffer="cubemapVertexBuffer3" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData3"/>
+
+  <Data id="cubemapVertexData4">
+    <FloatValues>0.0 -1.0 1.0 0.0 1.0</FloatValues>
+    <FloatValues>1.0 1.0 1.0 0.0 1.0</FloatValues>
+    <FloatValues>-1.0 1.0 1.0 0.0 1.0</FloatValues>
+  </Data>
+  <Buffer id="cubemapVertexBuffer4" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <BufferLoader buffer="cubemapVertexBuffer4" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData4"/>
+
+  <Data id="cubemapVertexData5">
+    <FloatValues>0.0 -1.0 0.0 1.0 1.0</FloatValues>
+    <FloatValues>1.0 1.0 0.0 1.0 1.0</FloatValues>
+    <FloatValues>-1.0 1.0 0.0 1.0 1.0</FloatValues>
+  </Data>
+  <Buffer id="cubemapVertexBuffer5" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <BufferLoader buffer="cubemapVertexBuffer5" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData5"/>
+
+  <!-- Model -->
+  <!-- Material -->
+  <Image id="drawTextureImage" flags="CubeCompatible" format="R8G8B8A8Unorm" width="512" height="512" arrayLayers="6" usage="Sampled ColorAttachment"/>
+  <ImageView id="drawTextureImageView" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" layerCount="6"/>
+  <Sampler id="drawTextureSampler" magFilter="Linear" minFilter="Linear" addressModeU="ClampToEdge" addressModeV="ClampToEdge" addressModeW="ClampToEdge" anisotropyEnable="true"/>
+
+  <DescriptorSet id="drawMaterialDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawMaterialDescriptorSetLayout">
+    <Descriptor binding="0" descriptorType="CombinedImageSampler"><ImageInfo sampler="drawTextureSampler" imageView="drawTextureImageView" imageLayout="ShaderReadOnlyOptimal"/></Descriptor>
+  </DescriptorSet>
+
+  <!-- Geometry -->
+  <Data id="drawVertexData">
+    <FloatValues>5 -5 -5</FloatValues>
+    <FloatValues>-5 -5 -5</FloatValues>
+    <FloatValues>5 -5 5</FloatValues>
+    <FloatValues>-5 -5 5</FloatValues>
+    <FloatValues>5 5 -5</FloatValues>
+    <FloatValues>-5 5 -5</FloatValues>
+    <FloatValues>-5 5 5</FloatValues>
+    <FloatValues>5 5 5</FloatValues>
+  </Data>
+
+  <Buffer id="drawVertexBuffer" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
+
+  <Data id="drawIndexData">
+    <UInt8Values>3 2 6 7 4 2 0 3 1 6 5 4 1 0</UInt8Values>
+  </Data>
+
+  <Buffer id="drawIndexBuffer" usage="TransferSrc TransferDst IndexBuffer StorageBuffer"/>
+  <BufferLoader buffer="drawIndexBuffer" accessMask="IndexRead" queue="mainQueue" stageMask="VertexInput" data="drawIndexData"/>
+
+  <!-- Scene -->
+  <CommandGroup id="mainCommandGroup">
+    <CommandList>
+      <BeginRenderPass renderPass="cubemapRenderPass" framebuffer="cubemapFramebuffer">
+      <ClearValues>
+        <ClearColorValue value="0.0 0.0 0.0 1.0"/>
+      </ClearValues>
+      </BeginRenderPass>
+      
+      <BindPipeline pipeline="cubemapPipeline"/>
+      
+      <BindVertexBuffers>
+        <Buffer buffer="cubemapVertexBuffer0"/>
+      </BindVertexBuffers>
+      <Draw vertexCount="3"/>
+
+      <NextSubpass/>
+      <BindVertexBuffers>
+        <Buffer buffer="cubemapVertexBuffer1"/>
+      </BindVertexBuffers>
+      <Draw vertexCount="3"/>
+
+      <NextSubpass/>
+      <BindVertexBuffers>
+        <Buffer buffer="cubemapVertexBuffer2"/>
+      </BindVertexBuffers>
+      <Draw vertexCount="3"/>
+
+      <NextSubpass/>
+      <BindVertexBuffers>
+        <Buffer buffer="cubemapVertexBuffer3"/>
+      </BindVertexBuffers>
+      <Draw vertexCount="3"/>
+
+      <NextSubpass/>
+      <BindVertexBuffers>
+        <Buffer buffer="cubemapVertexBuffer4"/>
+      </BindVertexBuffers>
+      <Draw vertexCount="3"/>
+
+      <NextSubpass/>
+      <BindVertexBuffers>
+        <Buffer buffer="cubemapVertexBuffer5"/>
+      </BindVertexBuffers>
+      <Draw vertexCount="3"/>
+
+      <EndRenderPass/>      
+      
+      <BeginRenderPass renderPass="mainRenderPass" framebuffer="mainFramebuffer"/>
+
+      <BindDescriptorSets layout="drawPipelineLayout" firstSet="0">
+        <DescriptorSet descriptorSet="drawCommonDescriptorSet"/>
+        <DescriptorSet descriptorSet="drawMaterialDescriptorSet"/>        
+      </BindDescriptorSets>
+
+      <BindPipeline pipeline="drawPipeline"/>
+      
+      <BindVertexBuffers firstBinding="0">
+        <Buffer buffer="drawVertexBuffer" offset="0"/>
+      </BindVertexBuffers>
+      <BindIndexBuffer buffer="drawIndexBuffer" indexType="Uint8"/>
+      <DrawIndexed indexCount="14" instanceCount="1"/>      
+
+      <EndRenderPass/>
+    </CommandList>
+  </CommandGroup>
+
+  <Camera id="mainCamera">
+    <Perspective fov="60" width="winWidth" height="winHeight" zNear="0.1" zFar="256.0"/>
+    <LookAt eye="0 0 -1" center="0 0 0" up="0 -1 0"/>
+  </Camera>
+
+  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
+    <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
+    <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
+    <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
+      <Submit>
+        <Wait semaphore="imageAvailableSemaphore" dstStageMask="ColorAttachmentOutput"/>
+        <CommandBuffer commandBuffer="mainCommandBuffer"/>
+        <SignalSemaphore semaphore="renderCompleteSemaphore"/>
+      </Submit>
+    </QueueSubmit>
+    <QueuePresent queue="mainQueue">
+      <WaitSemaphore semaphore="renderCompleteSemaphore"/>
+    </QueuePresent>
+    <Resizer>
+      <GraphicsPipeline graphicsPipeline="drawPipeline"/>
+      <Framebuffer framebuffer="mainFramebuffer"/>
+    </Resizer>
+    <Updater>
+      <Buffer buffer="drawCommonUniformBuffer"/>
+    </Updater>
+  </Viewer>
+</Engine>

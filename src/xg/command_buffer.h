@@ -194,6 +194,10 @@ struct EventInfo {
   PipelineStageFlags stage_mask;
 };
 
+struct NextSubpassInfo {
+  SubpassContents contents;
+};
+
 class CommandBuffer {
  public:
   CommandBuffer(const CommandBuffer&) = delete;
@@ -229,6 +233,7 @@ class CommandBuffer {
   virtual void EndQuery(const QueryInfo& info) const = 0;
   virtual void SetEvent(const EventInfo& info) const = 0;
   virtual void ResetEvent(const EventInfo& info) const = 0;
+  virtual void NextSubpass(const NextSubpassInfo& info) const = 0;
 
  protected:
   CommandBuffer() = default;

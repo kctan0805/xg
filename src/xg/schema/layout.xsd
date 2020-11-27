@@ -934,6 +934,13 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="SubpassContentsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Inline" />
+      <xs:enumeration value="SecondaryCommandBuffers" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:element name="CommandList">
     <xs:complexType>
       <xs:sequence>
@@ -1270,6 +1277,12 @@
               <xs:attribute name="stageMask" type="PipelineStageFlagsTypeList" default="AllCommands" />
             </xs:complexType>
           </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="NextSubpass">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="contents" type="SubpassContentsType" default="Inline" />
+            </xs:complexType>
+          </xs:element>          
         </xs:choice>
       </xs:sequence>
       <xs:attribute name="id" type="xs:ID" />

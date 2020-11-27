@@ -1150,6 +1150,20 @@ IndexType StringToIndexType(const char* value) {
   return IndexType::kUint16;
 }
 
+SubpassContents StringToSubpassContents(const char* value) {
+  static std::unordered_map<std::string, SubpassContents> mapping{
+#define ENTRY(s) {#s, SubpassContents::k##s}
+      ENTRY(Inline), ENTRY(SecondaryCommandBuffers)
+#undef ENTRY
+  };
+  const auto x = mapping.find(value);
+  if (x != std::end(mapping)) {
+    return x->second;
+  }
+  XG_ERROR("unknown subpass contents: {}", value);
+  return SubpassContents::kInline;
+}
+
 void StringToFloats(const char* value, std::vector<float>* results) {
   std::stringstream ss(value);
   std::string token;

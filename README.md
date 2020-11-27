@@ -26,6 +26,7 @@ and has following features :
 - [serialize layout](app/serialize_layout/) serialize layout example.
 - [embedded layout](app/embed_layout/) embedded serialized layout to execute file.
 - [skybox](app/skybox/) skybox example.
+- [render_to_skybox](app/render_to_skybox/) render to skybox example.
 
 
 ## Dependencies

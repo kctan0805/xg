@@ -394,6 +394,19 @@ class CommandResetEvent : public CommandBase {
   friend class Renderer;
 };
 
+class CommandNextSubpass : public CommandBase {
+ public:
+  virtual ~CommandNextSubpass() = default;
+
+  void Init(const LayoutNextSubpass& lnext_subpass);
+  void Build(const CommandInfo& cmd_info) const override;
+
+ protected:
+  NextSubpassInfo info_ = {};
+
+  friend class Renderer;
+};
+
 }  // namespace xg
 
 #endif  // XG_COMMAND_H_

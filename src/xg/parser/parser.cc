@@ -196,6 +196,8 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
     return ParserSetEvent::Get().ParseElement(element, status);
   } else if (strcmp(name, "ResetEvent") == 0) {
     return ParserResetEvent::Get().ParseElement(element, status);
+  } else if (strcmp(name, "NextSubpass") == 0) {
+    return ParserNextSubpass::Get().ParseElement(element, status);
   } else if (strcmp(name, "Viewer") == 0) {
     return ParserViewer::Get().ParseElement(element, status);
   } else if (strcmp(name, "AcquireNextImage") == 0) {

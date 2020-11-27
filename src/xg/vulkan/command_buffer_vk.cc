@@ -655,4 +655,14 @@ void CommandBufferVK::ResetEvent(const EventInfo& info) const {
   cmd_buffer_.resetEvent(event_vk->event_, stage_mask);
 }
 
+void CommandBufferVK::NextSubpass(const NextSubpassInfo& info) const {
+  const auto contents = static_cast<vk::SubpassContents>(info.contents);
+
+  XG_TRACE("nextSubpass: {} {}",
+           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
+           vk::to_string(contents));
+
+  cmd_buffer_.nextSubpass(contents);
+}
+
 }  // namespace xg

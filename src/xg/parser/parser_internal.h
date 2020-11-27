@@ -166,6 +166,7 @@ class ParserPushConstants : public ParserSingleton<ParserPushConstants> {};
 class ParserResetQueryPool : public ParserSingleton<ParserResetQueryPool> {};
 class ParserSetEvent : public ParserSingleton<ParserSetEvent> {};
 class ParserResetEvent : public ParserSingleton<ParserResetEvent> {};
+class ParserNextSubpass : public ParserSingleton<ParserNextSubpass> {};
 class ParserViewer : public ParserSingleton<ParserViewer> {};
 class ParserAcquireNextImage : public ParserSingleton<ParserAcquireNextImage> {
 };
@@ -220,6 +221,7 @@ glm::vec3 StringToVec3(const char* value);
 glm::vec4 StringToVec4(const char* value);
 PipelineBindPoint StringToPipelineBindPoint(const char* value);
 IndexType StringToIndexType(const char* value);
+SubpassContents StringToSubpassContents(const char* value);
 void StringToFloats(const char* value, std::vector<float>* results);
 
 template <typename T>

@@ -45,6 +45,7 @@ class CommandBufferVK : public CommandBuffer {
   void EndQuery(const QueryInfo& info) const override;
   void SetEvent(const EventInfo& info) const override;
   void ResetEvent(const EventInfo& info) const override;
+  void NextSubpass(const NextSubpassInfo& info) const override;
 
  protected:
   vk::Device device_;

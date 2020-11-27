@@ -462,15 +462,7 @@ inline MemoryAllocFlags operator&(MemoryAllocFlags lhs, MemoryAllocFlags rhs) {
 
 enum class MemoryUsage { kUnknown, kGpuOnly, kCpuOnly, kCpuToGpu, kGpuToCpu };
 
-enum class ComponentSwizzle {
-  kIdentity,
-  kZero,
-  kOne,
-  kR,
-  kG,
-  kB,
-  kA
-};
+enum class ComponentSwizzle { kIdentity, kZero, kOne, kR, kG, kB, kA };
 
 struct ComponentMapping {
   ComponentSwizzle r;
@@ -868,6 +860,8 @@ enum class QueryType {
   kPipelineStatistics = 1,
   kTimestamp = 2
 };
+
+enum class SubpassContents { kInline, kSecondaryCommandBuffers };
 
 }  // namespace xg
 

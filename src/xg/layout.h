@@ -210,6 +210,7 @@ enum class LayoutType {
   kResetQueryPool,
   kSetEvent,
   kResetEvent,
+  kNextSubpass,
   kViewer,
   kAcquireNextImage,
   kQueueSubmit,
@@ -1599,6 +1600,17 @@ struct LayoutResetEvent : LayoutBase {
   const char* levent_id = nullptr;
 };
 
+struct LayoutNextSubpass : LayoutBase {
+  LayoutNextSubpass() : LayoutBase{LayoutType::kNextSubpass} {}
+
+  SubpassContents contents = SubpassContents::kInline;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), subpass_contents);
+  }
+};
+
 struct LayoutAcquireNextImage;
 struct LayoutQueueSubmit;
 struct LayoutQueuePresent;
@@ -1861,7 +1873,6 @@ struct Layout : std::enable_shared_from_this<Layout> {
     archive(lbind_vertex_buffers);
     archive(lbind_index_buffers);
     archive(ldraw_indexed_indirects);
-
     archive(lblit_images);
     archive(lpush_constants);
     archive(lreset_query_pools);

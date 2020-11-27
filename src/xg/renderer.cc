@@ -568,6 +568,20 @@ std::shared_ptr<CommandList> Renderer::CreateCommandList(
         break;
       }
 
+      case LayoutType::kNextSubpass: {
+        auto cmd = std::make_shared<CommandNextSubpass>();
+        if (!cmd) {
+          XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+          return nullptr;
+        }
+        auto lnext_subpass = std::static_pointer_cast<LayoutNextSubpass>(lcmd);
+        cmd->Init(*lnext_subpass);
+
+        cmd_list->commands_.emplace_back(cmd);
+        lcmd->instance = std::move(cmd);
+        break;
+      }
+
       default:
         XG_ERROR("unknown command layout: {}",
                  static_cast<int>(lcmd->layout_type));

@@ -663,4 +663,12 @@ void CommandResetEvent::Build(const CommandInfo& cmd_info) const {
   }
 }
 
+void CommandNextSubpass::Init(const LayoutNextSubpass& lnext_subpass) {
+  info_.contents = lnext_subpass.contents;
+}
+
+void CommandNextSubpass::Build(const CommandInfo& cmd_info) const {
+  cmd_info.cmd_buffer->NextSubpass(info_);
+}
+
 }  // namespace xg
