@@ -245,6 +245,7 @@
   <xs:element name="Swapchain">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />
       <xs:attribute name="window" type="xs:IDREF" />
       <xs:attribute name="minImageCount" type="xs:unsignedByte" />
       <xs:attribute name="imageFormat" type="FormatType" />
@@ -356,6 +357,7 @@
   <xs:element name="ShaderModule">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />
       <xs:attribute name="file" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
@@ -406,6 +408,7 @@
   <xs:element name="Buffer">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />
       <xs:attribute name="size" type="xs:string" default="0" />
       <xs:attribute name="usage" type="BufferUsageTypeList" use="required" />
       <xs:attribute name="allocFlags" type="MemoryAllocFlagsTypeList" default="DedicatedMemory" />
@@ -462,6 +465,7 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />
       <xs:attribute name="descriptorPool" type="xs:IDREF" />
       <xs:attribute name="setLayout" type="xs:IDREF" use="required" />
     </xs:complexType>
@@ -480,6 +484,7 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />
     </xs:complexType>
   </xs:element>
 
@@ -501,12 +506,14 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />
     </xs:complexType>
   </xs:element>
 
   <xs:element name="Fence">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />
       <xs:attribute name="signaled" type="xs:boolean" default="false" />
     </xs:complexType>
   </xs:element>
@@ -514,6 +521,7 @@
   <xs:element name="CommandBuffer">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />      
       <xs:attribute name="commandPool" type="xs:IDREF" />
     </xs:complexType>
   </xs:element>
@@ -629,6 +637,7 @@
   <xs:element name="ImageView">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />
       <xs:attribute name="image" type="xs:IDREF" />
       <xs:attribute name="viewType" type="ImageViewType" default="2D" />
       <xs:attribute name="format" type="FormatType" use="required" />
@@ -728,6 +737,7 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />      
     </xs:complexType>
   </xs:element>
 
@@ -810,6 +820,7 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />      
       <xs:attribute name="renderPass" type="xs:IDREF" use="required" />
       <xs:attribute name="width" type="xs:string" />
       <xs:attribute name="height" type="xs:string" />
@@ -820,6 +831,7 @@
   <xs:element name="Semaphore">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />      
     </xs:complexType>
   </xs:element>
 
@@ -834,6 +846,7 @@
   <xs:element name="QueryPool">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />      
       <xs:attribute name="queryType" type="QueryType" default="Occlusion" />
       <xs:attribute name="queryCount" type="xs:string" use="required" />
     </xs:complexType>
@@ -842,6 +855,7 @@
   <xs:element name="Event">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" use="required" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />      
     </xs:complexType>
   </xs:element>
 
@@ -948,6 +962,7 @@
           <xs:element minOccurs="0" maxOccurs="unbounded" name="Function">
             <xs:complexType>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />              
               <xs:attribute name="data" type="xs:IDREF" />
             </xs:complexType>
           </xs:element>
@@ -1293,6 +1308,7 @@
   <xs:element name="CommandContext">
     <xs:complexType>
       <xs:attribute name="id" type="xs:ID" />
+      <xs:attribute name="realize" type="xs:boolean" default="true" />
       <xs:attribute name="commandGroup" type="xs:IDREF" use="required" />
       <xs:attribute name="commandBuffer" type="xs:IDREF" use="required" />
     </xs:complexType>
@@ -1410,6 +1426,7 @@
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandBuffer" />
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
               <xs:attribute name="queue" type="xs:IDREF" use="required" />
             </xs:complexType>
           </xs:element>
@@ -1419,6 +1436,7 @@
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="DescriptorSet" />
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
             </xs:complexType>
           </xs:element>
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="DescriptorSetLayout" />
@@ -1449,6 +1467,7 @@
                 <xs:element minOccurs="0" ref="PipelineLayout" />
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
               <xs:attribute name="layout" type="xs:IDREF" />
             </xs:complexType>
           </xs:element>
@@ -1458,6 +1477,7 @@
                 <xs:element minOccurs="0" ref="ImageView" />
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />              
               <xs:attribute name="flags" type="ImageCreateFlagsTypeList" default="Undefined" />
               <xs:attribute name="imageType" type="ImageType" default="2D" />
               <xs:attribute name="format" type="FormatType" use="required" />
@@ -1664,6 +1684,7 @@
                 <xs:element minOccurs="0" ref="RenderPass" />
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
               <xs:attribute name="layout" type="xs:IDREF" />
               <xs:attribute name="renderPass" type="xs:IDREF" />
               <xs:attribute name="subpass" type="xs:IDREF" use="required" />
@@ -1674,6 +1695,7 @@
           <xs:element minOccurs="0" maxOccurs="unbounded" name="Sampler">
             <xs:complexType>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
               <xs:attribute name="magFilter" type="FilterType" default="Nearest" />
               <xs:attribute name="minFilter" type="FilterType" default="Nearest" />
               <xs:attribute name="mipmapMode" default="Nearest">
@@ -1694,6 +1716,7 @@
           <xs:element minOccurs="0" maxOccurs="unbounded" name="ImageLoader">
             <xs:complexType>
               <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
               <xs:attribute name="image" type="xs:IDREF" use="required" />
               <xs:attribute name="queue" type="xs:IDREF" use="required" />
               <xs:attribute name="file" type="xs:string" use="required" />
@@ -1716,6 +1739,7 @@
                 </xs:choice>
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
             </xs:complexType>
           </xs:element>
           <xs:element minOccurs="0" maxOccurs="unbounded" name="Camera">
@@ -1739,11 +1763,13 @@
                 </xs:element>
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
             </xs:complexType>
           </xs:element>
           <xs:element minOccurs="0" maxOccurs="unbounded" name="BufferLoader">
             <xs:complexType>
               <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
               <xs:attribute name="buffer" type="xs:IDREF" use="required" />
               <xs:attribute name="queue" type="xs:IDREF" use="required" />
               <xs:attribute name="file" type="xs:string" />
@@ -1816,6 +1842,7 @@
                 </xs:choice>
               </xs:sequence>
               <xs:attribute name="id" type="xs:string" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />              
               <xs:attribute name="window" type="xs:IDREF" use="required" />
               <xs:attribute name="frame" type="xs:IDREF" use="required" />
               <xs:attribute name="camera" type="xs:IDREF" use="required" />
