@@ -227,10 +227,11 @@ struct LayoutBase {
 
   LayoutType layout_type = LayoutType::kUndefined;
   std::string id;
+  bool realize = true;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(layout_type, id);
+    archive(layout_type, id, realize);
   }
 
   std::shared_ptr<void> instance;

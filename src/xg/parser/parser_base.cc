@@ -25,6 +25,8 @@ bool ParserSingleton<ParserBase>::ParseElement(
   const char* id = element->Attribute("id");
   if (id) status->node->id = id;
 
+  element->QueryBoolAttribute("realize", &status->node->realize);
+
   return true;
 }
 

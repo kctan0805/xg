@@ -134,6 +134,8 @@ bool Engine::CreateRenderer(Layout* layout) {
 
 bool Engine::CreateWindows(Layout* layout) {
   for (const auto& lwin : layout->lwindows) {
+    if (!lwin->realize) continue;
+
     auto win = renderer_->CreateWindow(*lwin);
     if (!win) return false;
 
@@ -149,7 +151,6 @@ bool Engine::CreateWindows(Layout* layout) {
 
 bool Engine::CreateDevice(Layout* layout) {
   const auto& ldevice = layout->ldevice;
-
   if (!renderer_->InitDevice(*ldevice)) return false;
 
   auto device = renderer_->GetDevice();
@@ -165,6 +166,8 @@ bool Engine::CreateDevice(Layout* layout) {
 
 bool Engine::CreateSwapchains(const Layout& layout) {
   for (const auto& lswapchain : layout.lswapchains) {
+    if (!lswapchain->realize) continue;
+
     auto swapchain = device_->CreateSwapchain(lswapchain.get());
     if (!swapchain) return false;
 
@@ -197,6 +200,8 @@ bool Engine::CreateQueues(Layout* layout) {
 
 bool Engine::CreateCommandPools(const Layout& layout) {
   for (const auto& lcmd_pool : layout.lcmd_pools) {
+    if (!lcmd_pool->realize) continue;
+
     const auto queue =
         std::static_pointer_cast<Queue>(lcmd_pool->lqueue->instance);
     auto cmd_pool = queue->CreateCommandPool(*lcmd_pool);
@@ -218,6 +223,8 @@ bool Engine::CreateCommandBuffers(const Layout& layout) {
       pool_lcmd_buffers_mapping;
 
   for (const auto& lcmd_buffer : layout.lcmd_buffers) {
+    if (!lcmd_buffer->realize) continue;
+
     if (lcmd_buffer->lframe) {
       auto cmd_buffers = renderer_->CreateCommandBuffersOfFrame(lcmd_buffer);
       if (!cmd_buffers) return false;
@@ -256,6 +263,8 @@ bool Engine::CreateCommandBuffers(const Layout& layout) {
 
 bool Engine::CreateFences(const Layout& layout) {
   for (const auto& lfence : layout.lfences) {
+    if (!lfence->realize) continue;
+
     if (lfence->lframe) {
       auto fences = renderer_->CreateFencesOfFrame(*lfence);
       if (!fences) return false;
@@ -358,6 +367,8 @@ bool Engine::CreateBuffers(const Layout& layout) {
   }
 
   for (const auto& lbuffer : layout.lbuffers) {
+    if (!lbuffer->realize) continue;
+
     if (lbuffer->lframe) {
       auto buffers = renderer_->CreateBuffersOfFrame(*lbuffer);
       if (!buffers) return false;
@@ -381,6 +392,8 @@ bool Engine::CreateBuffers(const Layout& layout) {
 
 bool Engine::CreateBufferLoaders(const Layout& layout) {
   for (auto& lbuffer_loader : layout.lbuffer_loaders) {
+    if (!lbuffer_loader->realize) continue;
+
     const auto lbuffer = lbuffer_loader->lbuffer.get();
     BufferLoaderInfo info = {};
     info.file_path = lbuffer_loader->file;
@@ -419,6 +432,7 @@ bool Engine::CreateBufferLoaders(const Layout& layout) {
 
 bool Engine::CreateImages(const Layout& layout) {
   for (const auto& limage : layout.limages) {
+    if (!limage->realize) continue;
     if (limage->extent.width == 0 || limage->extent.height == 0) continue;
 
     auto image = device_->CreateImage(*limage);
@@ -434,6 +448,8 @@ bool Engine::CreateImages(const Layout& layout) {
 
 bool Engine::CreateImageLoaders(const Layout& layout) {
   for (const auto& limage_loader : layout.limage_loaders) {
+    if (!limage_loader->realize) continue;
+
     if (!limage_loader->file.empty()) {
       const auto& limage = limage_loader->limage;
 
@@ -460,6 +476,8 @@ bool Engine::CreateImageLoaders(const Layout& layout) {
 
 bool Engine::CreateImageViews(const Layout& layout) {
   for (const auto& limage_view : layout.limage_views) {
+    if (!limage_view->realize) continue;
+
     auto image_view = device_->CreateImageView(*limage_view);
     if (!image_view) return false;
 
@@ -474,6 +492,8 @@ bool Engine::CreateImageViews(const Layout& layout) {
 
 bool Engine::CreateSamplers(const Layout& layout) {
   for (const auto& lsampler : layout.lsamplers) {
+    if (!lsampler->realize) continue;
+
     auto sampler = device_->CreateSampler(*lsampler);
     if (!sampler) return false;
 
@@ -487,6 +507,8 @@ bool Engine::CreateSamplers(const Layout& layout) {
 
 bool Engine::CreateDescriptorSetLayouts(const Layout& layout) {
   for (const auto& ldesc_set_layout : layout.ldesc_set_layouts) {
+    if (!ldesc_set_layout->realize) continue;
+
     auto desc_set_layout =
         device_->CreateDescriptorSetLayout(*ldesc_set_layout);
     if (!desc_set_layout) return false;
@@ -528,6 +550,8 @@ bool Engine::CreateDescriptorPools(Layout* layout) {
   }
 
   for (const auto& ldesc_pool : layout->ldesc_pools) {
+    if (!ldesc_pool->realize) continue;
+
     if (ldesc_pool->pool_sizes.size() == 0 || ldesc_pool->max_sets == 0)
       continue;
 
@@ -550,6 +574,8 @@ bool Engine::CreateDescriptorSets(const Layout& layout) {
   std::vector<std::shared_ptr<LayoutDescriptorSet>> ldesc_sets;
 
   for (const auto& ldesc_set : layout.ldesc_sets) {
+    if (!ldesc_set->realize) continue;
+
     if (ldesc_set->lframe) {
       auto desc_sets = renderer_->CreateDescriptorSetsOfFrame(ldesc_set);
       if (!desc_sets) return false;
@@ -683,6 +709,8 @@ bool Engine::CreateDescriptorSets(const Layout& layout) {
 
 bool Engine::CreateRenderPasses(const Layout& layout) {
   for (const auto& lrender_pass : layout.lrender_passes) {
+    if (!lrender_pass->realize) continue;
+
     auto render_pass = device_->CreateRenderPass(*lrender_pass);
     if (!render_pass) return false;
 
@@ -697,6 +725,8 @@ bool Engine::CreateRenderPasses(const Layout& layout) {
 
 bool Engine::CreateShaderModules(const Layout& layout) {
   for (const auto& lshader_module : layout.lshader_modules) {
+    if (!lshader_module->realize) continue;
+
     auto shader_module = device_->CreateShaderModule(*lshader_module);
     if (!shader_module) return false;
 
@@ -713,6 +743,8 @@ bool Engine::CreateShaderModules(const Layout& layout) {
 
 bool Engine::CreatePipelineLayouts(const Layout& layout) {
   for (const auto& lpipeline_layout : layout.lpipeline_layouts) {
+    if (!lpipeline_layout->realize) continue;
+
     auto pipeline_layout = device_->CreatePipelineLayout(*lpipeline_layout);
     if (!pipeline_layout) return false;
 
@@ -727,15 +759,21 @@ bool Engine::CreatePipelineLayouts(const Layout& layout) {
 }
 
 bool Engine::CreateComputePipelines(const Layout& layout) {
-  if (layout.lcompute_pipelines.size() > 0) {
+  std::vector<std::shared_ptr<LayoutComputePipeline>> lcompute_pipelines;
+  for (auto lcompute_pipeline : layout.lcompute_pipelines) {
+    if (lcompute_pipeline->realize)
+      lcompute_pipelines.emplace_back(lcompute_pipeline);
+  }
+
+  if (lcompute_pipelines.size() > 0) {
     std::vector<std::shared_ptr<Pipeline>> compute_pipelines;
 
-    if (!renderer_->CreateComputePipelines(layout.lcompute_pipelines,
+    if (!renderer_->CreateComputePipelines(lcompute_pipelines,
                                            &compute_pipelines))
       return false;
 
-    for (int i = 0; i < layout.lcompute_pipelines.size(); ++i) {
-      const auto& lcompute_pipeline = layout.lcompute_pipelines[i];
+    for (int i = 0; i < lcompute_pipelines.size(); ++i) {
+      const auto& lcompute_pipeline = lcompute_pipelines[i];
       const auto& pipeline = compute_pipelines[i];
 
       lcompute_pipeline->instance = pipeline;
@@ -750,15 +788,21 @@ bool Engine::CreateComputePipelines(const Layout& layout) {
 }
 
 bool Engine::CreateGraphicsPipelines(const Layout& layout) {
-  if (layout.lgraphics_pipelines.size() > 0) {
+  std::vector<std::shared_ptr<LayoutGraphicsPipeline>> lgraphics_pipelines;
+  for (auto lgraphics_pipeline : layout.lgraphics_pipelines) {
+    if (lgraphics_pipeline->realize)
+      lgraphics_pipelines.emplace_back(lgraphics_pipeline);
+  }
+
+  if (lgraphics_pipelines.size() > 0) {
     std::vector<std::shared_ptr<Pipeline>> graphics_pipelines;
 
-    if (!renderer_->CreateGraphicsPipelines(layout.lgraphics_pipelines,
+    if (!renderer_->CreateGraphicsPipelines(lgraphics_pipelines,
                                             &graphics_pipelines))
       return false;
 
-    for (int i = 0; i < layout.lgraphics_pipelines.size(); ++i) {
-      const auto& lgraphics_pipeline = layout.lgraphics_pipelines[i];
+    for (int i = 0; i < lgraphics_pipelines.size(); ++i) {
+      const auto& lgraphics_pipeline = lgraphics_pipelines[i];
       const auto& pipeline = graphics_pipelines[i];
 
       lgraphics_pipeline->instance = pipeline;
@@ -774,6 +818,8 @@ bool Engine::CreateGraphicsPipelines(const Layout& layout) {
 
 bool Engine::CreateSemaphores(const Layout& layout) {
   for (const auto& lsemaphore : layout.lsemaphores) {
+    if (!lsemaphore->realize) continue;
+
     if (lsemaphore->lframe) {
       auto semaphores = renderer_->CreateSemaphoresOfFrame(*lsemaphore);
       if (!semaphores) return false;
@@ -799,6 +845,8 @@ bool Engine::CreateSemaphores(const Layout& layout) {
 
 bool Engine::CreateFramebuffers(const Layout& layout) {
   for (const auto& lframebuffer : layout.lframebuffers) {
+    if (!lframebuffer->realize) continue;
+
     if (lframebuffer->lframe) {
       auto framebuffers =
           renderer_->CreateFramebuffersOfFrame(lframebuffer.get());
@@ -825,6 +873,8 @@ bool Engine::CreateFramebuffers(const Layout& layout) {
 
 bool Engine::CreateQueryPools(const Layout& layout) {
   for (const auto& lquery_pool : layout.lquery_pools) {
+    if (!lquery_pool->realize) continue;
+
     if (lquery_pool->lframe) {
       auto query_pools = renderer_->CreateQueryPoolsOfFrame(*lquery_pool);
       if (!query_pools) return false;
@@ -850,6 +900,8 @@ bool Engine::CreateQueryPools(const Layout& layout) {
 
 bool Engine::CreateEvents(const Layout& layout) {
   for (const auto& levent : layout.levents) {
+    if (!levent->realize) continue;
+
     if (levent->lframe) {
       auto events = renderer_->CreateEventsOfFrame(*levent);
       if (!events) return false;
@@ -873,6 +925,8 @@ bool Engine::CreateEvents(const Layout& layout) {
 
 bool Engine::CreateCameras(const Layout& layout) {
   for (const auto& lcamera : layout.lcameras) {
+    if (!lcamera->realize) continue;
+
     auto camera = renderer_->CreateCamera(*lcamera);
     if (!camera) return false;
 
@@ -886,6 +940,8 @@ bool Engine::CreateCameras(const Layout& layout) {
 
 bool Engine::CreateCommandLists(const Layout& layout) {
   for (const auto& lcmd_list : layout.lcmd_lists) {
+    if (!lcmd_list->realize) continue;
+
     auto cmd_list = renderer_->CreateCommandList(*lcmd_list);
     if (!cmd_list) return false;
 
@@ -904,6 +960,8 @@ bool Engine::CreateCommandLists(const Layout& layout) {
 
 bool Engine::CreateCommandGroups(const Layout& layout) {
   for (const auto& lcmd_group : layout.lcmd_groups) {
+    if (!lcmd_group->realize) continue;
+
     auto cmd_group = renderer_->CreateCommandGroup(*lcmd_group);
     if (!cmd_group) return false;
 
@@ -914,6 +972,8 @@ bool Engine::CreateCommandGroups(const Layout& layout) {
   }
 
   for (const auto& lcmd_group : layout.lcmd_groups) {
+    if (!lcmd_group->realize) continue;
+
     auto cmd_group = static_cast<CommandGroup*>(lcmd_group->instance.get());
     assert(cmd_group);
     for (const auto& lcmd_node : lcmd_group->lcmd_nodes) {
@@ -927,6 +987,8 @@ bool Engine::CreateCommandGroups(const Layout& layout) {
 
 bool Engine::CreateCommandContexts(const Layout& layout) {
   for (const auto& lcmd_context : layout.lcmd_contexts) {
+    if (!lcmd_context->realize) continue;
+
     auto cmd_context = renderer_->CreateCommandContext(*lcmd_context);
     if (!cmd_context) return false;
 
@@ -940,6 +1002,8 @@ bool Engine::CreateCommandContexts(const Layout& layout) {
 
 bool Engine::CreateQueueSubmits(const Layout& layout) {
   for (auto& lqueue_submit : layout.lqueue_submits) {
+    if (!lqueue_submit->realize) continue;
+
     auto queue_submit = renderer_->CreateQueueSubmit(*lqueue_submit.get());
     if (!queue_submit) return false;
 
@@ -956,6 +1020,8 @@ bool Engine::CreateQueueSubmits(const Layout& layout) {
 
 bool Engine::CreateQueuePresents(const Layout& layout) {
   for (auto& lqueue_present : layout.lqueue_presents) {
+    if (!lqueue_present->realize) continue;
+
     auto queue_present = renderer_->CreateQueuePresent(*lqueue_present.get());
     if (!queue_present) return false;
 
@@ -973,6 +1039,8 @@ bool Engine::CreateQueuePresents(const Layout& layout) {
 
 bool Engine::CreateViewers(const Layout& layout) {
   for (const auto& lviewer : layout.lviewers) {
+    if (!lviewer->realize) continue;
+
     auto viewer = renderer_->CreateViewer(*lviewer);
     if (!viewer) return false;
 
