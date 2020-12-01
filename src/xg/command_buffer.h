@@ -89,7 +89,6 @@ struct CopyBufferToImageInfo {
   Buffer* src_buffer;
   Image* dst_image;
   ImageLayout dst_image_layout;
-  size_t offset;
   std::vector<BufferImageCopy> regions;
 };
 

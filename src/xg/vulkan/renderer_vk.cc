@@ -309,6 +309,7 @@ bool RendererVK::CreateComputePipelines(
 
 void RendererVK::DebugMarkerSetObjectName(const LayoutBase& lbase) const {
   if (!dispatch_loader_dynamic_.vkDebugMarkerSetObjectNameEXT) return;
+  if (!lbase.realize) return;
 
   auto device_vk = static_cast<DeviceVK*>(device_.get());
   vk::DebugMarkerObjectNameInfoEXT name_info;
