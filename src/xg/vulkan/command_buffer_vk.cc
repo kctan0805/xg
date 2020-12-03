@@ -143,7 +143,7 @@ void CommandBufferVK::PipelineBarrier(const PipelineBarrierInfo& info) const {
                     .setBaseMipLevel(static_cast<uint32_t>(
                         barrier.subresource_range.base_mip_level))
                     .setLevelCount(static_cast<uint32_t>(
-                        barrier.subresource_range.layer_count))
+                        barrier.subresource_range.level_count))
                     .setBaseArrayLayer(
                         barrier.subresource_range.base_array_layer)
                     .setLayerCount(static_cast<uint32_t>(
@@ -156,7 +156,7 @@ void CommandBufferVK::PipelineBarrier(const PipelineBarrierInfo& info) const {
              static_cast<void*>((VkImage)image->image_),
              vk::to_string(aspect_mask),
              barrier.subresource_range.base_mip_level,
-             barrier.subresource_range.layer_count,
+             barrier.subresource_range.level_count,
              barrier.subresource_range.base_array_layer,
              barrier.subresource_range.layer_count);
   }

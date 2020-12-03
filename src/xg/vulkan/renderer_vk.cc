@@ -81,7 +81,6 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
     wanted_extensions.emplace_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
     wanted_extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     wanted_layers.emplace_back("VK_LAYER_LUNARG_monitor");
-    wanted_layers.emplace_back("VK_LAYER_RENDERDOC_Capture");
   }
 
   if (lrenderer.validation) {
