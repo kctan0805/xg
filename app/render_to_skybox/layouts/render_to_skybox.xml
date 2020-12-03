@@ -3,7 +3,7 @@
   <Constant id="winWidth" value="640"/>
   <Constant id="winHeight" value="480"/>
 
-  <Renderer appName="render_to_skybox" debug="true">
+  <Renderer appName="render_to_skybox">
     <Window id="mainWindow" width="winWidth" height="winHeight" title="Skybox" resizable="true"/>
     <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
 
@@ -84,12 +84,12 @@
 
   <!-- Cubemap -->
   <RenderPass id="cubemapRenderPass">
-    <Attachment id="cubemapColorAttachment0" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
-    <Attachment id="cubemapColorAttachment1" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
-    <Attachment id="cubemapColorAttachment2" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
-    <Attachment id="cubemapColorAttachment3" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
-    <Attachment id="cubemapColorAttachment4" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
-    <Attachment id="cubemapColorAttachment5" format="B8G8R8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment0" format="R8G8B8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment1" format="R8G8B8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment2" format="R8G8B8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment3" format="R8G8B8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment4" format="R8G8B8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
+    <Attachment id="cubemapColorAttachment5" format="R8G8B8A8Unorm" storeOp="Store" finalLayout="ShaderReadOnlyOptimal"/>
     <Subpass id="cubemapSubpass0">
       <ColorAttachment attachment="cubemapColorAttachment0" layout="ColorAttachmentOptimal"/>
     </Subpass>
@@ -162,7 +162,7 @@
   <ShaderModule id="cubemapVertexShader" file="cubemap.vert.spv"/>
   <ShaderModule id="cubemapFragmentShader" file="cubemap.frag.spv"/>
 
-  <GraphicsPipeline id="cubemapPipeline" layout="cubemapPipelineLayout" renderPass="cubemapRenderPass" subpass="cubemapSubpass0">
+  <GraphicsPipeline id="cubemapPipeline0" layout="cubemapPipelineLayout" renderPass="cubemapRenderPass" subpass="cubemapSubpass0">
     <Stage stage="Vertex" module="cubemapVertexShader"/>
     <Stage stage="Fragment" module="cubemapFragmentShader"/>
     <VertexInputState>
@@ -183,12 +183,117 @@
     </ColorBlendState>
   </GraphicsPipeline>
 
-  <ImageView id="cubemapImageView0" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="0" layerCount="1"/>
-  <ImageView id="cubemapImageView1" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="1" layerCount="1"/>
-  <ImageView id="cubemapImageView2" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="2" layerCount="1"/>
-  <ImageView id="cubemapImageView3" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="3" layerCount="1"/>
-  <ImageView id="cubemapImageView4" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="4" layerCount="1"/>
-  <ImageView id="cubemapImageView5" image="drawTextureImage" viewType="Cube" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="5" layerCount="1"/>
+  <GraphicsPipeline id="cubemapPipeline1" layout="cubemapPipelineLayout" renderPass="cubemapRenderPass" subpass="cubemapSubpass1">
+    <Stage stage="Vertex" module="cubemapVertexShader"/>
+    <Stage stage="Fragment" module="cubemapFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="(2+3)*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32Sfloat" offset="0"/>
+      <VertexAttributeDescription location="1" binding="0" format="R32G32B32Sfloat" offset="2*4"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleList"/>
+    <ViewportState>
+      <Viewport width="512" height="512" maxDepth="1.0"/>
+      <Scissor width="512" height="512"/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise"/>
+    <MultisampleState/>
+    <DepthStencilState/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <GraphicsPipeline id="cubemapPipeline2" layout="cubemapPipelineLayout" renderPass="cubemapRenderPass" subpass="cubemapSubpass2">
+    <Stage stage="Vertex" module="cubemapVertexShader"/>
+    <Stage stage="Fragment" module="cubemapFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="(2+3)*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32Sfloat" offset="0"/>
+      <VertexAttributeDescription location="1" binding="0" format="R32G32B32Sfloat" offset="2*4"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleList"/>
+    <ViewportState>
+      <Viewport width="512" height="512" maxDepth="1.0"/>
+      <Scissor width="512" height="512"/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise"/>
+    <MultisampleState/>
+    <DepthStencilState/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <GraphicsPipeline id="cubemapPipeline3" layout="cubemapPipelineLayout" renderPass="cubemapRenderPass" subpass="cubemapSubpass3">
+    <Stage stage="Vertex" module="cubemapVertexShader"/>
+    <Stage stage="Fragment" module="cubemapFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="(2+3)*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32Sfloat" offset="0"/>
+      <VertexAttributeDescription location="1" binding="0" format="R32G32B32Sfloat" offset="2*4"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleList"/>
+    <ViewportState>
+      <Viewport width="512" height="512" maxDepth="1.0"/>
+      <Scissor width="512" height="512"/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise"/>
+    <MultisampleState/>
+    <DepthStencilState/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <GraphicsPipeline id="cubemapPipeline4" layout="cubemapPipelineLayout" renderPass="cubemapRenderPass" subpass="cubemapSubpass4">
+    <Stage stage="Vertex" module="cubemapVertexShader"/>
+    <Stage stage="Fragment" module="cubemapFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="(2+3)*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32Sfloat" offset="0"/>
+      <VertexAttributeDescription location="1" binding="0" format="R32G32B32Sfloat" offset="2*4"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleList"/>
+    <ViewportState>
+      <Viewport width="512" height="512" maxDepth="1.0"/>
+      <Scissor width="512" height="512"/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise"/>
+    <MultisampleState/>
+    <DepthStencilState/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <GraphicsPipeline id="cubemapPipeline5" layout="cubemapPipelineLayout" renderPass="cubemapRenderPass" subpass="cubemapSubpass5">
+    <Stage stage="Vertex" module="cubemapVertexShader"/>
+    <Stage stage="Fragment" module="cubemapFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="(2+3)*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32Sfloat" offset="0"/>
+      <VertexAttributeDescription location="1" binding="0" format="R32G32B32Sfloat" offset="2*4"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleList"/>
+    <ViewportState>
+      <Viewport width="512" height="512" maxDepth="1.0"/>
+      <Scissor width="512" height="512"/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise"/>
+    <MultisampleState/>
+    <DepthStencilState/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <ImageView id="cubemapImageView0" image="drawTextureImage" viewType="2D" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="0" layerCount="1"/>
+  <ImageView id="cubemapImageView1" image="drawTextureImage" viewType="2D" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="1" layerCount="1"/>
+  <ImageView id="cubemapImageView2" image="drawTextureImage" viewType="2D" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="2" layerCount="1"/>
+  <ImageView id="cubemapImageView3" image="drawTextureImage" viewType="2D" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="3" layerCount="1"/>
+  <ImageView id="cubemapImageView4" image="drawTextureImage" viewType="2D" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="4" layerCount="1"/>
+  <ImageView id="cubemapImageView5" image="drawTextureImage" viewType="2D" format="R8G8B8A8Unorm" components="R  G  B  A" baseArrayLayer="5" layerCount="1"/>
   
   <Framebuffer id="cubemapFramebuffer" renderPass="cubemapRenderPass" width="512" height="512">
     <Attachment imageView="cubemapImageView0"/>
@@ -204,7 +309,7 @@
     <FloatValues>1.0 1.0 1.0 0.0 0.0</FloatValues>
     <FloatValues>-1.0 1.0 1.0 0.0 0.0</FloatValues>
   </Data>
-  <Buffer id="cubemapVertexBuffer0" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <Buffer id="cubemapVertexBuffer0" usage="TransferDst VertexBuffer StorageBuffer"/>
   <BufferLoader buffer="cubemapVertexBuffer0" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData0"/>
   
   <Data id="cubemapVertexData1">
@@ -212,7 +317,7 @@
     <FloatValues>1.0 1.0 0.0 1.0 0.0</FloatValues>
     <FloatValues>-1.0 1.0 0.0 1.0 0.0</FloatValues>
   </Data>
-  <Buffer id="cubemapVertexBuffer1" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <Buffer id="cubemapVertexBuffer1" usage="TransferDst VertexBuffer StorageBuffer"/>
   <BufferLoader buffer="cubemapVertexBuffer1" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData1"/>
 
   <Data id="cubemapVertexData2">
@@ -220,7 +325,7 @@
     <FloatValues>1.0 1.0 0.0 0.0 1.0</FloatValues>
     <FloatValues>-1.0 1.0 0.0 0.0 1.0</FloatValues>
   </Data>
-  <Buffer id="cubemapVertexBuffer2" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <Buffer id="cubemapVertexBuffer2" usage="TransferDst VertexBuffer StorageBuffer"/>
   <BufferLoader buffer="cubemapVertexBuffer2" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData2"/>
 
   <Data id="cubemapVertexData3">
@@ -228,7 +333,7 @@
     <FloatValues>1.0 1.0 1.0 1.0 0.0</FloatValues>
     <FloatValues>-1.0 1.0 1.0 1.0 0.0</FloatValues>
   </Data>
-  <Buffer id="cubemapVertexBuffer3" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <Buffer id="cubemapVertexBuffer3" usage="TransferDst VertexBuffer StorageBuffer"/>
   <BufferLoader buffer="cubemapVertexBuffer3" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData3"/>
 
   <Data id="cubemapVertexData4">
@@ -236,7 +341,7 @@
     <FloatValues>1.0 1.0 1.0 0.0 1.0</FloatValues>
     <FloatValues>-1.0 1.0 1.0 0.0 1.0</FloatValues>
   </Data>
-  <Buffer id="cubemapVertexBuffer4" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <Buffer id="cubemapVertexBuffer4" usage="TransferDst VertexBuffer StorageBuffer"/>
   <BufferLoader buffer="cubemapVertexBuffer4" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData4"/>
 
   <Data id="cubemapVertexData5">
@@ -244,7 +349,7 @@
     <FloatValues>1.0 1.0 0.0 1.0 1.0</FloatValues>
     <FloatValues>-1.0 1.0 0.0 1.0 1.0</FloatValues>
   </Data>
-  <Buffer id="cubemapVertexBuffer5" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <Buffer id="cubemapVertexBuffer5" usage="TransferDst VertexBuffer StorageBuffer"/>
   <BufferLoader buffer="cubemapVertexBuffer5" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="cubemapVertexData5"/>
 
   <!-- Model -->
@@ -288,38 +393,42 @@
       </ClearValues>
       </BeginRenderPass>
       
-      <BindPipeline pipeline="cubemapPipeline"/>
-      
+      <BindPipeline pipeline="cubemapPipeline0"/>
       <BindVertexBuffers>
         <Buffer buffer="cubemapVertexBuffer0"/>
       </BindVertexBuffers>
       <Draw vertexCount="3"/>
 
       <NextSubpass/>
+      <BindPipeline pipeline="cubemapPipeline1"/>
       <BindVertexBuffers>
         <Buffer buffer="cubemapVertexBuffer1"/>
       </BindVertexBuffers>
       <Draw vertexCount="3"/>
 
       <NextSubpass/>
+      <BindPipeline pipeline="cubemapPipeline2"/>
       <BindVertexBuffers>
         <Buffer buffer="cubemapVertexBuffer2"/>
       </BindVertexBuffers>
       <Draw vertexCount="3"/>
 
       <NextSubpass/>
+      <BindPipeline pipeline="cubemapPipeline3"/>
       <BindVertexBuffers>
         <Buffer buffer="cubemapVertexBuffer3"/>
       </BindVertexBuffers>
       <Draw vertexCount="3"/>
 
       <NextSubpass/>
+      <BindPipeline pipeline="cubemapPipeline4"/>
       <BindVertexBuffers>
         <Buffer buffer="cubemapVertexBuffer4"/>
       </BindVertexBuffers>
       <Draw vertexCount="3"/>
 
       <NextSubpass/>
+      <BindPipeline pipeline="cubemapPipeline5"/>
       <BindVertexBuffers>
         <Buffer buffer="cubemapVertexBuffer5"/>
       </BindVertexBuffers>
