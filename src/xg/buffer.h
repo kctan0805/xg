@@ -32,7 +32,6 @@ class Buffer {
   virtual void FlushRange(const MemoryRangeInfo& info) = 0;
   virtual void* MapMemory() = 0;
   virtual void UnmapMemory() = 0;
-  virtual Result Resize(size_t size) = 0;
 
  protected:
   Buffer() = default;

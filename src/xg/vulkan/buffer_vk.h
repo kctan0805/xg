@@ -30,7 +30,6 @@ class BufferVK : public Buffer {
   void FlushRange(const MemoryRangeInfo& info) override;
   void* MapMemory() override;
   void UnmapMemory() override;
-  Result Resize(size_t size) override;
 
  protected:
   VmaAllocator vma_allocator_ = VK_NULL_HANDLE;

@@ -99,14 +99,4 @@ void* BufferVK::MapMemory() {
 
 void BufferVK::UnmapMemory() { vmaUnmapMemory(vma_allocator_, alloc_); }
 
-Result BufferVK::Resize(size_t size) {
-  VkResult result = vmaResizeAllocation(vma_allocator_, alloc_, size);
-  if (result != VK_SUCCESS) {
-    XG_ERROR(ResultString(static_cast<Result>(result)));
-    return static_cast<Result>(result);
-  }
-  size_ = size;
-  return xg::Result::kSuccess;
-}
-
 }  // namespace xg
