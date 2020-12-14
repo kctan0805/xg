@@ -863,6 +863,23 @@ enum class QueryType {
 
 enum class SubpassContents { kInline, kSecondaryCommandBuffers };
 
+enum class DependencyFlags {
+  kUndefined = 0x0,
+  kByRegion = 0x1,
+  kDeviceGroup = 0x4,
+  kViewLocal = 0x2
+};
+inline DependencyFlags operator|(DependencyFlags lhs, DependencyFlags rhs) {
+  return static_cast<DependencyFlags>(
+      static_cast<std::underlying_type_t<DependencyFlags>>(lhs) |
+      static_cast<std::underlying_type_t<DependencyFlags>>(rhs));
+}
+inline DependencyFlags operator&(DependencyFlags lhs, DependencyFlags rhs) {
+  return static_cast<DependencyFlags>(
+      static_cast<std::underlying_type_t<DependencyFlags>>(lhs) &
+      static_cast<std::underlying_type_t<DependencyFlags>>(rhs));
+}
+
 }  // namespace xg
 
 #endif  // XG_TYPES_H_

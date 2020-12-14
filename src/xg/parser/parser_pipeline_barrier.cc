@@ -32,6 +32,9 @@ bool ParserSingleton<ParserPipelineBarrier>::ParseElement(
   value = element->Attribute("dstStageMask");
   if (value) node->dst_stage_mask = StringToPipelineStageFlags(value);
 
+  value = element->Attribute("dependencyFlags");
+  if (value) node->dependency_flags = StringToDependencyFlags(value);
+
   status->node = node;
   status->child_element = element->FirstChildElement();
 

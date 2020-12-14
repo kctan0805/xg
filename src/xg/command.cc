@@ -177,6 +177,7 @@ bool CommandPipelineBarrier::Init(
     const LayoutPipelineBarrier& lpipeline_barrier) {
   info_.src_stage_mask = lpipeline_barrier.src_stage_mask;
   info_.dst_stage_mask = lpipeline_barrier.dst_stage_mask;
+  info_.dependency_flags = lpipeline_barrier.dependency_flags;
 
   for (const auto& lbuffer_memory_barrier :
        lpipeline_barrier.lbuffer_memory_barriers) {

@@ -1452,6 +1452,7 @@ struct LayoutPipelineBarrier : LayoutBase {
 
   PipelineStageFlags src_stage_mask = PipelineStageFlags::kUndefined;
   PipelineStageFlags dst_stage_mask = PipelineStageFlags::kUndefined;
+  DependencyFlags dependency_flags = DependencyFlags::kUndefined;
   std::vector<std::shared_ptr<LayoutBufferMemoryBarrier>>
       lbuffer_memory_barriers;
   std::vector<std::shared_ptr<LayoutImageMemoryBarrier>> limage_memory_barriers;

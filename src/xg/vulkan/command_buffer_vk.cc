@@ -71,10 +71,13 @@ void CommandBufferVK::PipelineBarrier(const PipelineBarrierInfo& info) const {
       static_cast<vk::PipelineStageFlagBits>(info.src_stage_mask);
   const auto dst_stage_mask =
       static_cast<vk::PipelineStageFlagBits>(info.dst_stage_mask);
+  const auto dependency_flags =
+      static_cast<vk::DependencyFlagBits>(info.dependency_flags);
 
-  XG_TRACE("pipelineBarrier: {} {} {}",
+  XG_TRACE("pipelineBarrier: {} {} {} {}",
            static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           vk::to_string(src_stage_mask), vk::to_string(dst_stage_mask));
+           vk::to_string(src_stage_mask), vk::to_string(dst_stage_mask),
+           vk::to_string(dependency_flags));
 
   for (const auto& barrier : info.memory_barriers) {
     const auto src_access_mask =
@@ -162,7 +165,7 @@ void CommandBufferVK::PipelineBarrier(const PipelineBarrierInfo& info) const {
   }
 
   cmd_buffer_.pipelineBarrier(
-      src_stage_mask, dst_stage_mask, vk::DependencyFlagBits(),
+      src_stage_mask, dst_stage_mask, dependency_flags,
       static_cast<uint32_t>(memory_barriers.size()), memory_barriers.data(),
       static_cast<uint32_t>(buffer_barriers.size()), buffer_barriers.data(),
       static_cast<uint32_t>(image_barriers.size()), image_barriers.data());

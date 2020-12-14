@@ -903,6 +903,10 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="ColorComponentTypeList">
+    <xs:list itemType="ColorComponentType"/>
+  </xs:simpleType>
+
   <xs:simpleType name="BlendFactorType">
     <xs:restriction base="xs:token">
       <xs:enumeration value="Zero" />
@@ -937,10 +941,6 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="ColorComponentTypeList">
-    <xs:list itemType="ColorComponentType"/>
-  </xs:simpleType>
-
   <xs:simpleType name="FilterType">
     <xs:restriction base="xs:token">
       <xs:enumeration value="Nearest" />
@@ -953,6 +953,19 @@
       <xs:enumeration value="Inline" />
       <xs:enumeration value="SecondaryCommandBuffers" />
     </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DependencyFlagsType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Undefined" />
+      <xs:enumeration value="ByRegion" />
+      <xs:enumeration value="DeviceGroup" />
+      <xs:enumeration value="ViewLocal" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DependencyFlagsTypeList">
+    <xs:list itemType="DependencyFlagsType"/>
   </xs:simpleType>
 
   <xs:element name="CommandList">
@@ -1023,6 +1036,7 @@
               <xs:attribute name="id" type="xs:ID" />
               <xs:attribute name="srcStageMask" type="PipelineStageFlagsTypeList" use="required" />
               <xs:attribute name="dstStageMask" type="PipelineStageFlagsTypeList" use="required" />
+              <xs:attribute name="dependencyFlags" type="DependencyFlagsTypeList" />
             </xs:complexType>
           </xs:element>
           <xs:element minOccurs="0" maxOccurs="unbounded" name="CopyBuffer">

@@ -59,6 +59,7 @@ struct ImageMemoryBarrier {
 struct PipelineBarrierInfo {
   PipelineStageFlags src_stage_mask;
   PipelineStageFlags dst_stage_mask;
+  DependencyFlags dependency_flags;
   std::vector<MemoryBarrier> memory_barriers;
   std::vector<BufferMemoryBarrier> buffer_barriers;
   std::vector<ImageMemoryBarrier> image_barriers;

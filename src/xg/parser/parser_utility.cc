@@ -1164,6 +1164,25 @@ SubpassContents StringToSubpassContents(const char* value) {
   return SubpassContents::kInline;
 }
 
+DependencyFlags StringToDependencyFlags(const char* value) {
+  static std::unordered_map<std::string, DependencyFlags> mapping{
+#define ENTRY(s) {#s, DependencyFlags::k##s}
+      ENTRY(Undefined), ENTRY(ByRegion), ENTRY(DeviceGroup), ENTRY(ViewLocal)
+#undef ENTRY
+  };
+  std::stringstream ss(value);
+  std::string token;
+  auto result = DependencyFlags::kUndefined;
+
+  while (ss >> token) {
+    const auto x = mapping.find(token.c_str());
+    if (x != std::end(mapping)) {
+      result = result | x->second;
+    }
+  }
+  return result;
+}
+
 void StringToFloats(const char* value, std::vector<float>* results) {
   std::stringstream ss(value);
   std::string token;

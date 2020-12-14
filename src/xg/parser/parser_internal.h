@@ -222,6 +222,7 @@ glm::vec4 StringToVec4(const char* value);
 PipelineBindPoint StringToPipelineBindPoint(const char* value);
 IndexType StringToIndexType(const char* value);
 SubpassContents StringToSubpassContents(const char* value);
+DependencyFlags StringToDependencyFlags(const char* value);
 void StringToFloats(const char* value, std::vector<float>* results);
 
 template <typename T>
