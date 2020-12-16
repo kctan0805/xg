@@ -34,7 +34,9 @@ bool ParserSingleton<ParserData>::ParseElement(
       if (text) {
         std::vector<int32_t> values;
         StringToIntegers(text, &values);
-        node->data.insert(node->data.end(), values.begin(), values.end());
+        const auto data = reinterpret_cast<const uint8_t*>(values.data());
+        node->data.insert(node->data.end(), &data[0],
+                          &data[values.size() * sizeof(int32_t)]);
       }
     } else if (strcmp(name, "UInt32Values") == 0) {
       const char* text = child->GetText();
