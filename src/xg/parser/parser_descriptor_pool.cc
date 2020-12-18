@@ -9,6 +9,7 @@
 #include "xg/parser/parser_internal.h"
 
 #include <memory>
+#include <utility>
 
 #include "tinyxml2.h"
 #include "xg/layout.h"
@@ -22,8 +23,30 @@ bool ParserSingleton<ParserDescriptorPool>::ParseElement(
   auto node = std::make_shared<LayoutDescriptorPool>();
   if (!node) return false;
 
+  const char* value = element->Attribute("maxSets");
+  if (value)
+    node->max_sets = static_cast<size_t>(Expression::Get().Evaluate(value));
+
+  for (auto child = element->FirstChildElement(); child;
+       child = child->NextSiblingElement()) {
+    const char* name = child->Name();
+
+    if (strcmp(name, "PoolSize") == 0) {
+      std::pair<DescriptorType, size_t> pool_size(DescriptorType::kSampler, 1);
+
+      value = child->Attribute("type");
+      if (value) pool_size.first = StringToDescriptorType(value);
+
+      value = child->Attribute("descriptorCount");
+      if (value)
+        pool_size.second =
+            static_cast<size_t>(Expression::Get().Evaluate(value));
+
+      node->pool_sizes.emplace_back(pool_size);
+    }
+  }
+
   status->node = node;
-  status->child_element = element->FirstChildElement();
 
   return ParserBase::Get().ParseElement(element, status);
 }

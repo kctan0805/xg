@@ -70,6 +70,7 @@ class ParserBase : public ParserSingleton<ParserBase> {};
 class ParserEngine : public ParserSingleton<ParserEngine> {};
 class ParserConstant : public ParserSingleton<ParserConstant> {};
 class ParserData : public ParserSingleton<ParserData> {};
+class ParserResourceLoader : public ParserSingleton<ParserResourceLoader> {};
 class ParserRenderer : public ParserSingleton<ParserRenderer> {};
 class ParserWindow : public ParserSingleton<ParserWindow> {};
 class ParserDevice : public ParserSingleton<ParserDevice> {};

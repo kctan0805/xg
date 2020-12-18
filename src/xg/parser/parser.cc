@@ -40,6 +40,8 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
     return ParserConstant::Get().ParseElement(element, status);
   } else if (strcmp(name, "Data") == 0) {
     return ParserData::Get().ParseElement(element, status);
+  } else if (strcmp(name, "ResourceLoader") == 0) {
+    return ParserResourceLoader::Get().ParseElement(element, status);
   } else if (strcmp(name, "Renderer") == 0) {
     return ParserRenderer::Get().ParseElement(element, status);
   } else if (strcmp(name, "Window") == 0) {
@@ -296,6 +298,11 @@ void Parser::AddLayoutNode(std::shared_ptr<Layout> layout,
     case LayoutType::kRenderer:
       assert(layout->lrenderer == nullptr);
       layout->lrenderer = std::static_pointer_cast<LayoutRenderer>(node);
+      break;
+
+    case LayoutType::kResourceLoader:
+      assert(layout->lres_loader == nullptr);
+      layout->lres_loader = std::static_pointer_cast<LayoutResourceLoader>(node);
       break;
 
     case LayoutType::kWindow:

@@ -131,6 +131,7 @@ enum class LayoutType {
   kEngine,
   kConstant,
   kData,
+  kResourceLoader,
   kRenderer,
   kWindow,
   kDevice,
@@ -265,6 +266,20 @@ struct LayoutData : LayoutBase {
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), data);
+  }
+};
+
+struct LayoutResourceLoader : LayoutBase {
+  LayoutResourceLoader() : LayoutBase{LayoutType::kResourceLoader} {}
+
+  QueueFamily queue_family = QueueFamily::kGraphics;
+  float queue_priority = 0.0f;
+  int count = -1;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), queue_family, queue_priority,
+            count);
   }
 };
 
@@ -1758,6 +1773,7 @@ struct LayoutUpdater : LayoutBase {
 };
 
 struct Layout : std::enable_shared_from_this<Layout> {
+  std::shared_ptr<LayoutResourceLoader> lres_loader;
   std::shared_ptr<LayoutRenderer> lrenderer;
   std::vector<std::shared_ptr<LayoutWindow>> lwindows;
   std::shared_ptr<LayoutDevice> ldevice;
@@ -1828,6 +1844,7 @@ struct Layout : std::enable_shared_from_this<Layout> {
 
   template <class Archive>
   void serialize(Archive& archive) {
+    archive(lres_loader);
     archive(lrenderer);
     archive(lwindows);
     archive(ldevice);

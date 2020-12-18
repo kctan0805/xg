@@ -32,7 +32,9 @@ bool ParserSingleton<ParserDescriptorSetLayoutBinding>::ParseElement(
   const char* value = element->Attribute("descriptorType");
   if (value) node->desc_type = StringToDescriptorType(value);
 
-  element->QueryIntAttribute("descriptorCount", &node->desc_count);
+  value = element->Attribute("descriptorCount");
+  if (value)
+    node->desc_count = static_cast<int>(Expression::Get().Evaluate(value));
 
   value = element->Attribute("stageFlags");
   if (value) node->stage_flags = StringToShaderStageFlags(value);

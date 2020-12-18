@@ -111,14 +111,30 @@ bool Engine::PostInit(const std::shared_ptr<Layout>& layout) {
 
 void Engine::AddSystemLayouts(Layout* layout) {
   // for resource loader
-  const auto count = ThreadPool::Get().GetWorkerCount();
+  auto lres_loader = layout->lres_loader;
+  if (lres_loader) {
+    size_t count = lres_loader->count;
+    if (count == -1) count = ThreadPool::Get().GetWorkerCount();
 
-  for (auto i = 0; i < count; ++i) {
-    auto lqueue = std::make_shared<LayoutQueue>();
-    lqueue->queue_family = QueueFamily::kGraphics;
-    layout->ldevice->lqueues.emplace_back(lqueue);
-    layout->lqueues.emplace_back(lqueue);
-    system_.lqueues.emplace_back(std::move(lqueue));
+    for (auto i = 0; i < count; ++i) {
+      auto lqueue = std::make_shared<LayoutQueue>();
+      lqueue->queue_family = lres_loader->queue_family;
+      lqueue->queue_priority = lres_loader->queue_priority;
+      layout->ldevice->lqueues.emplace_back(lqueue);
+      layout->lqueues.emplace_back(lqueue);
+      system_.lqueues.emplace_back(std::move(lqueue));
+    }
+
+  } else {
+    const auto count = ThreadPool::Get().GetWorkerCount();
+
+    for (auto i = 0; i < count; ++i) {
+      auto lqueue = std::make_shared<LayoutQueue>();
+      lqueue->queue_family = QueueFamily::kGraphics;
+      layout->ldevice->lqueues.emplace_back(lqueue);
+      layout->lqueues.emplace_back(lqueue);
+      system_.lqueues.emplace_back(std::move(lqueue));
+    }
   }
 }
 
@@ -523,9 +539,28 @@ bool Engine::CreateDescriptorSetLayouts(const Layout& layout) {
 }
 
 bool Engine::CreateDescriptorPools(Layout* layout) {
+  for (const auto& ldesc_pool : layout->ldesc_pools) {
+    if (!ldesc_pool->realize) continue;
+
+    if (ldesc_pool->pool_sizes.size() == 0 || ldesc_pool->max_sets == 0)
+      continue;
+
+    auto desc_pool = device_->CreateDescriptorPool(*ldesc_pool);
+    if (!desc_pool) return false;
+
+    ldesc_pool->instance = desc_pool;
+
+    if (!ldesc_pool->id.empty())
+      instance_id_map_.insert(
+          std::make_pair(ldesc_pool->id, std::move(desc_pool)));
+  }
+
   // calculates max_sets and pool_sizes
   for (auto ldesc_set : layout->ldesc_sets) {
     auto ldesc_pool = ldesc_set->ldesc_pool;
+
+    if (ldesc_pool->instance) continue;
+
     int count = 1;
     if (ldesc_set->lframe) {
       const auto& swapchain = std::static_pointer_cast<Swapchain>(
@@ -550,7 +585,7 @@ bool Engine::CreateDescriptorPools(Layout* layout) {
   }
 
   for (const auto& ldesc_pool : layout->ldesc_pools) {
-    if (!ldesc_pool->realize) continue;
+    if (!ldesc_pool->realize || ldesc_pool->instance) continue;
 
     if (ldesc_pool->pool_sizes.size() == 0 || ldesc_pool->max_sets == 0)
       continue;
