@@ -563,9 +563,13 @@ bool Engine::CreateDescriptorPools(Layout* layout) {
 
     int count = 1;
     if (ldesc_set->lframe) {
-      const auto& swapchain = std::static_pointer_cast<Swapchain>(
-          ldesc_set->lframe->lswapchain->instance);
-      count = swapchain->GetFrameCount();
+      if (ldesc_set->lframe->frame_count > 0) {
+        count = ldesc_set->lframe->frame_count;
+      } else {
+        const auto& swapchain = std::static_pointer_cast<Swapchain>(
+            ldesc_set->lframe->lswapchain->instance);
+        count = swapchain->GetFrameCount();
+      }
     }
 
     ldesc_pool->max_sets += count;

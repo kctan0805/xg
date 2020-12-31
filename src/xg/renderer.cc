@@ -38,13 +38,18 @@ namespace xg {
 std::shared_ptr<std::vector<std::shared_ptr<Framebuffer>>>
 Renderer::CreateFramebuffersOfFrame(LayoutFramebuffer* lframebuffer) {
   assert(lframebuffer->lframe);
-  const auto& swapchain = std::static_pointer_cast<Swapchain>(
-      lframebuffer->lframe->lswapchain->instance);
-  int frame_count = swapchain->GetFrameCount();
+  int frame_count = 0;
+  if (lframebuffer->lframe->frame_count > 0) {
+    frame_count = lframebuffer->lframe->frame_count;
+  } else {
+    const auto& swapchain = std::static_pointer_cast<Swapchain>(
+        lframebuffer->lframe->lswapchain->instance);
+    frame_count = swapchain->GetFrameCount();
 
-  if (!lframebuffer->width || !lframebuffer->height) {
-    lframebuffer->width = swapchain->GetWidth();
-    lframebuffer->height = swapchain->GetHeight();
+    if (!lframebuffer->width || !lframebuffer->height) {
+      lframebuffer->width = swapchain->GetWidth();
+      lframebuffer->height = swapchain->GetHeight();
+    }
   }
 
   auto framebuffers =
@@ -69,9 +74,14 @@ Renderer::CreateFramebuffersOfFrame(LayoutFramebuffer* lframebuffer) {
 std::shared_ptr<std::vector<std::shared_ptr<Fence>>>
 Renderer::CreateFencesOfFrame(const LayoutFence& lfence) {
   assert(lfence.lframe);
-  const auto& swapchain =
-      std::static_pointer_cast<Swapchain>(lfence.lframe->lswapchain->instance);
-  int frame_count = swapchain->GetFrameCount();
+  int frame_count = 0;
+  if (lfence.lframe->frame_count > 0) {
+    frame_count = lfence.lframe->frame_count;
+  } else {
+    const auto& swapchain = std::static_pointer_cast<Swapchain>(
+        lfence.lframe->lswapchain->instance);
+    frame_count = swapchain->GetFrameCount();
+  }
 
   auto fences =
       std::make_shared<std::vector<std::shared_ptr<Fence>>>(frame_count);
@@ -93,9 +103,14 @@ Renderer::CreateFencesOfFrame(const LayoutFence& lfence) {
 std::shared_ptr<std::vector<std::shared_ptr<Semaphore>>>
 Renderer::CreateSemaphoresOfFrame(const LayoutSemaphore& lsemaphore) {
   assert(lsemaphore.lframe);
-  const auto& swapchain = std::static_pointer_cast<Swapchain>(
-      lsemaphore.lframe->lswapchain->instance);
-  int frame_count = swapchain->GetFrameCount();
+  int frame_count = 0;
+  if (lsemaphore.lframe->frame_count > 0) {
+    frame_count = lsemaphore.lframe->frame_count;
+  } else {
+    const auto& swapchain = std::static_pointer_cast<Swapchain>(
+        lsemaphore.lframe->lswapchain->instance);
+    frame_count = swapchain->GetFrameCount();
+  }
 
   auto semaphores =
       std::make_shared<std::vector<std::shared_ptr<Semaphore>>>(frame_count);
@@ -118,9 +133,14 @@ std::shared_ptr<std::vector<std::shared_ptr<CommandBuffer>>>
 Renderer::CreateCommandBuffersOfFrame(
     const std::shared_ptr<LayoutCommandBuffer> lcmd_buffer) {
   assert(lcmd_buffer->lframe);
-  const auto& swapchain = std::static_pointer_cast<Swapchain>(
-      lcmd_buffer->lframe->lswapchain->instance);
-  int frame_count = swapchain->GetFrameCount();
+  int frame_count = 0;
+  if (lcmd_buffer->lframe->frame_count > 0) {
+    frame_count = lcmd_buffer->lframe->frame_count;
+  } else {
+    const auto& swapchain = std::static_pointer_cast<Swapchain>(
+        lcmd_buffer->lframe->lswapchain->instance);
+    frame_count = swapchain->GetFrameCount();
+  }
 
   const auto cmd_pool =
       std::static_pointer_cast<CommandPool>(lcmd_buffer->lcmd_pool->instance);
@@ -146,9 +166,14 @@ Renderer::CreateCommandBuffersOfFrame(
 std::shared_ptr<std::vector<std::shared_ptr<Buffer>>>
 Renderer::CreateBuffersOfFrame(const LayoutBuffer& lbuffer) {
   assert(lbuffer.lframe);
-  const auto& swapchain =
-      std::static_pointer_cast<Swapchain>(lbuffer.lframe->lswapchain->instance);
-  int frame_count = swapchain->GetFrameCount();
+  int frame_count = 0;
+  if (lbuffer.lframe->frame_count > 0) {
+    frame_count = lbuffer.lframe->frame_count;
+  } else {
+    const auto& swapchain = std::static_pointer_cast<Swapchain>(
+        lbuffer.lframe->lswapchain->instance);
+    frame_count = swapchain->GetFrameCount();
+  }
 
   auto buffers =
       std::make_shared<std::vector<std::shared_ptr<Buffer>>>(frame_count);
@@ -171,9 +196,14 @@ std::shared_ptr<std::vector<std::shared_ptr<DescriptorSet>>>
 Renderer::CreateDescriptorSetsOfFrame(
     const std::shared_ptr<LayoutDescriptorSet> ldesc_set) {
   assert(ldesc_set->lframe);
-  const auto& swapchain = std::static_pointer_cast<Swapchain>(
-      ldesc_set->lframe->lswapchain->instance);
-  int frame_count = swapchain->GetFrameCount();
+  int frame_count = 0;
+  if (ldesc_set->lframe->frame_count > 0) {
+    frame_count = ldesc_set->lframe->frame_count;
+  } else {
+    const auto& swapchain = std::static_pointer_cast<Swapchain>(
+        ldesc_set->lframe->lswapchain->instance);
+    frame_count = swapchain->GetFrameCount();
+  }
 
   const auto desc_pool =
       std::static_pointer_cast<DescriptorPool>(ldesc_set->ldesc_pool->instance);
@@ -197,9 +227,14 @@ Renderer::CreateDescriptorSetsOfFrame(
 std::shared_ptr<std::vector<std::shared_ptr<QueryPool>>>
 Renderer::CreateQueryPoolsOfFrame(const LayoutQueryPool& lquery_pool) {
   assert(lquery_pool.lframe);
-  const auto& swapchain = std::static_pointer_cast<Swapchain>(
-      lquery_pool.lframe->lswapchain->instance);
-  int frame_count = swapchain->GetFrameCount();
+  int frame_count = 0;
+  if (lquery_pool.lframe->frame_count > 0) {
+    frame_count = lquery_pool.lframe->frame_count;
+  } else {
+    const auto& swapchain = std::static_pointer_cast<Swapchain>(
+        lquery_pool.lframe->lswapchain->instance);
+    frame_count = swapchain->GetFrameCount();
+  }
 
   auto query_pools =
       std::make_shared<std::vector<std::shared_ptr<QueryPool>>>(frame_count);
@@ -221,9 +256,14 @@ Renderer::CreateQueryPoolsOfFrame(const LayoutQueryPool& lquery_pool) {
 std::shared_ptr<std::vector<std::shared_ptr<Event>>>
 Renderer::CreateEventsOfFrame(const LayoutEvent& levent) {
   assert(levent.lframe);
-  const auto& swapchain =
-      std::static_pointer_cast<Swapchain>(levent.lframe->lswapchain->instance);
-  int frame_count = swapchain->GetFrameCount();
+  int frame_count = 0;
+  if (levent.lframe->frame_count > 0) {
+    frame_count = levent.lframe->frame_count;
+  } else {
+    const auto& swapchain = std::static_pointer_cast<Swapchain>(
+        levent.lframe->lswapchain->instance);
+    frame_count = swapchain->GetFrameCount();
+  }
 
   auto events =
       std::make_shared<std::vector<std::shared_ptr<Event>>>(frame_count);

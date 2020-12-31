@@ -28,6 +28,9 @@ bool ParserSingleton<ParserFrame>::ParseElement(
     node->lswapchain_id = element->Attribute("swapchain");
   }
 
+  const char* value = element->Attribute("frameCount");
+  if (value) node->frame_count = static_cast<int>(Expression::Get().Evaluate(value));
+
   status->node = node;
   status->child_element = element->FirstChildElement();
 

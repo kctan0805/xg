@@ -1077,10 +1077,11 @@ struct LayoutFrame : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lswapchain);
+    archive(cereal::base_class<LayoutBase>(this), lswapchain, frame_count);
   }
 
   const char* lswapchain_id = nullptr;
+  int frame_count = 0;
   int curr_frame = 0;
 };
 

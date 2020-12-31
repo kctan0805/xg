@@ -26,6 +26,7 @@ class Buffer {
   virtual void Exit() = 0;
 
   size_t GetSize() const { return size_; }
+  size_t GetUnitSize() const { return unit_size_; }
   void* GetMappedData() const { return mapped_data_; }
 
   virtual void InvalidateRange(const MemoryRangeInfo& info) = 0;
@@ -37,6 +38,7 @@ class Buffer {
   Buffer() = default;
 
   size_t size_ = 0;
+  size_t unit_size_ = 0;
   void* mapped_data_ = nullptr;
 };
 
