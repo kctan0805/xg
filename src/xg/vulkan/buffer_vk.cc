@@ -28,8 +28,8 @@ Result BufferVK::Init(const LayoutBuffer& lbuffer) {
   if (buffer_size == 0) {
     auto unit_size = lbuffer.unit_size;
     if (min_uniform_buffer_offset_align_ > 0) {
-      unit_size =
-          (unit_size + min_uniform_buffer_offset_align_ - 1) & ~(unit_size - 1);
+      unit_size = (unit_size + min_uniform_buffer_offset_align_ - 1) &
+                  ~(min_uniform_buffer_offset_align_ - 1);
     }
     buffer_size = unit_size * lbuffer.unit;
     unit_size_ = unit_size;
