@@ -237,11 +237,11 @@ bool DeviceVK::CreateDevice(const LayoutDevice& ldevice) {
   }
 
   physical_device_.getFeatures(&physical_device_features_);
-  const auto& features2 =
-      physical_device_
-          .getFeatures2<vk::PhysicalDeviceFeatures2,
-                        vk::PhysicalDeviceIndexTypeUint8FeaturesEXT>();
-  const auto& index_type_uint8_features =
+
+  const auto& features2 = physical_device_.getFeatures2<
+      vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceIndexTypeUint8FeaturesEXT,
+      vk::PhysicalDeviceShaderAtomicFloatFeaturesEXT>();
+  auto index_type_uint8_features =
       features2.get<vk::PhysicalDeviceIndexTypeUint8FeaturesEXT>();
 
   const auto& create_info =
