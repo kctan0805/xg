@@ -27,6 +27,7 @@ class Buffer {
 
   size_t GetSize() const { return size_; }
   size_t GetUnitSize() const { return unit_size_; }
+  MemoryUsage GetMemoryUsage() const { return mem_usage_; }
   void* GetMappedData() const { return mapped_data_; }
 
   virtual void InvalidateRange(const MemoryRangeInfo& info) = 0;
@@ -39,6 +40,7 @@ class Buffer {
 
   size_t size_ = 0;
   size_t unit_size_ = 0;
+  MemoryUsage mem_usage_ = MemoryUsage::kUnknown;
   void* mapped_data_ = nullptr;
 };
 

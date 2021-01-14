@@ -72,7 +72,7 @@
     <FloatValues>-1.0 1.0 0.0 0.0 1.0</FloatValues>
   </Data>
 
-  <Buffer id="drawVertexBuffer" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <Buffer id="drawVertexBuffer" usage="TransferDst VertexBuffer"/>
   <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
 
   <!-- Scene -->

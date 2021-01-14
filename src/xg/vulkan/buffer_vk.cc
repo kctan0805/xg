@@ -58,6 +58,7 @@ Result BufferVK::Init(const LayoutBuffer& lbuffer) {
   }
 
   size_ = buffer_size;
+  mem_usage_ = lbuffer.mem_usage;
   mapped_data_ = alloc_info.pMappedData;
 
   XG_TRACE("vmaCreateBuffer: {} {}", static_cast<void*>(buffer_), lbuffer.id);
