@@ -177,14 +177,14 @@
     <FloatValues>-0.5 0.5 -0.5 1.0 1.0 1.0 1.0 1.0</FloatValues>
   </Data>
 
-  <Buffer id="drawVertexBuffer" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <Buffer id="drawVertexBuffer" usage="TransferDst VertexBuffer"/>
   <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
 
   <Data id="drawIndexData">
     <UInt32Values>0 1 2 2 3 0 4 5 6 6 7 4</UInt32Values>
   </Data>
 
-  <Buffer id="drawIndexBuffer" usage="TransferSrc TransferDst IndexBuffer StorageBuffer"/>
+  <Buffer id="drawIndexBuffer" usage="TransferDst IndexBuffer"/>
   <BufferLoader buffer="drawIndexBuffer" accessMask="IndexRead" queue="mainQueue" stageMask="VertexInput" data="drawIndexData"/>
 
   <!-- Scene -->

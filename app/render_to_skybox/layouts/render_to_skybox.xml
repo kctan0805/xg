@@ -374,14 +374,14 @@
     <FloatValues>5 5 5</FloatValues>
   </Data>
 
-  <Buffer id="drawVertexBuffer" usage="TransferSrc TransferDst VertexBuffer StorageBuffer"/>
+  <Buffer id="drawVertexBuffer" usage="TransferDst VertexBuffer"/>
   <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
 
   <Data id="drawIndexData">
     <UInt8Values>3 2 6 7 4 2 0 3 1 6 5 4 1 0</UInt8Values>
   </Data>
 
-  <Buffer id="drawIndexBuffer" usage="TransferSrc TransferDst IndexBuffer StorageBuffer"/>
+  <Buffer id="drawIndexBuffer" usage="TransferDst IndexBuffer"/>
   <BufferLoader buffer="drawIndexBuffer" accessMask="IndexRead" queue="mainQueue" stageMask="VertexInput" data="drawIndexData"/>
 
   <!-- Scene -->
