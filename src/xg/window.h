@@ -17,7 +17,6 @@
 namespace xg {
 
 enum class MouseButton { kLeft = 1, kMiddle = 2, kRight = 3 };
-enum class ButtonAction { kRelease, kPress };
 
 enum class WindowFlags : unsigned int {
   kVisible = 0x00000004,
@@ -47,12 +46,9 @@ class Window {
 
   virtual const void* GetHandle() const = 0;
   virtual void GetDrawableSize(int* width, int* height) const = 0;
-  virtual void GetMousePosition(int* xpos, int* ypos) const = 0;
   virtual WindowFlags GetWindowFlags() const = 0;
   virtual bool ShouldClose() const = 0;
   virtual void PollEvents() = 0;
-  virtual void MinimizeWindow() = 0;
-  virtual void RestoreWindow() = 0;
 
   using ResizeHandlerType = void(int, int);
 
@@ -60,10 +56,14 @@ class Window {
     resize_handler_ = handler;
   }
 
-  using MouseButtonHandlerType = void(MouseButton, ButtonAction);
+  using MouseButtonHandlerType = void(MouseButton, int, int);
 
-  void SetMouseButtonHandler(std::function<MouseButtonHandlerType> handler) {
-    mouse_button_handler_ = handler;
+  void SetMouseDownHandler(std::function<MouseButtonHandlerType> handler) {
+    mouse_down_handler_ = handler;
+  }
+
+  void SetMouseUpHandler(std::function<MouseButtonHandlerType> handler) {
+    mouse_up_handler_ = handler;
   }
 
   using MouseMoveHandlerType = void(int, int);
@@ -76,10 +76,11 @@ class Window {
   virtual bool Init(const LayoutWindow& lwin) = 0;
 
   std::function<ResizeHandlerType> resize_handler_ = [](int, int) {};
-  std::function<MouseButtonHandlerType> mouse_button_handler_ =
-      [](MouseButton, ButtonAction) {};
-  std::function<MouseMoveHandlerType> mouse_move_handler_ = [](int, int) {
-  };
+  std::function<MouseButtonHandlerType> mouse_down_handler_ = [](MouseButton,
+                                                                 int, int) {};
+  std::function<MouseButtonHandlerType> mouse_up_handler_ = [](MouseButton, int,
+                                                               int) {};
+  std::function<MouseMoveHandlerType> mouse_move_handler_ = [](int, int) {};
 };
 
 }  // namespace xg

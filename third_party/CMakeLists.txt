@@ -1,8 +1,3 @@
-# glfw
-option(GLFW_BUILD_DOCS OFF)
-option(GLFW_INSTALL OFF)
-add_subdirectory(glfw)
-
 # glm
 option(BUILD_SHARED_LIBS OFF)
 option(GLM_TEST_ENABLE OFF)

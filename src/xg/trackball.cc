@@ -48,40 +48,38 @@ void Trackball::ComputeCoordinates(int mouse_x, int mouse_y, glm::dvec2* ndc,
   }
 }
 
-void Trackball::OnMouseButton(MouseButton button, ButtonAction action, int posx,
-                              int posy) {
+void Trackball::OnMouseDown(MouseButton button, int posx, int posy) {
   if (!camera_) return;
-  switch (action) {
-    case ButtonAction::kPress:
-      ComputeCoordinates(posx, posy, &prev_ndc_, &prev_tbc_);
 
-      switch (button) {
-        case MouseButton::kLeft:
-          mouse_pressed_.left = true;
-          break;
-        case MouseButton::kRight:
-          mouse_pressed_.right = true;
-          break;
-        case MouseButton::kMiddle:
-          mouse_pressed_.middle = true;
-          break;
-      }
+  ComputeCoordinates(posx, posy, &prev_ndc_, &prev_tbc_);
+
+  switch (button) {
+    case MouseButton::kLeft:
+      mouse_pressed_.left = true;
       break;
+    case MouseButton::kRight:
+      mouse_pressed_.right = true;
+      break;
+    case MouseButton::kMiddle:
+      mouse_pressed_.middle = true;
+      break;
+  }
+}
 
-    case ButtonAction::kRelease:
-      ComputeCoordinates(posx, posy, &prev_ndc_, &prev_tbc_);
+void Trackball::OnMouseUp(MouseButton button, int posx, int posy) {
+  if (!camera_) return;
 
-      switch (button) {
-        case MouseButton::kLeft:
-          mouse_pressed_.left = false;
-          break;
-        case MouseButton::kRight:
-          mouse_pressed_.right = false;
-          break;
-        case MouseButton::kMiddle:
-          mouse_pressed_.middle = false;
-          break;
-      }
+  ComputeCoordinates(posx, posy, &prev_ndc_, &prev_tbc_);
+
+  switch (button) {
+    case MouseButton::kLeft:
+      mouse_pressed_.left = false;
+      break;
+    case MouseButton::kRight:
+      mouse_pressed_.right = false;
+      break;
+    case MouseButton::kMiddle:
+      mouse_pressed_.middle = false;
       break;
   }
 }

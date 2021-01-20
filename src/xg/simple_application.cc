@@ -30,10 +30,15 @@ bool SimpleApplication::Init(xg::Engine* engine) {
 
     const auto& win = viewer->GetWindow();
 
-    win->SetMouseButtonHandler([this, &viewer](MouseButton button,
-                                               ButtonAction action) {
-      this->OnMouseButton(viewer, button, action);
-    });
+    win->SetMouseDownHandler(
+        [this, &viewer](MouseButton button, int posx, int posy) {
+          this->OnMouseDown(viewer, button, posx, posy);
+        });
+
+    win->SetMouseUpHandler(
+        [this, &viewer](MouseButton button, int posx, int posy) {
+          this->OnMouseUp(viewer, button, posx, posy);
+        });
 
     win->SetMouseMoveHandler([this, &viewer](int posx, int posy) {
       this->OnMouseMove(viewer, posx, posy);
@@ -58,12 +63,16 @@ bool SimpleApplication::Init(xg::Engine* engine) {
   return true;
 }
 
-void SimpleApplication::OnMouseButton(std::shared_ptr<Viewer> viewer,
-                                      MouseButton button, ButtonAction action) {
+void SimpleApplication::OnMouseDown(std::shared_ptr<Viewer> viewer,
+                                    MouseButton button, int posx, int posy) {
   auto& viewer_data = viewer_data_map_[viewer];
-  int posx, posy;
-  viewer->GetWindow()->GetMousePosition(&posx, &posy);
-  viewer_data.trackball.OnMouseButton(button, action, posx, posy);
+  viewer_data.trackball.OnMouseDown(button, posx, posy);
+}
+
+void SimpleApplication::OnMouseUp(std::shared_ptr<Viewer> viewer,
+                                  MouseButton button, int posx, int posy) {
+  auto& viewer_data = viewer_data_map_[viewer];
+  viewer_data.trackball.OnMouseUp(button, posx, posy);
 }
 
 void SimpleApplication::OnMouseMove(std::shared_ptr<Viewer> viewer, int posx,

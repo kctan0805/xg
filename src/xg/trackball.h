@@ -24,8 +24,8 @@ struct TrackballInfo {
 class Trackball {
  public:
   void Init(const TrackballInfo& info);
-  void OnMouseButton(MouseButton button, ButtonAction action, int posx,
-                     int posy);
+  void OnMouseDown(MouseButton button, int posx, int posy);
+  void OnMouseUp(MouseButton button, int posx, int posy);
   void OnMouseMove(int posx, int posy);
 
  protected:
