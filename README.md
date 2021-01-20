@@ -1,12 +1,12 @@
 # XML-based Vulkan Graphics Engine
 
-The engine use XML to describe internal graphics layout that has following targets :
+The engine use XML to describe internal graphics layout that has following targets:
 
 - Much easier to develop Vulkan applications than usual way.
 - Much easier to setup a more flexible environment for those who focus on developing shaders.
 - Much easier to fine tune the settings of Vulkan graphics pipeline.
 
-and has following features :
+and has following features:
 
 - XML described layout, even including commands. See [hello_world.xml](app/hello_world/layouts/hello_world.xml) for example.
 - Uses [XML schema](src/xg/schema/layout.xsd) to provide validation and intellisense function by Visual Studio.
@@ -34,7 +34,7 @@ and has following features :
 - [cereal - A C++11 library for serialization](https://github.com/USCiLab/cereal)
 - [Embed](https://github.com/magcks/embed)
 - [C++ Mathematical Expression Toolkit Library Documentation](https://github.com/ArashPartow/exprtk)
-- [GLFW](https://github.com/glfw/glfw)
+- [SDL](https://github.com/SDL-mirror/SDL)
 - [KTX](https://github.com/KhronosGroup/KTX-Software)
 - [OpenGL Mathematics](https://github.com/g-truc/glm)
 - [spdlog](https://github.com/gabime/spdlog)

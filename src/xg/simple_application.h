@@ -34,9 +34,8 @@ class SimpleApplication {
   virtual bool Init(xg::Engine* engine);
 
  protected:
-  virtual void OnMouseButton(std::shared_ptr<Viewer> viewer, MouseButton button, ButtonAction action,
-                          ModifierKey mods);
-  virtual void OnMouseMove(std::shared_ptr<Viewer> viewer, double posx, double posy);
+  virtual void OnMouseButton(std::shared_ptr<Viewer> viewer, MouseButton button, ButtonAction action);
+  virtual void OnMouseMove(std::shared_ptr<Viewer> viewer, int posx, int posy);
   virtual Result OnUpdate(std::shared_ptr<Viewer> viewer) {
     return Result::kSuccess;
   }

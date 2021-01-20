@@ -9,21 +9,27 @@
 #ifndef XG_VULKAN_WINDOW_VK_H_
 #define XG_VULKAN_WINDOW_VK_H_
 
+#include <vector>
+
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_vulkan.h"
 #include "vulkan/vulkan.hpp"
 #include "xg/types.h"
 #include "xg/window.h"
-#include "xg/window_glfw.h"
+#include "xg/window_sdl.h"
 
 namespace xg {
 
-class WindowVK : public WindowGLFW {
+class WindowVK : public WindowSDL {
  public:
+  static bool Initialize();
+  static void GetInstanceExtensions(std::vector<const char*>* extensions);
+
   ~WindowVK();
 
-  static const char** GetRequiredExtensions(int* count);
-  static bool IsPhysicalDevicePresentationSupport(VkInstance instance,
-                                           VkPhysicalDevice device,
-                                           QueueFamily family);
+  void GetDrawableSize(int* width, int* height) const override {
+    SDL_Vulkan_GetDrawableSize(window_, width, height);
+  }
 
  protected:
   bool Init(const LayoutWindow& lwin) override;

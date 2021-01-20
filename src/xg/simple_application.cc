@@ -31,12 +31,11 @@ bool SimpleApplication::Init(xg::Engine* engine) {
     const auto& win = viewer->GetWindow();
 
     win->SetMouseButtonHandler([this, &viewer](MouseButton button,
-                                               ButtonAction action,
-                                               ModifierKey mods) {
-      this->OnMouseButton(viewer, button, action, mods);
+                                               ButtonAction action) {
+      this->OnMouseButton(viewer, button, action);
     });
 
-    win->SetMouseMoveHandler([this, &viewer](double posx, double posy) {
+    win->SetMouseMoveHandler([this, &viewer](int posx, int posy) {
       this->OnMouseMove(viewer, posx, posy);
     });
 
@@ -60,16 +59,15 @@ bool SimpleApplication::Init(xg::Engine* engine) {
 }
 
 void SimpleApplication::OnMouseButton(std::shared_ptr<Viewer> viewer,
-                                      MouseButton button, ButtonAction action,
-                                      ModifierKey mods) {
+                                      MouseButton button, ButtonAction action) {
   auto& viewer_data = viewer_data_map_[viewer];
-  double posx, posy;
-  viewer->GetWindow()->GetCursorPos(&posx, &posy);
+  int posx, posy;
+  viewer->GetWindow()->GetMousePosition(&posx, &posy);
   viewer_data.trackball.OnMouseButton(button, action, posx, posy);
 }
 
-void SimpleApplication::OnMouseMove(std::shared_ptr<Viewer> viewer, double posx,
-                                    double posy) {
+void SimpleApplication::OnMouseMove(std::shared_ptr<Viewer> viewer, int posx,
+                                    int posy) {
   auto& viewer_data = viewer_data_map_[viewer];
   viewer_data.trackball.OnMouseMove(posx, posy);
 }

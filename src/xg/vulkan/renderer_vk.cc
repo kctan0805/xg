@@ -42,7 +42,7 @@
 #include "xg/vulkan/shader_module_vk.h"
 #include "xg/vulkan/swapchain_vk.h"
 #include "xg/vulkan/window_vk.h"
-#include "xg/window_glfw.h"
+#include "xg/window_sdl.h"
 
 namespace xg {
 
@@ -56,11 +56,11 @@ RendererVK::~RendererVK() {
     XG_TRACE("destroy: {}", static_cast<void*>((VkInstance)instance_));
     instance_.destroy();
   }
-  WindowGLFW::Terminate();
+  WindowSDL::Terminate();
 }
 
 bool RendererVK::Init(const LayoutRenderer& lrenderer) {
-  if (!WindowGLFW::Initialize()) return false;
+  if (!WindowVK::Initialize()) return false;
   if (!CreateInstance(lrenderer)) return false;
   CreateDispatchLoader(nullptr);
   if (lrenderer.debug && !CreateDebugMessenger()) return false;
@@ -70,9 +70,8 @@ bool RendererVK::Init(const LayoutRenderer& lrenderer) {
 
 bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
   const auto& found_extensions = vk::enumerateInstanceExtensionProperties();
-  int win_extension_count = 0;
-  const char** win_extensions =
-      WindowVK::GetRequiredExtensions(&win_extension_count);
+  std::vector<const char*> win_extensions;
+  WindowVK::GetInstanceExtensions(&win_extensions);
   std::vector<const char*> wanted_extensions{
       VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
   std::vector<const char*> wanted_layers;
@@ -90,7 +89,7 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
 
   std::vector<const char*> extensions;
 
-  for (auto i = 0; i < win_extension_count; ++i) {
+  for (auto i = 0; i < win_extensions.size(); ++i) {
     for (const auto& found : found_extensions) {
       if (std::string(found.extensionName.data()) == win_extensions[i]) {
         extensions.emplace_back(win_extensions[i]);

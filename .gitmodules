@@ -1,9 +1,6 @@
 [submodule "third_party/exprtk"]
 	path = third_party/exprtk
 	url = https://github.com/ArashPartow/exprtk.git
-[submodule "third_party/glfw"]
-	path = third_party/glfw
-	url = https://github.com/glfw/glfw.git
 [submodule "third_party/glm"]
 	path = third_party/glm
 	url = https://github.com/g-truc/glm.git
@@ -35,3 +32,6 @@
 [submodule "third_party/zstd"]
 	path = third_party/zstd
 	url = https://github.com/facebook/zstd.git
+[submodule "third_party/SDL"]
+	path = third_party/SDL
+	url = https://github.com/SDL-mirror/SDL.git

@@ -16,16 +16,25 @@
 
 namespace xg {
 
-enum class MouseButton { kLeft, kRight, kMiddle };
-enum class ButtonAction { kRelease, kPress, kRepeat };
-enum class ModifierKey { kShift = 0x1, kControl = 0x2, kAlt = 0x4 };
+enum class MouseButton { kLeft = 1, kMiddle = 2, kRight = 3 };
+enum class ButtonAction { kRelease, kPress };
 
-enum class WindowAttrib {
-  kFocused = 0x00020001,
-  kIconified = 0x00020002,
-  kResizable = 0x00020003,
-  kVisible = 0x00020004
+enum class WindowFlags : unsigned int {
+  kVisible = 0x00000004,
+  kResizable = 0x00000020,
+  kMinimized = 0x00000040,
+  kFocused = 0x00000400
 };
+inline WindowFlags operator|(WindowFlags lhs, WindowFlags rhs) {
+  return static_cast<WindowFlags>(
+      static_cast<std::underlying_type_t<WindowFlags>>(lhs) |
+      static_cast<std::underlying_type_t<WindowFlags>>(rhs));
+}
+inline WindowFlags operator&(WindowFlags lhs, WindowFlags rhs) {
+  return static_cast<WindowFlags>(
+      static_cast<std::underlying_type_t<WindowFlags>>(lhs) &
+      static_cast<std::underlying_type_t<WindowFlags>>(rhs));
+}
 
 class Window {
  public:
@@ -37,13 +46,13 @@ class Window {
   virtual ~Window() = default;
 
   virtual const void* GetHandle() const = 0;
-  virtual void GetFramebufferSize(int* width, int* height) const = 0;
-  virtual void GetCursorPos(double* xpos, double* ypos) const = 0;
-  virtual int GetAttrib(WindowAttrib attrib) const = 0;
+  virtual void GetDrawableSize(int* width, int* height) const = 0;
+  virtual void GetMousePosition(int* xpos, int* ypos) const = 0;
+  virtual WindowFlags GetWindowFlags() const = 0;
   virtual bool ShouldClose() const = 0;
   virtual void PollEvents() = 0;
-  virtual void Iconify() = 0;
-  virtual void Restore() = 0;
+  virtual void MinimizeWindow() = 0;
+  virtual void RestoreWindow() = 0;
 
   using ResizeHandlerType = void(int, int);
 
@@ -51,13 +60,13 @@ class Window {
     resize_handler_ = handler;
   }
 
-  using MouseButtonHandlerType = void(MouseButton, ButtonAction, ModifierKey);
+  using MouseButtonHandlerType = void(MouseButton, ButtonAction);
 
   void SetMouseButtonHandler(std::function<MouseButtonHandlerType> handler) {
     mouse_button_handler_ = handler;
   }
 
-  using MouseMoveHandlerType = void(double, double);
+  using MouseMoveHandlerType = void(int, int);
 
   void SetMouseMoveHandler(std::function<MouseMoveHandlerType> handler) {
     mouse_move_handler_ = handler;
@@ -68,8 +77,8 @@ class Window {
 
   std::function<ResizeHandlerType> resize_handler_ = [](int, int) {};
   std::function<MouseButtonHandlerType> mouse_button_handler_ =
-      [](MouseButton, ButtonAction, ModifierKey) {};
-  std::function<MouseMoveHandlerType> mouse_move_handler_ = [](double, double) {
+      [](MouseButton, ButtonAction) {};
+  std::function<MouseMoveHandlerType> mouse_move_handler_ = [](int, int) {
   };
 };
 

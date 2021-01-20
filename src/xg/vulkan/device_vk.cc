@@ -530,7 +530,7 @@ std::shared_ptr<Swapchain> DeviceVK::CreateSwapchain(
   if (surface_capabilities.currentExtent.width == UINT32_MAX) {
     int width = lswapchain->width;
     int height = lswapchain->height;
-    if (!width || !height) win->GetFramebufferSize(&width, &height);
+    if (!width || !height) win->GetDrawableSize(&width, &height);
 
     width = std::min(
         std::max(width,

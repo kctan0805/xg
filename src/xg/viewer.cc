@@ -127,7 +127,8 @@ void Viewer::Disable() {
 }
 
 Result Viewer::Resize() {
-  if (win_->GetAttrib(WindowAttrib::kIconified)) {
+  if (static_cast<unsigned int>(win_->GetWindowFlags() &
+                                WindowFlags::kMinimized)) {
     Disable();
     return Result::kSuccess;
   } else {
@@ -175,7 +176,7 @@ Result Viewer::Resize() {
   // recreate
   int width = 0;
   int height = 0;
-  win_->GetFramebufferSize(&width, &height);
+  win_->GetDrawableSize(&width, &height);
 
   auto lswapchain = lframe_->lswapchain.get();
   lswapchain->width = width;

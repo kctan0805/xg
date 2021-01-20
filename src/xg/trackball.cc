@@ -6,6 +6,10 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
+
 #include "xg/trackball.h"
 
 #include <cassert>
@@ -27,8 +31,8 @@ void Trackball::Init(const TrackballInfo& info) {
   camera_up_ = glm::dvec3(camera_->GetUp());
 }
 
-void Trackball::ComputeCoordinates(double mouse_x, double mouse_y,
-                                   glm::dvec2* ndc, glm::dvec3* tbc) const {
+void Trackball::ComputeCoordinates(int mouse_x, int mouse_y, glm::dvec2* ndc,
+                                   glm::dvec3* tbc) const {
   assert(ndc);
   assert(tbc);
 
@@ -44,8 +48,8 @@ void Trackball::ComputeCoordinates(double mouse_x, double mouse_y,
   }
 }
 
-void Trackball::OnMouseButton(MouseButton button, ButtonAction action,
-                              double posx, double posy) {
+void Trackball::OnMouseButton(MouseButton button, ButtonAction action, int posx,
+                              int posy) {
   if (!camera_) return;
   switch (action) {
     case ButtonAction::kPress:
@@ -82,7 +86,7 @@ void Trackball::OnMouseButton(MouseButton button, ButtonAction action,
   }
 }
 
-void Trackball::OnMouseMove(double posx, double posy) {
+void Trackball::OnMouseMove(int posx, int posy) {
   if (!camera_) return;
   if (!mouse_pressed_.left && !mouse_pressed_.right && !mouse_pressed_.middle)
     return;

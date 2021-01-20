@@ -21,9 +21,6 @@ add_definitions(
 if(WIN32)
     add_definitions(
         -D_SCL_SECURE_NO_WARNINGS
-        -D_USE_MATH_DEFINES
-        -DNOMINMAX
-        -DVK_USE_PLATFORM_WIN32_KHR
     )
     add_compile_options(/bigobj /utf-8)
 endif()
@@ -34,10 +31,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/third_party/embed)
 
 include_directories(
+    ${CMAKE_BINARY_DIR}/third_party/SDL/include
     third_party
     third_party/cereal/include
     third_party/KTX-Software/include
     third_party/KTX-Software/other_include
+    third_party/SDL/include
     third_party/spdlog/include
     third_party/thread-pool-cpp/include
     src

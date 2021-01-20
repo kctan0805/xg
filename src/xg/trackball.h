@@ -24,15 +24,15 @@ struct TrackballInfo {
 class Trackball {
  public:
   void Init(const TrackballInfo& info);
-  void OnMouseButton(MouseButton button, ButtonAction action, double posx,
-                     double posy);
-  void OnMouseMove(double posx, double posy);
+  void OnMouseButton(MouseButton button, ButtonAction action, int posx,
+                     int posy);
+  void OnMouseMove(int posx, int posy);
 
  protected:
   void Rotate(double angle, const glm::dvec3& axis);
   void Zoom(double ratio);
   void Pan(const glm::dvec2& delta);
-  void ComputeCoordinates(double mouse_x, double mouse_y, glm::dvec2* ndc,
+  void ComputeCoordinates(int mouse_x, int mouse_y, glm::dvec2* ndc,
                           glm::dvec3* tbc) const;
 
   double width_ = 0.0;

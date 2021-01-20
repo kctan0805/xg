@@ -8,10 +8,8 @@
 
 #include "xg/vulkan/window_vk.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4819)
-#include "GLFW/glfw3.h"
-#pragma warning(pop)
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_vulkan.h"
 #include "vulkan/vulkan.hpp"
 #include "xg/logger.h"
 #include "xg/types.h"
@@ -20,17 +18,30 @@
 
 namespace xg {
 
-const char** WindowVK::GetRequiredExtensions(int* count) {
-  return glfwGetRequiredInstanceExtensions(reinterpret_cast<uint32_t*>(count));
+bool WindowVK::Initialize() {
+  if (!WindowSDL::Initialize()) return false;
+
+  if (SDL_Vulkan_LoadLibrary(nullptr) < 0) {
+    XG_ERROR("SDL_Vulkan_LoadLibrary() fail");
+    return false;
+  }
+
+  return true;
 }
 
-bool WindowVK::IsPhysicalDevicePresentationSupport(VkInstance instance,
-                                                   VkPhysicalDevice device,
-                                                   QueueFamily family) {
-  return glfwGetPhysicalDevicePresentationSupport(instance, device,
-                                                  static_cast<uint32_t>(family))
-             ? true
-             : false;
+void WindowVK::GetInstanceExtensions(std::vector<const char*>* extensions) {
+  unsigned int count = 0;
+  if (!SDL_Vulkan_GetInstanceExtensions(nullptr, &count, nullptr)) {
+    XG_ERROR("SDL_Vulkan_GetInstanceExtensions() fail");
+    return;
+  }
+
+  extensions->resize(count);
+
+  if (!SDL_Vulkan_GetInstanceExtensions(nullptr, &count, extensions->data())) {
+    XG_ERROR("SDL_Vulkan_GetInstanceExtensions() fail");
+    return;
+  }
 }
 
 WindowVK::~WindowVK() {
@@ -43,7 +54,17 @@ WindowVK::~WindowVK() {
 }
 
 bool WindowVK::Init(const LayoutWindow& lwin) {
-  if (!WindowGLFW::Init(lwin)) return false;
+  Uint32 flags = SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN;
+  flags |= lwin.resizable ? SDL_WINDOW_RESIZABLE : 0;
+  int x = lwin.xpos == -1 ? SDL_WINDOWPOS_UNDEFINED : lwin.xpos;
+  int y = lwin.ypos == -1 ? SDL_WINDOWPOS_UNDEFINED : lwin.ypos;
+  window_ = SDL_CreateWindow(lwin.title.c_str(), x, y, lwin.width, lwin.height,
+                             flags);
+  if (!window_) {
+    XG_ERROR(SDL_GetError());
+    return false;
+  }
+
   if (!CreateSurface(lwin)) return false;
   return true;
 }
@@ -53,14 +74,13 @@ bool WindowVK::CreateSurface(const LayoutWindow& lwin) {
       std::static_pointer_cast<RendererVK>(lwin.lrenderer->instance);
   instance_ = renderer->GetVkInstance();
 
-  const auto& result =
-      glfwCreateWindowSurface(instance_, window_, nullptr, &surface_);
-  if (result != VK_SUCCESS) {
-    XG_ERROR(ResultString(static_cast<Result>(result)));
+  const auto result = SDL_Vulkan_CreateSurface(window_, instance_, &surface_);
+  if (!result) {
+    XG_ERROR("SDL_Vulkan_CreateSurface() fail");
     return false;
   }
 
-  XG_TRACE("glfwCreateWindowSurface: {}",
+  XG_TRACE("SDL_Vulkan_CreateSurface: {}",
            static_cast<void*>((VkSurfaceKHR)surface_));
 
   return true;
