@@ -4,7 +4,6 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
-option(BUILD_TESTING "" OFF)
 option(XG_BUILD_APPS "Build the XG example applications" ON)
 
 set(CMAKE_CXX_STANDARD 17)

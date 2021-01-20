@@ -1,66 +1,12 @@
 # glm
-option(BUILD_SHARED_LIBS OFF)
-option(GLM_TEST_ENABLE OFF)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(GLM_TEST_ENABLE OFF CACHE BOOL "" FORCE)
 add_subdirectory(glm)
 
 # ktx
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/KTX-Software/lib/version.h "")
-
-add_library(ktx
-    KTX-Software/include/ktx.h
-    KTX-Software/lib/basis_sgd.h
-    KTX-Software/lib/basis_transcode.cpp
-    KTX-Software/lib/basisu/transcoder/basisu_file_headers.h
-    KTX-Software/lib/basisu/transcoder/basisu_global_selector_cb.h
-    KTX-Software/lib/basisu/transcoder/basisu_global_selector_palette.h
-    KTX-Software/lib/basisu/transcoder/basisu_transcoder_internal.h
-    KTX-Software/lib/basisu/transcoder/basisu_transcoder_uastc.h
-    KTX-Software/lib/basisu/transcoder/basisu_transcoder.cpp
-    KTX-Software/lib/basisu/transcoder/basisu_transcoder.h
-    KTX-Software/lib/basisu/transcoder/basisu.h
-    KTX-Software/lib/checkheader.c
-    KTX-Software/lib/dfdutils/createdfd.c
-    KTX-Software/lib/dfdutils/colourspaces.c
-    KTX-Software/lib/dfdutils/dfd.h
-    KTX-Software/lib/dfdutils/dfd2vk.inl
-    KTX-Software/lib/dfdutils/interpretdfd.c
-    KTX-Software/lib/dfdutils/printdfd.c
-    KTX-Software/lib/dfdutils/queries.c
-    KTX-Software/lib/dfdutils/vk2dfd.c
-    KTX-Software/lib/dfdutils/vulkan/vk_platform.h
-    KTX-Software/lib/dfdutils/vulkan/vulkan_core.h
-    KTX-Software/lib/etcdec.cxx
-    KTX-Software/lib/etcunpack.cxx
-    KTX-Software/lib/filestream.c
-    KTX-Software/lib/filestream.h
-    KTX-Software/lib/formatsize.h
-    KTX-Software/lib/gl_format.h
-    KTX-Software/lib/gl_funcs.c
-    KTX-Software/lib/gl_funcs.h
-    KTX-Software/lib/glloader.c
-    KTX-Software/lib/hashlist.c
-    KTX-Software/lib/info.c
-    KTX-Software/lib/ktxint.h
-    KTX-Software/lib/memstream.c
-    KTX-Software/lib/memstream.h
-    KTX-Software/lib/stream.h
-    KTX-Software/lib/strings.c
-    KTX-Software/lib/swap.c
-    KTX-Software/lib/texture.c
-    KTX-Software/lib/texture.h
-    KTX-Software/lib/texture2.c
-    KTX-Software/lib/texture2.h
-    KTX-Software/lib/uthash.h
-    KTX-Software/lib/vk_format.h
-    KTX-Software/lib/vkformat_check.c
-    KTX-Software/lib/vkformat_enum.h
-    KTX-Software/lib/vkformat_str.c
-    KTX-Software/lib/texture1.c
-    KTX-Software/lib/texture1.h    
-)
-target_include_directories(ktx PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/KTX-Software/lib)
-set_target_properties(ktx PROPERTIES COMPILE_DEFINITIONS "LIBKTX=1;BASISD_SUPPORT_FXT1=0;LIBKTX_VERSION=v4.0.beta2.27.g5f5d61ca.dirty;LIBKTX_DEFAULT_VERSION=v4.0.__default__")
-target_link_libraries(ktx libzstd_static)
+set(KTX_FEATURE_STATIC_LIBRARY ON CACHE BOOL "" FORCE)
+set(KTX_FEATURE_TESTS OFF CACHE BOOL "" FORCE)
+add_subdirectory(KTX-Software)
 
 # sdl
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
@@ -71,11 +17,12 @@ add_subdirectory(SDL)
 add_subdirectory(spdlog)
 
 # tinyxml2
-option(BUILD_SHARED_LIBS OFF)
-option(BUILD_TESTS OFF)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(tinyxml2)
 
 # zstd
-option(ZSTD_BUILD_PROGRAMS OFF)
-option(ZSTD_BUILD_SHARED OFF)
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(ZSTD_BUILD_PROGRAMS OFF CACHE BOOL "" FORCE)
+set(ZSTD_BUILD_SHARED OFF CACHE BOOL "" FORCE)
 add_subdirectory(zstd/build/cmake)
