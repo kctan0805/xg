@@ -220,11 +220,15 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
   return false;
 }
 
-std::shared_ptr<Layout> Parser::ParseFile(const std::string& xmlPath) {
-  XG_TRACE("ParseFile: {}", xmlPath);
+std::shared_ptr<Layout> Parser::ParseFile(const std::string& xml_path) {
+  std::vector<uint8_t> xml;
+
+  XG_TRACE("ParseFile: {}", xml_path);
+
+  if (!LoadFile(xml_path, &xml)) return nullptr;
 
   tinyxml2::XMLDocument doc;
-  const auto err = doc.LoadFile(xmlPath.c_str());
+  const auto err = doc.Parse(reinterpret_cast<char*>(xml.data()), xml.size());
   if (err != tinyxml2::XML_SUCCESS) {
     XG_ERROR("parse layout file error: {}", Tinyxml2ErrorString(err));
     return nullptr;
@@ -302,7 +306,8 @@ void Parser::AddLayoutNode(std::shared_ptr<Layout> layout,
 
     case LayoutType::kResourceLoader:
       assert(layout->lres_loader == nullptr);
-      layout->lres_loader = std::static_pointer_cast<LayoutResourceLoader>(node);
+      layout->lres_loader =
+          std::static_pointer_cast<LayoutResourceLoader>(node);
       break;
 
     case LayoutType::kWindow:

@@ -9,10 +9,15 @@
 #include <memory>
 #include <utility>
 
-#if defined(_MSC_VER) && !defined(NDEBUG)
+#ifdef _MSC_VER
+#define SDL_MAIN_HANDLED
+
+#ifndef NDEBUG
 #include <vld.h>  // Visual Leak Detector
 #endif
+#endif  // _MSC_VER
 
+#include "SDL_main.h"
 #include "hello_world.h"
 #include "xg/engine.h"
 #include "xg/layout.h"

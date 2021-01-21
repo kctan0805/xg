@@ -13,6 +13,7 @@
 #include "tinyxml2.h"
 #include "xg/layout.h"
 #include "xg/types.h"
+#include "xg/utility.h"
 
 namespace xg {
 namespace parser {
@@ -28,7 +29,9 @@ bool ParserSingleton<ParserShaderModule>::ParseElement(
   }
 
   const char* value = element->Attribute("file");
-  if (value) node->code = ReadFile(value);
+  if (value) {
+    if (!LoadFile(value, &node->code)) return false;
+  }
 
   status->node = node;
 

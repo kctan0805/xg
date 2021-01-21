@@ -8,6 +8,9 @@
 
 #include "xg/utility.h"
 
+#include <cassert>
+
+#include "SDL.h"
 #include "xg/logger.h"
 
 namespace xg {
@@ -218,6 +221,31 @@ int FormatToSize(Format format) {
       XG_ERROR("unknown format size: {}", static_cast<int>(format));
       return 0;
   }
+}
+
+bool LoadFile(const std::string& filepath, std::vector<uint8_t>* data) {
+  assert(!filepath.empty());
+  assert(data);
+  XG_DEBUG("load file: {}", filepath);
+
+  auto* rw = SDL_RWFromFile(filepath.c_str(), "rb");
+  if (!rw) {
+    XG_ERROR("failed to open file: {}, error: {}", filepath, SDL_GetError());
+    return false;
+  }
+
+  auto size = SDL_RWsize(rw);
+  assert(size >= 0);
+
+  data->resize(size);
+
+  auto size_read = SDL_RWread(rw, data->data(), 1, size);
+  if (size_read != size) {
+    XG_ERROR("read file size incorrect: {} != {}", size, size_read);
+    return false;
+  }
+
+  return true;
 }
 
 }  // namespace xg

@@ -10,9 +10,10 @@
 
 #include <algorithm>
 #include <cassert>
-#include <fstream>
+#include <cstdint>
 #include <limits>
 #include <memory>
+#include <vector>
 
 #include "xg/device.h"
 #include "xg/layout.h"
@@ -40,7 +41,6 @@ void BufferLoader::Run(std::shared_ptr<Task> self) {
   const auto deleter = [&](void*) {
     barrier_.set_value(nullptr);
     status_ = ResourceLoaderStatus::kEnded;
-    if (!info_.file_path.empty()) delete info_.src_ptr;
   };
   std::unique_ptr<void, decltype(deleter)> raii(static_cast<void*>(this),
                                                 deleter);
@@ -58,26 +58,6 @@ void BufferLoader::Run(std::shared_ptr<Task> self) {
     LayoutBuffer lbuffer;
     lbuffer.size = data_size;
 
-    if (info_.src_ptr == nullptr) {
-      std::ifstream file(info_.file_path, std::ios::ate | std::ios::binary);
-
-      if (!file.is_open()) {
-        XG_ERROR("open buffer file fail: {}", info_.file_path);
-        return;
-      }
-
-      info_.src_ptr = new uint8_t[lbuffer.size];
-      if (!info_.src_ptr) {
-        XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
-        return;
-      }
-
-      file.seekg(info_.src_offset);
-      file.read(const_cast<char*>(static_cast<const char*>(info_.src_ptr)),
-                lbuffer.size);
-      file.close();
-    }
-
     lbuffer.usage = BufferUsage::kTransferSrc;
     lbuffer.alloc_flags = MemoryAllocFlags::kCreateMapped;
     lbuffer.mem_usage = MemoryUsage::kCpuToGpu;
@@ -93,13 +73,16 @@ void BufferLoader::Run(std::shared_ptr<Task> self) {
     const auto& staging_data =
         static_cast<uint8_t*>(context_->staging_buffer->MapMemory());
 
-    const auto& src_ptr =
-        static_cast<const uint8_t*>(info_.src_ptr) + info_.src_offset;
-    std::copy(src_ptr, src_ptr + lbuffer.size, staging_data);
+    if (info_.src_ptr) {
+      const auto* src_ptr =
+          static_cast<const uint8_t*>(info_.src_ptr) + info_.src_offset;
+      std::copy(src_ptr, src_ptr + lbuffer.size, staging_data);
+    } else {
+      std::vector<uint8_t> file_data;
+      if (!LoadFile(info_.file_path, &file_data)) return;
 
-    if (!info_.file_path.empty()) {
-      delete info_.src_ptr;
-      info_.src_ptr = nullptr;
+      const auto* src_ptr = file_data.data() + info_.src_offset;
+      std::copy(src_ptr, src_ptr + lbuffer.size, staging_data);
     }
 
     context_->staging_buffer->UnmapMemory();
@@ -166,21 +149,16 @@ void BufferLoader::Run(std::shared_ptr<Task> self) {
     }
   } else {
     auto* data = static_cast<uint8_t*>(dst_buffer->MapMemory());
-    if (info_.src_ptr == nullptr) {
-      std::ifstream file(info_.file_path, std::ios::ate | std::ios::binary);
 
-      if (!file.is_open()) {
-        XG_ERROR("open buffer file fail: {}", info_.file_path);
-        return;
-      }
-
-      file.seekg(info_.src_offset);
-      file.read(reinterpret_cast<char*>(data), data_size);
-      file.close();
-
-    } else {
-      const auto src_ptr =
+    if (info_.src_ptr) {
+      const auto* src_ptr =
           static_cast<const uint8_t*>(info_.src_ptr) + info_.src_offset;
+      std::copy(src_ptr, src_ptr + data_size, data);
+    } else {
+      std::vector<uint8_t> file_data;
+      if (!LoadFile(info_.file_path, &file_data)) return;
+
+      const auto* src_ptr = file_data.data() + info_.src_offset;
       std::copy(src_ptr, src_ptr + data_size, data);
     }
 

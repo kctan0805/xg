@@ -23,7 +23,7 @@ class Parser {
     return parser;
   }
 
-  std::shared_ptr<Layout> ParseFile(const std::string& xmlPath);
+  std::shared_ptr<Layout> ParseFile(const std::string& xml_path);
 
  private:
   Parser() = default;

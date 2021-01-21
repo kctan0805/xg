@@ -178,7 +178,6 @@ class ParserResizer : public ParserSingleton<ParserResizer> {};
 class ParserUpdater : public ParserSingleton<ParserUpdater> {};
 
 // Utilities
-std::vector<uint8_t> ReadFile(const std::string& filepath);
 const char* Tinyxml2ErrorString(tinyxml2::XMLError error);
 Format StringToFormat(const char* value);
 ColorSpace StringToColorSpace(const char* value);

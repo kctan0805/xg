@@ -9,6 +9,10 @@
 #ifndef XG_UTILITY_H_
 #define XG_UTILITY_H_
 
+#include <cstdint>
+#include <string>
+#include <vector>
+
 #include "xg/layout.h"
 #include "xg/types.h"
 
@@ -16,6 +20,7 @@ namespace xg {
 
 const char* ResultString(Result result);
 int FormatToSize(Format format);
+bool LoadFile(const std::string& filepath, std::vector<uint8_t>* data);
 
 }  // namespace xg
 

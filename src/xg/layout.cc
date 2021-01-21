@@ -8,13 +8,16 @@
 
 #include "xg/layout.h"
 
+#include <cstdint>
 #include <fstream>
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "cereal/archives/binary.hpp"
 #include "cereal/types/polymorphic.hpp"
+#include "xg/utility.h"
 
 CEREAL_REGISTER_TYPE(xg::LayoutEngine);
 CEREAL_REGISTER_TYPE(xg::LayoutConstant);

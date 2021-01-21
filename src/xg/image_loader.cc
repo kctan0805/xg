@@ -9,7 +9,9 @@
 #include "xg/image_loader.h"
 
 #include <cassert>
+#include <cstdint>
 #include <memory>
+#include <vector>
 
 #include "ktx.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -68,10 +70,13 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
   if (info_.src_ptr == nullptr) {
     assert(!info_.file_path.empty());
 
+    std::vector<uint8_t> file_data;
+    if (!LoadFile(info_.file_path, &file_data)) return;
+
     if (ends_with(info_.file_path, "ktx")) {
-      auto result = ktxTexture_CreateFromNamedFile(
-          info_.file_path.c_str(), KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
-          &ktx_texture);
+      auto result = ktxTexture_CreateFromMemory(
+          file_data.data(), file_data.size(),
+          KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktx_texture);
       if (result != KTX_SUCCESS) {
         XG_ERROR("load ktx image fail: {} result: {}", info_.file_path, result);
         return;
@@ -100,8 +105,9 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
     } else {
       int width, height, channels;
       int req_comp = FormatToSize(limage->format);
-      info_.src_ptr = stbi_load(info_.file_path.c_str(), &width, &height,
-                                &channels, req_comp);
+      info_.src_ptr = stbi_load_from_memory(
+          file_data.data(), static_cast<int>(file_data.size()), &width, &height,
+          &channels, req_comp);
       if (!info_.src_ptr) {
         XG_ERROR("load stb image fail: {}", info_.file_path);
         return;

@@ -8,7 +8,7 @@
 
 #include "xg/parser/parser_internal.h"
 
-#include <fstream>
+#include <cassert>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -21,26 +21,6 @@
 
 namespace xg {
 namespace parser {
-
-std::vector<uint8_t> ReadFile(const std::string& filepath) {
-  std::vector<uint8_t> buffer;
-
-  std::ifstream file(filepath, std::ios::ate | std::ios::binary);
-
-  if (!file.is_open()) {
-    XG_ERROR("failed to open file: {}", filepath);
-    return buffer;
-  }
-
-  auto size = static_cast<size_t>(file.tellg());
-  buffer.resize(size);
-
-  file.seekg(0);
-  file.read(reinterpret_cast<char*>(buffer.data()), size);
-  file.close();
-
-  return buffer;
-}
 
 const char* Tinyxml2ErrorString(tinyxml2::XMLError error) {
   switch (error) {
