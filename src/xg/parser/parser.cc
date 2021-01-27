@@ -635,6 +635,16 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     }
   }
 
+  for (auto limage : layout->limages) {
+    if (limage->lswapchain_id) {
+      const auto it = node_id_map.find(limage->lswapchain_id);
+      assert(it != node_id_map.end());
+      limage->lswapchain =
+          std::static_pointer_cast<LayoutSwapchain>(it->second);
+      assert(limage->lswapchain);
+    }
+  }
+
   for (auto limage_loader : layout->limage_loaders) {
     if (limage_loader->limage_id) {
       const auto it = node_id_map.find(limage_loader->limage_id);
@@ -876,6 +886,16 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
       }
     }
     assert(lgraphics_pipeline->subpass != -1);
+
+    auto lviewport_state = lgraphics_pipeline->lviewport_state;
+    assert(lviewport_state);
+    if (lviewport_state->lswapchain_id) {
+      const auto it = node_id_map.find(lviewport_state->lswapchain_id);
+      assert(it != node_id_map.end());
+      lviewport_state->lswapchain =
+          std::static_pointer_cast<LayoutSwapchain>(it->second);
+      assert(lviewport_state->lswapchain);
+    }
   }
 
   for (auto ldesc_set : layout->ldesc_sets) {
@@ -986,6 +1006,16 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
             std::static_pointer_cast<LayoutImageView>(it->second);
         assert(lattachment.limage_view);
       }
+    }
+  }
+
+  for (auto lcamera : layout->lcameras) {
+    if (lcamera->lswapchain_id) {
+      const auto it = node_id_map.find(lcamera->lswapchain_id);
+      assert(it != node_id_map.end());
+      lcamera->lswapchain =
+          std::static_pointer_cast<LayoutSwapchain>(it->second);
+      assert(lcamera->lswapchain);
     }
   }
 

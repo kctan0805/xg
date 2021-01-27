@@ -15,7 +15,7 @@ namespace xg {
 
 SemaphoreVK::~SemaphoreVK() {
   if (semaphore_ && device_) {
-    XG_TRACE("destroySemaphore: {}", static_cast<void*>((VkSemaphore)semaphore_));
+    XG_TRACE("destroySemaphore: {}", (void*)(VkSemaphore)semaphore_);
 
     device_.destroySemaphore(semaphore_);
   }

@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <list>
 #include <map>
 #include <memory>
@@ -49,11 +50,17 @@ namespace xg {
 RendererVK::~RendererVK() {
   device_.reset();
   if (instance_) {
-    if (debug_msg_)
+    if (debug_msg_) {
       instance_.destroyDebugUtilsMessengerEXT(debug_msg_, nullptr,
                                               dispatch_loader_dynamic_);
+    }
 
-    XG_TRACE("destroy: {}", static_cast<void*>((VkInstance)instance_));
+    if (debug_report_) {
+      instance_.destroyDebugReportCallbackEXT(debug_report_, nullptr,
+                                              dispatch_loader_dynamic_);
+    }
+
+    XG_TRACE("destroy: {}", (void*)(VkInstance)instance_);
     instance_.destroy();
   }
   WindowSDL::Terminate();
@@ -63,7 +70,7 @@ bool RendererVK::Init(const LayoutRenderer& lrenderer) {
   if (!WindowVK::Initialize()) return false;
   if (!CreateInstance(lrenderer)) return false;
   CreateDispatchLoader(nullptr);
-  if (lrenderer.debug && !CreateDebugMessenger()) return false;
+  if (lrenderer.validation && !CreateDebugMessenger()) return false;
 
   return true;
 }
@@ -76,22 +83,19 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
       VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
   std::vector<const char*> wanted_layers;
 
-  if (lrenderer.debug) {
-    wanted_extensions.emplace_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-    wanted_extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    wanted_layers.emplace_back("VK_LAYER_LUNARG_monitor");
-  }
-
   if (lrenderer.validation) {
-    wanted_layers.emplace_back("VK_LAYER_LUNARG_assistant_layer");
     wanted_layers.emplace_back("VK_LAYER_KHRONOS_validation");
+    wanted_layers.emplace_back("VK_LAYER_LUNARG_assistant_layer");
+    wanted_layers.emplace_back("VK_LAYER_LUNARG_monitor");
+    wanted_extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    wanted_extensions.emplace_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
   }
 
   std::vector<const char*> extensions;
 
   for (auto i = 0; i < win_extensions.size(); ++i) {
     for (const auto& found : found_extensions) {
-      if (std::string(found.extensionName.data()) == win_extensions[i]) {
+      if (std::strcmp(found.extensionName, win_extensions[i]) == 0) {
         extensions.emplace_back(win_extensions[i]);
         break;
       }
@@ -100,8 +104,16 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
 
   for (const char* wanted : wanted_extensions) {
     for (const auto& found : found_extensions) {
-      if (std::string(found.extensionName.data()) == wanted) {
+      if (std::strcmp(found.extensionName, wanted) == 0) {
         extensions.emplace_back(wanted);
+
+        if (std::strcmp(found.extensionName,
+                        VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == 0) {
+          debug_msg_available_ = true;
+        } else if (std::strcmp(found.extensionName,
+                               VK_EXT_DEBUG_REPORT_EXTENSION_NAME) == 0) {
+          debug_report_available_ = true;
+        }
         break;
       }
     }
@@ -112,7 +124,7 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
 
   for (auto i = 0; i < wanted_layers.size(); ++i) {
     for (const auto& found : found_layers) {
-      if (std::string(found.layerName.data()) == wanted_layers[i]) {
+      if (std::strcmp(found.layerName, wanted_layers[i]) == 0) {
         layers.emplace_back(wanted_layers[i]);
         break;
       }
@@ -139,7 +151,7 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
     XG_ERROR(ResultString(static_cast<Result>(result)));
     return false;
   }
-  XG_TRACE("createInstance: {} {}", static_cast<void*>((VkInstance)instance_),
+  XG_TRACE("createInstance: {} {}", (void*)(VkInstance)instance_,
            lrenderer.app_name);
 
   return true;
@@ -162,21 +174,57 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugMessengerCallback(
   return VK_FALSE;
 }
 
-bool RendererVK::CreateDebugMessenger() {
-  const auto& create_info =
-      vk::DebugUtilsMessengerCreateInfoEXT()
-          .setMessageSeverity(
-              vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
-              vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
-              vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-              vk::DebugUtilsMessageSeverityFlagBitsEXT::eError)
-          .setMessageType(vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
-                          vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
-                          vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance)
-          .setPfnUserCallback(DebugMessengerCallback);
+static VKAPI_ATTR VkBool32 VKAPI_CALL DebugReportCallback(
+    VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType,
+    uint64_t obj, size_t location, int32_t code, const char* layerPrefix,
+    const char* msg, void* userData) {
+  Logger* log = static_cast<Logger*>(userData);
 
-  const auto& result = instance_.createDebugUtilsMessengerEXT(
-      &create_info, nullptr, &debug_msg_, dispatch_loader_dynamic_);
+  if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
+    XG_TRACE(msg);
+  } else if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT) {
+    XG_DEBUG(msg);
+  } else if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT) {
+    XG_INFO(msg);
+  } else if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT) {
+    XG_WARN(msg);
+  } else if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
+    XG_ERROR(msg);
+  };
+  return VK_FALSE;
+}
+
+bool RendererVK::CreateDebugMessenger() {
+  vk::Result result = vk::Result::eSuccess;
+
+  if (debug_msg_available_) {
+    const auto& create_info =
+        vk::DebugUtilsMessengerCreateInfoEXT()
+            .setMessageSeverity(
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eError)
+            .setMessageType(vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+                            vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation |
+                            vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance)
+            .setPfnUserCallback(DebugMessengerCallback);
+
+    result = instance_.createDebugUtilsMessengerEXT(
+        &create_info, nullptr, &debug_msg_, dispatch_loader_dynamic_);
+  } else if (debug_report_available_) {
+    const auto& create_info = vk::DebugReportCallbackCreateInfoEXT(
+        vk::DebugReportFlagBitsEXT::eInformation |
+            vk::DebugReportFlagBitsEXT::eWarning |
+            vk::DebugReportFlagBitsEXT::ePerformanceWarning |
+            vk::DebugReportFlagBitsEXT::eError |
+            vk::DebugReportFlagBitsEXT::eDebug,
+        DebugReportCallback, nullptr);
+
+    result = instance_.createDebugReportCallbackEXT(
+        &create_info, nullptr, &debug_report_, dispatch_loader_dynamic_);
+  }
+
   if (result != vk::Result::eSuccess) {
     XG_ERROR(ResultString(static_cast<Result>(result)));
     return false;
@@ -246,6 +294,29 @@ bool RendererVK::CreateGraphicsPipelines(
                     ldata->data.size());
             lspec_info->data_size = ldata->data.size();
           }
+        }
+      }
+    }
+
+    assert(lgraphics_pipeline->lviewport_state);
+    auto lviewport_state = lgraphics_pipeline->lviewport_state;
+    if (lviewport_state->lswapchain) {
+      const auto& swapchain = std::static_pointer_cast<Swapchain>(
+          lviewport_state->lswapchain->instance);
+
+      for (const auto& lviewport : lviewport_state->lviewports) {
+        if ((lviewport->viewport.width == 0.0f) ||
+            (lviewport->viewport.height == 0.0f)) {
+          lviewport->viewport.width = static_cast<float>(swapchain->GetWidth());
+          lviewport->viewport.height =
+              static_cast<float>(swapchain->GetHeight());
+        }
+      }
+
+      for (const auto& lscissor : lviewport_state->lscissors) {
+        if ((lscissor->rect.width == 0) || (lscissor->rect.height == 0)) {
+          lscissor->rect.width = swapchain->GetWidth();
+          lscissor->rect.height = swapchain->GetHeight();
         }
       }
     }

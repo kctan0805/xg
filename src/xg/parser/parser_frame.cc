@@ -17,16 +17,13 @@
 namespace xg {
 namespace parser {
 
+template <>
 bool ParserSingleton<ParserFrame>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
   auto node = std::make_shared<LayoutFrame>();
   if (!node) return false;
 
-  if (status->parent->layout_type == LayoutType::kSwapchain) {
-    node->lswapchain = std::static_pointer_cast<LayoutSwapchain>(status->parent);
-  } else {
-    node->lswapchain_id = element->Attribute("swapchain");
-  }
+  node->lswapchain_id = element->Attribute("swapchain");
 
   const char* value = element->Attribute("frameCount");
   if (value) node->frame_count = static_cast<int>(Expression::Get().Evaluate(value));

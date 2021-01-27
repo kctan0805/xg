@@ -22,8 +22,7 @@ namespace xg {
 
 DescriptorPoolVK::~DescriptorPoolVK() {
   if (desc_pool_ && device_) {
-    XG_TRACE("destroyDescriptorPool: {}",
-             static_cast<void*>((VkDescriptorPool)desc_pool_));
+    XG_TRACE("destroyDescriptorPool: {}", (void*)(VkDescriptorPool)desc_pool_);
 
     device_.destroyDescriptorPool(desc_pool_);
   }
@@ -34,18 +33,16 @@ bool DescriptorPoolVK::AllocateDescriptorSets(
     std::vector<std::shared_ptr<DescriptorSet>>* desc_sets) {
   std::vector<vk::DescriptorSetLayout> set_layouts;
 
-  XG_TRACE("allocateDescriptorSets: {}",
-           static_cast<void*>((VkDescriptorPool)desc_pool_));
+  XG_TRACE("allocateDescriptorSets: {}", (void*)(VkDescriptorPool)desc_pool_);
 
   for (const auto& ldesc_set : ldesc_sets) {
     const auto& set_layout = std::static_pointer_cast<DescriptorSetLayoutVK>(
         ldesc_set->lset_layout->instance);
     set_layouts.emplace_back(set_layout->desc_set_layout_);
 
-    XG_TRACE(
-        "  SetLayout: {} {}",
-        static_cast<void*>((VkDescriptorSetLayout)set_layout->desc_set_layout_),
-        ldesc_set->lset_layout->id);
+    XG_TRACE("  SetLayout: {} {}",
+             (void*)(VkDescriptorSetLayout)set_layout->desc_set_layout_,
+             ldesc_set->lset_layout->id);
   }
 
   auto alloc_info =
@@ -74,9 +71,9 @@ bool DescriptorPoolVK::AllocateDescriptorSets(
     desc_set->desc_set_ = vk_desc_set;
     desc_sets->emplace_back(desc_set);
 
-    XG_TRACE("  DescriptorSet: {} {}",
-             static_cast<void*>((VkDescriptorSet)vk_desc_set),
-             ldesc_sets[i++]->id);
+    XG_TRACE("  DescriptorSet: {} {}", (void*)(VkDescriptorSet)vk_desc_set,
+             ldesc_sets[i]->id);
+    ++i;
   }
 
   return true;

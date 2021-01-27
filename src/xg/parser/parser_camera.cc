@@ -17,10 +17,13 @@
 namespace xg {
 namespace parser {
 
+template <>
 bool ParserSingleton<ParserCamera>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
   auto node = std::make_shared<LayoutCamera>();
   if (!node) return false;
+
+  node->lswapchain_id = element->Attribute("swapchain");
 
   for (auto child = element->FirstChildElement(); child;
        child = child->NextSiblingElement()) {

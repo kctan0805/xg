@@ -15,8 +15,7 @@ namespace xg {
 
 QueryPoolVK::~QueryPoolVK() {
   if (query_pool_ && device_) {
-    XG_TRACE("destroyQueryPool: {}",
-             static_cast<void*>((VkQueryPool)query_pool_));
+    XG_TRACE("destroyQueryPool: {}", (void*)(VkQueryPool)query_pool_);
 
     device_.destroyQueryPool(query_pool_);
   }

@@ -18,6 +18,7 @@
 namespace xg {
 namespace parser {
 
+template <>
 bool ParserSingleton<ParserBindVertexBuffers>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
   auto node = std::make_shared<LayoutBindVertexBuffers>();

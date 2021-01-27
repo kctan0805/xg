@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Engine>
-  <Constant id="winWidth" value="640"/>
-  <Constant id="winHeight" value="480"/>
-
-  <Renderer appName="hello_world" debug="true">
-    <Window id="mainWindow" width="winWidth" height="winHeight" title="Hello World!" resizable="true"/>
+  <Renderer appName="hello_world" debug="true" validation="true">
+    <Window id="mainWindow" width="640" height="480" title="Hello World!" resizable="true"/>
     <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
 
     <Device>
@@ -15,11 +12,11 @@
   <CommandPool id="mainCommandPool" queue="mainQueue"/>
   <DescriptorPool id="mainDescriptorPool"/>
 
-  <Image id="mainDepthBufferImage" format="D32Sfloat" width="winWidth" height="winHeight" usage="DepthStencilAttachment"/>
+  <Image id="mainDepthBufferImage" format="D32Sfloat" usage="DepthStencilAttachment" swapchain="mainSwapchain"/>
   <ImageView id="mainDepthBufferImageView" image="mainDepthBufferImage" format="D32Sfloat" aspectMask="Depth"/>
 
   <RenderPass id="mainRenderPass">
-    <Attachment id="mainColorAttachment" format="B8G8R8A8Unorm" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc"/>
+    <Attachment id="mainColorAttachment" format="R8G8B8A8Unorm" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc"/>
     <Attachment id="mainDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
     <Subpass id="mainSubpass">
       <ColorAttachment attachment="mainColorAttachment" layout="ColorAttachmentOptimal"/>
@@ -48,8 +45,8 @@
     <PushConstantRange stageFlags="Vertex" size="4*16"/> <!-- model matrix -->
   </PipelineLayout>
 
-  <ShaderModule id="drawVertexShader" file="hello_world.vert.spv"/>
-  <ShaderModule id="drawFragmentShader" file="hello_world.frag.spv"/>
+  <ShaderModule id="drawVertexShader" file="shaders/hello_world.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="shaders/hello_world.frag.spv"/>
 
   <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
     <Stage stage="Vertex" module="drawVertexShader"/>
@@ -61,9 +58,9 @@
       <VertexAttributeDescription location="2" binding="0" format="R32G32Sfloat" offset="(3+3)*4"/>
     </VertexInputState>
     <InputAssemblyState topology="TriangleList"/>
-    <ViewportState>
-      <Viewport width="winWidth" height="winHeight" maxDepth="1.0"/>
-      <Scissor width="winWidth" height="winHeight"/>
+    <ViewportState swapchain="mainSwapchain">
+      <Viewport maxDepth="1.0"/>
+      <Scissor/>
     </ViewportState>
     <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise" lineWidth="1.0"/>
     <MultisampleState/>
@@ -172,8 +169,8 @@
     </CommandList>
   </CommandGroup>
 
-  <Camera id="mainCamera">
-    <Perspective fov="60" width="winWidth" height="winHeight" zNear="0.1" zFar="10.0"/>
+  <Camera id="mainCamera" swapchain="mainSwapchain">
+    <Perspective fov="60" zNear="0.1" zFar="10.0"/>
     <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
 

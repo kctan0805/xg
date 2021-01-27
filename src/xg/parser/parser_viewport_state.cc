@@ -17,6 +17,7 @@
 namespace xg {
 namespace parser {
 
+template <>
 bool ParserSingleton<ParserViewportState>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
   auto node = std::make_shared<LayoutViewportState>();
@@ -26,6 +27,8 @@ bool ParserSingleton<ParserViewportState>::ParseElement(
   auto lgraphics_pipeline =
       static_cast<LayoutGraphicsPipeline*>(status->parent.get());
   lgraphics_pipeline->lviewport_state = node;
+
+  node->lswapchain_id = element->Attribute("swapchain");
 
   status->node = node;
   status->child_element = element->FirstChildElement();

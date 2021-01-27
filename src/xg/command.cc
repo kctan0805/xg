@@ -49,7 +49,7 @@ bool CommandContext::Init(const LayoutCommandContext& lcmd_context) {
   lcmd_buffer_ = lcmd_context.lcmd_buffer;
 
   if (lcmd_buffer_->lframe) {
-    auto& cmd_buffers =
+    auto cmd_buffers =
         std::static_pointer_cast<std::vector<std::shared_ptr<CommandBuffer>>>(
             lcmd_buffer_->instance);
 
@@ -62,7 +62,7 @@ bool CommandContext::Init(const LayoutCommandContext& lcmd_context) {
 }
 
 void CommandContext::Rebuild() {
-  for (auto& need_rebuild : need_rebuilds_) need_rebuild = true;
+  for (auto need_rebuild : need_rebuilds_) need_rebuild = true;
 }
 
 Result CommandContext::Update(int frame) {
@@ -72,7 +72,7 @@ Result CommandContext::Update(int frame) {
     assert(frame < need_rebuilds_.size());
     if (!need_rebuilds_[frame]) return Result::kSuccess;
 
-    auto& cmd_buffers =
+    auto cmd_buffers =
         std::static_pointer_cast<std::vector<std::shared_ptr<CommandBuffer>>>(
             lcmd_buffer_->instance);
 
@@ -117,7 +117,7 @@ Result CommandContext::Build() {
   CommandInfo info = {};
 
   if (lcmd_buffer_->lframe) {
-    auto& cmd_buffers =
+    auto cmd_buffers =
         std::static_pointer_cast<std::vector<std::shared_ptr<CommandBuffer>>>(
             lcmd_buffer_->instance);
 
@@ -138,7 +138,7 @@ Result CommandContext::Build() {
       need_rebuilds_[i] = false;
     }
   } else {
-    auto& cmd_buffer =
+    auto cmd_buffer =
         std::static_pointer_cast<CommandBuffer>(lcmd_buffer_->instance);
 
     cmd_buffer->Reset();
@@ -158,7 +158,7 @@ Result CommandContext::Build() {
 
 CommandBuffer* CommandContext::GetCommandBuffer(int frame) const {
   if (lcmd_buffer_->lframe) {
-    auto& cmd_buffers =
+    auto cmd_buffers =
         std::static_pointer_cast<std::vector<std::shared_ptr<CommandBuffer>>>(
             lcmd_buffer_->instance);
     return (*cmd_buffers)[frame].get();
@@ -433,7 +433,7 @@ void CommandBindDescriptorSets::Build(const CommandInfo& cmd_info) const {
     for (const auto& desc_sets : *frame_desc_sets_) {
       if (desc_sets) {
         assert(cmd_info.frame < desc_sets->size());
-        auto& desc_set = std::static_pointer_cast<DescriptorSet>(
+        auto desc_set = std::static_pointer_cast<DescriptorSet>(
             (*desc_sets)[cmd_info.frame]);
         assert(desc_set);
         info.desc_sets[i] = desc_set.get();
@@ -615,7 +615,7 @@ void CommandResetQueryPool::Build(const CommandInfo& cmd_info) const {
     assert(lquery_pool_);
     assert(lquery_pool_->lframe);
     auto info = info_;
-    auto& query_pools =
+    auto query_pools =
         std::static_pointer_cast<std::vector<std::shared_ptr<QueryPool>>>(
             lquery_pool_->instance);
     info.query_pool = (*query_pools)[cmd_info.frame].get();

@@ -129,7 +129,7 @@ std::shared_ptr<Layout> Layout::Deserialize(const std::string& filepath) {
 
   if (!file.is_open()) {
     XG_ERROR("failed to open file: {}", filepath);
-    return false;
+    return nullptr;
   }
 
   cereal::BinaryInputArchive archive(file);

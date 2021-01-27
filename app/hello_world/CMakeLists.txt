@@ -27,7 +27,10 @@ add_executable(hello_world
     ${src}
 )
 
+set_target_properties(hello_world PROPERTIES WIN32_EXECUTABLE TRUE)
+
 target_link_libraries(hello_world
+    SDL2main
     xg
 )
 
@@ -35,6 +38,10 @@ file(COPY
     ${image_files}
     ${layout_files}
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+file(MAKE_DIRECTORY
+    ${CMAKE_CURRENT_BINARY_DIR}/shaders
 )
 
 set_property(SOURCE ${image_files} PROPERTY VS_DEPLOYMENT_CONTENT 1)

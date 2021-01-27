@@ -20,7 +20,7 @@ class FenceVK : public Fence {
 
   void Reset() override;
   void Wait() override;
-  bool IsSignaled() const;
+  bool IsSignaled() const override;
 
  protected:
   vk::Device device_;

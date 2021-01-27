@@ -17,6 +17,7 @@
 namespace xg {
 namespace parser {
 
+template <>
 bool ParserSingleton<ParserImage>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
   auto node = std::make_shared<LayoutImage>();
@@ -60,6 +61,8 @@ bool ParserSingleton<ParserImage>::ParseElement(
 
   value = element->Attribute("initialLayout");
   if (value) node->initial_layout = StringToImageLayout(value);
+
+  node->lswapchain_id = element->Attribute("swapchain");
 
   status->node = node;
 

@@ -170,7 +170,7 @@ Result Viewer::Resize() {
     image->Exit();
   }
 
-  auto& swapchain = GetSwapchain();
+  auto swapchain = GetSwapchain();
   swapchain->Exit(false);
 
   // recreate
@@ -272,7 +272,7 @@ Result Viewer::AcquireNextImage() {
   fence->Reset();
 
   auto& info = acquire_next_image_infos_[curr_frame_];
-  auto& swapchain = GetSwapchain();
+  auto swapchain = GetSwapchain();
 
   auto result = swapchain->AcquireNextImage(info, &curr_image_);
   if (result == Result::kSuboptimal || result == Result::kErrorOutOfDate) {
@@ -409,7 +409,7 @@ Result Viewer::PostUpdate() {
     }
     if (result != Result::kSuccess) return result;
 
-    auto& swapchain = GetSwapchain();
+    auto swapchain = GetSwapchain();
 
     curr_frame_ = (curr_frame_ + 1) % swapchain->GetFrameCount();
     if (first_round_ && !curr_frame_) first_round_ = false;
@@ -419,7 +419,7 @@ Result Viewer::PostUpdate() {
 }
 
 void Viewer::InitAcquireNextImage(const LayoutViewer& lviewer) {
-  auto& swapchain = GetSwapchain();
+  auto swapchain = GetSwapchain();
 
   if (lviewer.lacquire_next_image) {
     const auto& lacquire_next_image = lviewer.lacquire_next_image;
@@ -432,7 +432,7 @@ void Viewer::InitAcquireNextImage(const LayoutViewer& lviewer) {
         Fence* fence;
         auto lfence = lacquire_next_image->lwait_fence.get();
         if (lfence->lframe) {
-          auto& fences =
+          auto fences =
               std::static_pointer_cast<std::vector<std::shared_ptr<Fence>>>(
                   lfence->instance);
           fence = (*fences)[i].get();
@@ -450,7 +450,7 @@ void Viewer::InitAcquireNextImage(const LayoutViewer& lviewer) {
       if (lacquire_next_image->lsemaphore) {
         auto lsemaphore = lacquire_next_image->lsemaphore.get();
         if (lsemaphore->lframe) {
-          auto& semaphores =
+          auto semaphores =
               std::static_pointer_cast<std::vector<std::shared_ptr<Semaphore>>>(
                   lsemaphore->instance);
           info.semaphore = (*semaphores)[i].get();
@@ -462,7 +462,7 @@ void Viewer::InitAcquireNextImage(const LayoutViewer& lviewer) {
       if (lacquire_next_image->lfence) {
         auto lfence = lacquire_next_image->lfence.get();
         if (lfence->lframe) {
-          auto& fences =
+          auto fences =
               std::static_pointer_cast<std::vector<std::shared_ptr<Fence>>>(
                   lfence->instance);
           info.fence = (*fences)[i].get();

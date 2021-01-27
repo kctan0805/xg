@@ -37,17 +37,17 @@ std::shared_ptr<CommandPool> QueueVK::CreateCommandPool(
           .setFlags(vk::CommandPoolCreateFlagBits::eResetCommandBuffer)
           .setQueueFamilyIndex(static_cast<uint32_t>(family_index_));
 
-  const auto& result = device_.createCommandPool(&create_info, nullptr,
-                                                 &cmd_pool->cmd_pool_);
+  const auto& result =
+      device_.createCommandPool(&create_info, nullptr, &cmd_pool->cmd_pool_);
   if (result != vk::Result::eSuccess) {
     XG_ERROR(ResultString(static_cast<Result>(result)));
-    return false;
+    return nullptr;
   }
   cmd_pool->device_ = device_;
 
   XG_TRACE("createCommandPool: {} {} {}",
-           static_cast<void*>((VkCommandPool)cmd_pool->cmd_pool_),
-           lcmd_pool.id, family_index_);
+           (void*)(VkCommandPool)cmd_pool->cmd_pool_, lcmd_pool.id,
+           family_index_);
 
   return cmd_pool;
 }

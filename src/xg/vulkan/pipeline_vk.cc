@@ -17,7 +17,7 @@ PipelineVK::~PipelineVK() { Exit(); }
 
 void PipelineVK::Exit() {
   if (pipeline_ && device_) {
-    XG_TRACE("destroyPipeline: {}", static_cast<void*>((VkPipeline)pipeline_));
+    XG_TRACE("destroyPipeline: {}", (void*)(VkPipeline)pipeline_);
 
     device_.destroyPipeline(pipeline_);
     pipeline_ = nullptr;

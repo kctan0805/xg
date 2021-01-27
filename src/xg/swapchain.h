@@ -58,7 +58,7 @@ class Swapchain {
 
   int width_ = 0;
   int height_ = 0;
-  Format format_ = Format::kB8G8R8A8Unorm;
+  Format format_ = Format::kR8G8B8A8Unorm;
   std::vector<std::shared_ptr<Image>> images_;
   std::vector<std::shared_ptr<ImageView>> image_views_;
 };

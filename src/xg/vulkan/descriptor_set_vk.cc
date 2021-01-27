@@ -15,8 +15,7 @@ namespace xg {
 
 DescriptorSetVK::~DescriptorSetVK() {
   if (desc_pool_ && device_) {
-    XG_TRACE("freeDescriptorSets: {}",
-             static_cast<void*>((VkDescriptorSet)desc_set_));
+    XG_TRACE("freeDescriptorSets: {}", (void*)(VkDescriptorSet)desc_set_);
 
     device_.freeDescriptorSets(desc_pool_, 1, &desc_set_);
   }

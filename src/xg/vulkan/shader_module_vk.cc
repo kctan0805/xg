@@ -15,8 +15,7 @@ namespace xg {
 
 ShaderModuleVK::~ShaderModuleVK() {
   if (shader_module_ && device_) {
-    XG_TRACE("destroyShaderModule: {}",
-             static_cast<void*>((VkShaderModule)shader_module_));
+    XG_TRACE("destroyShaderModule: {}", (void*)(VkShaderModule)shader_module_);
 
     device_.destroyShaderModule(shader_module_);
   }

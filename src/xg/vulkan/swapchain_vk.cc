@@ -69,19 +69,16 @@ Result SwapchainVK::Init(const LayoutSwapchain& lswapchain) {
     return static_cast<Result>(result);
   }
   XG_TRACE("createSwapchainKHR: {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}",
-           static_cast<void*>((VkSwapchainKHR)swapchain_), lswapchain.id,
-           static_cast<void*>((VkSurfaceKHR)win->surface_),
-           lswapchain.min_image_count, vk::to_string(image_format),
-           vk::to_string(image_color_space), lswapchain.width,
-           lswapchain.height, lswapchain.image_array_layers,
+           (void*)(VkSwapchainKHR)swapchain_, lswapchain.id,
+           (void*)(VkSurfaceKHR)win->surface_, lswapchain.min_image_count,
+           vk::to_string(image_format), vk::to_string(image_color_space),
+           lswapchain.width, lswapchain.height, lswapchain.image_array_layers,
            vk::to_string(image_usage), vk::to_string(pre_transform),
            vk::to_string(composite_alpha), vk::to_string(present_mode),
-           lswapchain.clipped,
-           static_cast<void*>((VkSwapchainKHR)old_swapchain));
+           lswapchain.clipped, (void*)(VkSwapchainKHR)old_swapchain);
 
   if (old_swapchain) {
-    XG_TRACE("destroySwapchainKHR: {}",
-             static_cast<void*>((VkSwapchainKHR)old_swapchain));
+    XG_TRACE("destroySwapchainKHR: {}", (void*)(VkSwapchainKHR)old_swapchain);
 
     device_.destroySwapchainKHR(old_swapchain);
   }
@@ -130,8 +127,7 @@ Result SwapchainVK::Init(const LayoutSwapchain& lswapchain) {
     auto& vk_image = vk_images[i];
     auto image = static_cast<ImageVK*>(images_[i].get());
 
-    XG_TRACE("getSwapchainImagesKHR: {}",
-             static_cast<void*>((VkImage)vk_image));
+    XG_TRACE("getSwapchainImagesKHR: {}", (void*)(VkImage)vk_image);
 
     image->image_ = vk_image;
 
@@ -147,7 +143,7 @@ Result SwapchainVK::Init(const LayoutSwapchain& lswapchain) {
     }
 
     XG_TRACE("createImageView: {}",
-             static_cast<void*>((VkImageView)image_view->image_view_));
+             (void*)(VkImageView)image_view->image_view_);
   }
   width_ = lswapchain.width;
   height_ = lswapchain.height;
@@ -161,8 +157,7 @@ void SwapchainVK::Exit(bool destroy_swapchain) {
     image_view->Exit();
   }
   if (destroy_swapchain && swapchain_ && device_) {
-    XG_TRACE("destroySwapchainKHR: {}",
-             static_cast<void*>((VkSwapchainKHR)swapchain_));
+    XG_TRACE("destroySwapchainKHR: {}", (void*)(VkSwapchainKHR)swapchain_);
 
     device_.destroySwapchainKHR(swapchain_);
     swapchain_ = nullptr;
@@ -191,7 +186,7 @@ Result SwapchainVK::AcquireNextImage(const AcquireNextImageInfo& info,
       device_.acquireNextImageKHR(swapchain_, info.timeout, semaphore, fence,
                                   reinterpret_cast<uint32_t*>(image_index));
   // XG_TRACE("acquireNextImageKHR: {} {} ImageIndex={}",
-  //         static_cast<void*>((VkSwapchainKHR)swapchain_),
+  //         (void*)(VkSwapchainKHR)swapchain_,
   //         vk::to_string(result), *image_index);
   return static_cast<Result>(result);
 }

@@ -429,6 +429,8 @@ struct LayoutBufferLoader : LayoutBase {
   const char* ldata_id = nullptr;
 };
 
+struct LayoutSwapchain;
+
 struct LayoutImage : LayoutBase {
   LayoutImage() : LayoutBase{LayoutType::kImage} {}
 
@@ -443,6 +445,7 @@ struct LayoutImage : LayoutBase {
   MemoryAllocFlags alloc_flags = MemoryAllocFlags::kDedicatedMemory;
   MemoryUsage mem_usage = MemoryUsage::kGpuOnly;
   ImageLayout initial_layout = ImageLayout::kUndefined;
+  std::shared_ptr<LayoutSwapchain> lswapchain;
 
   template <class Archive>
   void serialize(Archive& archive) {
@@ -450,6 +453,8 @@ struct LayoutImage : LayoutBase {
             extent, mip_levels, array_layers, tiling, usage, alloc_flags,
             mem_usage, initial_layout);
   }
+
+  const char* lswapchain_id = nullptr;
 };
 
 struct LayoutImageLoader : LayoutBase {
@@ -497,14 +502,14 @@ struct LayoutSwapchain : LayoutBase {
 
   std::shared_ptr<LayoutWindow> lwin;
   int min_image_count = 3;
-  Format image_format = Format::kB8G8R8A8Unorm;
+  Format image_format = Format::kR8G8B8A8Unorm;
   ColorSpace image_color_space = ColorSpace::kSrgbNonlinear;
   int width = 0;
   int height = 0;
   int image_array_layers = 1;
   ImageUsage image_usage = ImageUsage::kColorAttachment;
   SurfaceTransformFlags pre_transform = SurfaceTransformFlags::kIdentity;
-  CompositeAlpha composite_alpha = CompositeAlpha::kOpaque;
+  CompositeAlpha composite_alpha = CompositeAlpha::kInherit;
   PresentMode present_mode = PresentMode::kImmediate;
   bool clipped = true;
 
@@ -855,11 +860,14 @@ struct LayoutViewportState : LayoutBase {
 
   std::vector<std::shared_ptr<LayoutViewport>> lviewports;
   std::vector<std::shared_ptr<LayoutScissor>> lscissors;
+  std::shared_ptr<LayoutSwapchain> lswapchain;
 
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), lviewports, lscissors);
   }
+
+  const char* lswapchain_id = nullptr;
 };
 
 struct LayoutViewport : LayoutBase {
@@ -1189,12 +1197,15 @@ struct LayoutCamera : LayoutBase {
   glm::vec3 eye = glm::vec3(0.0f);
   glm::vec3 center = glm::vec3(0.0f);
   glm::vec3 up = glm::vec3(0.0f);
+  std::shared_ptr<LayoutSwapchain> lswapchain;
 
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), fov, width, height, z_near,
             z_far, eye, center, up);
   }
+
+  const char* lswapchain_id = nullptr;
 };
 
 struct LayoutCommandGroup : LayoutBase {
@@ -1625,7 +1636,7 @@ struct LayoutNextSubpass : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), subpass_contents);
+    archive(cereal::base_class<LayoutBase>(this), contents);
   }
 };
 

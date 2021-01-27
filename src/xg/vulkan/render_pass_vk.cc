@@ -184,15 +184,14 @@ Result RenderPassVK::Init(const LayoutRenderPass& lrender_pass) {
     return static_cast<Result>(result);
   }
 
-  XG_TRACE("  RenderPass: {}", static_cast<void*>((VkRenderPass)render_pass_));
+  XG_TRACE("  RenderPass: {}", (void*)(VkRenderPass)render_pass_);
 
   return Result::kSuccess;
 }
 
 void RenderPassVK::Exit() {
   if (render_pass_ && device_) {
-    XG_TRACE("destroyRenderPass: {}",
-             static_cast<void*>((VkRenderPass)render_pass_));
+    XG_TRACE("destroyRenderPass: {}", (void*)(VkRenderPass)render_pass_);
 
     device_.destroyRenderPass(render_pass_);
     render_pass_ = nullptr;

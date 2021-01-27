@@ -879,8 +879,8 @@
     <xs:complexType>
       <xs:attribute name="x" type="xs:string" default="0.0" />
       <xs:attribute name="y" type="xs:string" default="0.0" />
-      <xs:attribute name="width" type="xs:string" use="required" />
-      <xs:attribute name="height" type="xs:string" use="required" />
+      <xs:attribute name="width" type="xs:string" />
+      <xs:attribute name="height" type="xs:string" />
       <xs:attribute name="minDepth" type="xs:decimal" default="0.0" />
       <xs:attribute name="maxDepth" type="xs:decimal" default="1.0" />
     </xs:complexType>
@@ -889,8 +889,8 @@
     <xs:complexType>
       <xs:attribute name="x" type="xs:string" default="0" />
       <xs:attribute name="y" type="xs:string" default="0" />
-      <xs:attribute name="width" type="xs:string" use="required" />
-      <xs:attribute name="height" type="xs:string" use="required" />
+      <xs:attribute name="width" type="xs:string" />
+      <xs:attribute name="height" type="xs:string" />
     </xs:complexType>
   </xs:element>
 
@@ -1500,9 +1500,6 @@
           </xs:element>
           <xs:element minOccurs="0" maxOccurs="unbounded" name="Image">
             <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" ref="ImageView" />
-              </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
               <xs:attribute name="realize" type="xs:boolean" default="true" />              
               <xs:attribute name="flags" type="ImageCreateFlagsTypeList" default="Undefined" />
@@ -1525,6 +1522,7 @@
               <xs:attribute name="allocFlags" type="MemoryAllocFlagsTypeList" default="DedicatedMemory" />
               <xs:attribute name="memUsage" type="MemoryUsageType" default="GpuOnly" />
               <xs:attribute name="initialLayout" type="ImageLayoutType" default="Undefined" />
+              <xs:attribute name="swapchain" type="xs:IDREF" />
             </xs:complexType>
           </xs:element>
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="ImageView" />
@@ -1592,6 +1590,7 @@
                       <xs:element maxOccurs="unbounded" ref="Viewport" />
                       <xs:element maxOccurs="unbounded" ref="Scissor" />
                     </xs:sequence>
+                    <xs:attribute name="swapchain" type="xs:IDREF" />
                   </xs:complexType>
                 </xs:element>
                 <xs:element name="RasterizationState">
@@ -1776,8 +1775,8 @@
                 <xs:element name="Perspective">
                   <xs:complexType>
                     <xs:attribute name="fov" type="xs:decimal" use="required" />
-                    <xs:attribute name="width" type="xs:string" use="required" />
-                    <xs:attribute name="height" type="xs:string" use="required" />
+                    <xs:attribute name="width" type="xs:string" />
+                    <xs:attribute name="height" type="xs:string" />
                     <xs:attribute name="zNear" type="xs:decimal" use="required" />
                     <xs:attribute name="zFar" type="xs:decimal" use="required" />
                   </xs:complexType>
@@ -1792,6 +1791,7 @@
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
               <xs:attribute name="realize" type="xs:boolean" default="true" />
+              <xs:attribute name="swapchain" type="xs:IDREF" />
             </xs:complexType>
           </xs:element>
           <xs:element minOccurs="0" maxOccurs="unbounded" name="BufferLoader">

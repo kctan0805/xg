@@ -34,8 +34,8 @@ Result FramebufferVK::Init(const LayoutFramebuffer& lframebuffer) {
   std::vector<vk::ImageView> attachments;
 
   XG_TRACE("createFramebuffer: {} {} {} {} {}", lframebuffer.id,
-           static_cast<void*>((VkRenderPass)render_pass->render_pass_),
-           lframebuffer.width, lframebuffer.height, lframebuffer.layers);
+           (void*)(VkRenderPass)render_pass->render_pass_, lframebuffer.width,
+           lframebuffer.height, lframebuffer.layers);
 
   for (const auto& lattachment : lframebuffer.lattachments) {
     std::shared_ptr<ImageViewVK> image_view;
@@ -52,8 +52,7 @@ Result FramebufferVK::Init(const LayoutFramebuffer& lframebuffer) {
     assert(image_view);
     attachments.emplace_back(image_view->image_view_);
 
-    XG_TRACE("  Attachment: {}",
-             static_cast<void*>((VkImageView)image_view->image_view_));
+    XG_TRACE("  Attachment: {}", (void*)(VkImageView)image_view->image_view_);
   }
 
   auto& create_info =
@@ -74,16 +73,15 @@ Result FramebufferVK::Init(const LayoutFramebuffer& lframebuffer) {
   width_ = lframebuffer.width;
   height_ = lframebuffer.height;
 
-  XG_TRACE("  Framebuffer: {} {} ",
-           static_cast<void*>((VkFramebuffer)framebuffer_), lframebuffer.id);
+  XG_TRACE("  Framebuffer: {} {} ", (void*)(VkFramebuffer)framebuffer_,
+           lframebuffer.id);
 
   return Result::kSuccess;
 }
 
 void FramebufferVK::Exit() {
   if (framebuffer_ && device_) {
-    XG_TRACE("destroyFramebuffer: {} ",
-             static_cast<void*>((VkFramebuffer)framebuffer_));
+    XG_TRACE("destroyFramebuffer: {} ", (void*)(VkFramebuffer)framebuffer_);
 
     device_.destroyFramebuffer(framebuffer_);
     framebuffer_ = nullptr;

@@ -64,8 +64,8 @@ Result ImageViewVK::Init(const LayoutImageView& limage_view) {
   }
 
   XG_TRACE("createImageView: {} {} {} {} {} {} {} {} {} {}",
-           static_cast<void*>((VkImageView)image_view_), limage_view.id,
-           static_cast<void*>(image->image_), vk::to_string(view_type),
+           (void*)(VkImageView)image_view_, limage_view.id,
+           (void*)image->image_, vk::to_string(view_type),
            vk::to_string(format), vk::to_string(aspect_mask),
            limage_view.subresource_range.base_mip_level,
            limage_view.subresource_range.level_count,
@@ -77,8 +77,7 @@ Result ImageViewVK::Init(const LayoutImageView& limage_view) {
 
 void xg::ImageViewVK::Exit() {
   if (image_view_ && device_) {
-    XG_TRACE("destroyImageView: {}",
-             static_cast<void*>((VkImageView)image_view_));
+    XG_TRACE("destroyImageView: {}", (void*)(VkImageView)image_view_);
 
     device_.destroyImageView(image_view_);
     image_view_ = nullptr;

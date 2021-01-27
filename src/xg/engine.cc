@@ -449,7 +449,17 @@ bool Engine::CreateBufferLoaders(const Layout& layout) {
 bool Engine::CreateImages(const Layout& layout) {
   for (const auto& limage : layout.limages) {
     if (!limage->realize) continue;
-    if (limage->extent.width == 0 || limage->extent.height == 0) continue;
+
+    if ((limage->extent.width == 0) || (limage->extent.height == 0)) {
+      if (limage->lswapchain) {
+        const auto& swapchain =
+            std::static_pointer_cast<Swapchain>(limage->lswapchain->instance);
+        limage->extent.width = swapchain->GetWidth();
+        limage->extent.height = swapchain->GetHeight();
+      } else {
+        continue;
+      }
+    }
 
     auto image = device_->CreateImage(*limage);
     if (!image) return false;
@@ -965,6 +975,15 @@ bool Engine::CreateEvents(const Layout& layout) {
 bool Engine::CreateCameras(const Layout& layout) {
   for (const auto& lcamera : layout.lcameras) {
     if (!lcamera->realize) continue;
+
+    if ((lcamera->width == 0.0f) || (lcamera->height == 0.0f)) {
+      if (lcamera->lswapchain) {
+        const auto& swapchain =
+            std::static_pointer_cast<Swapchain>(lcamera->lswapchain->instance);
+        lcamera->width = static_cast<float>(swapchain->GetWidth());
+        lcamera->height = static_cast<float>(swapchain->GetHeight());
+      }
+    }
 
     auto camera = renderer_->CreateCamera(*lcamera);
     if (!camera) return false;

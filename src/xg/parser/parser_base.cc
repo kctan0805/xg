@@ -18,6 +18,7 @@
 namespace xg {
 namespace parser {
 
+template <>
 bool ParserSingleton<ParserBase>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
   assert(status->node);

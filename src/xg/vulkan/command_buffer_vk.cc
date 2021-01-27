@@ -29,8 +29,7 @@ namespace xg {
 
 CommandBufferVK::~CommandBufferVK() {
   if (cmd_buffer_ && command_pool_ && device_) {
-    XG_TRACE("freeCommandBuffers: {}",
-             static_cast<void*>((VkCommandBuffer)cmd_buffer_));
+    XG_TRACE("freeCommandBuffers: {}", (void*)(VkCommandBuffer)cmd_buffer_);
 
     device_.freeCommandBuffers(command_pool_, 1, &cmd_buffer_);
   }
@@ -42,19 +41,19 @@ Result CommandBufferVK::Begin(const CommandBufferBeginInfo& info) const {
 
   const auto& result = cmd_buffer_.begin(&begin_info);
 
-  XG_TRACE("begin: {} {}", static_cast<void*>((VkCommandBuffer)cmd_buffer_),
+  XG_TRACE("begin: {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
            vk::to_string(begin_info.flags));
 
   return static_cast<Result>(result);
 }
 
 void CommandBufferVK::End() const {
-  XG_TRACE("end: {}", static_cast<void*>((VkCommandBuffer)cmd_buffer_));
+  XG_TRACE("end: {}", (void*)(VkCommandBuffer)cmd_buffer_);
   cmd_buffer_.end();
 }
 
 void CommandBufferVK::Reset() const {
-  XG_TRACE("reset: {}", static_cast<void*>((VkCommandBuffer)cmd_buffer_));
+  XG_TRACE("reset: {}", (void*)(VkCommandBuffer)cmd_buffer_);
   cmd_buffer_.reset(vk::CommandBufferResetFlags());
 }
 
@@ -74,8 +73,7 @@ void CommandBufferVK::PipelineBarrier(const PipelineBarrierInfo& info) const {
   const auto dependency_flags =
       static_cast<vk::DependencyFlagBits>(info.dependency_flags);
 
-  XG_TRACE("pipelineBarrier: {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
+  XG_TRACE("pipelineBarrier: {} {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
            vk::to_string(src_stage_mask), vk::to_string(dst_stage_mask),
            vk::to_string(dependency_flags));
 
@@ -115,7 +113,7 @@ void CommandBufferVK::PipelineBarrier(const PipelineBarrierInfo& info) const {
     XG_TRACE("  BufferMemoryBarrier: {} {} {} {} {} {} {}",
              vk::to_string(src_access_mask), vk::to_string(dst_access_mask),
              barrier.src_queue_family_index, barrier.dst_queue_family_index,
-             static_cast<void*>((VkBuffer)buf->buffer_), barrier.offset,
+             (void*)(VkBuffer)buf->buffer_, barrier.offset,
              static_cast<int64_t>(barrier.size));
   }
 
@@ -156,8 +154,7 @@ void CommandBufferVK::PipelineBarrier(const PipelineBarrierInfo& info) const {
              vk::to_string(src_access_mask), vk::to_string(dst_access_mask),
              vk::to_string(old_layout), vk::to_string(new_layout),
              barrier.src_queue_family_index, barrier.dst_queue_family_index,
-             static_cast<void*>((VkImage)image->image_),
-             vk::to_string(aspect_mask),
+             (void*)(VkImage)image->image_, vk::to_string(aspect_mask),
              barrier.subresource_range.base_mip_level,
              barrier.subresource_range.level_count,
              barrier.subresource_range.base_array_layer,
@@ -172,9 +169,8 @@ void CommandBufferVK::PipelineBarrier(const PipelineBarrierInfo& info) const {
 }
 
 void CommandBufferVK::Dispatch(const DispatchInfo& info) const {
-  XG_TRACE("dispatch: {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_), info.group_count_x,
-           info.group_count_y, info.group_count_z);
+  XG_TRACE("dispatch: {} {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           info.group_count_x, info.group_count_y, info.group_count_z);
 
   cmd_buffer_.dispatch(static_cast<uint32_t>(info.group_count_x),
                        static_cast<uint32_t>(info.group_count_y),
@@ -211,9 +207,8 @@ void CommandBufferVK::CopyBufferToImage(
       static_cast<vk::ImageLayout>(info.dst_image_layout);
 
   XG_TRACE("copyBufferToImage: {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           static_cast<void*>((VkBuffer)src_buf->buffer_),
-           static_cast<void*>((VkImage)dst_image->image_),
+           (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkBuffer)src_buf->buffer_, (void*)(VkImage)dst_image->image_,
            vk::to_string(dst_image_layout));
 
   for (const auto& region : info.regions) {
@@ -271,12 +266,10 @@ void CommandBufferVK::BlitImage(const BlitImageInfo& info) const {
   std::vector<vk::ImageBlit> blites;
   const auto filter = static_cast<vk::Filter>(info.filter);
 
-  XG_TRACE("blitImage: {} {} {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           static_cast<void*>((VkImage)src_image->image_),
-           vk::to_string(src_image_layout),
-           static_cast<void*>((VkImage)dst_image->image_),
-           vk::to_string(dst_image_layout), vk::to_string(filter));
+  XG_TRACE("blitImage: {} {} {} {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkImage)src_image->image_, vk::to_string(src_image_layout),
+           (void*)(VkImage)dst_image->image_, vk::to_string(dst_image_layout),
+           vk::to_string(filter));
 
   for (const auto& region : info.regions) {
     const auto src_aspect_mask = static_cast<vk::ImageAspectFlagBits>(
@@ -352,10 +345,8 @@ void CommandBufferVK::PushConstants(const PushConstantsInfo& info) const {
   const auto stage_flags =
       static_cast<vk::ShaderStageFlagBits>(info.stage_flags);
 
-  XG_TRACE("pushConstants: {} {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           static_cast<void*>(
-               (VkPipelineLayout)pipeline_layout_vk->pipeline_layout_),
+  XG_TRACE("pushConstants: {} {} {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkPipelineLayout)pipeline_layout_vk->pipeline_layout_,
            vk::to_string(stage_flags), info.offset, info.size);
 
   cmd_buffer_.pushConstants(pipeline_layout_vk->pipeline_layout_, stage_flags,
@@ -377,10 +368,10 @@ void CommandBufferVK::BeginRenderPass(const RenderPassBeginInfo& info) const {
   std::vector<vk::ClearValue> clear_values;
 
   XG_TRACE("beginRenderPass: {} {} {} {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           static_cast<void*>((VkRenderPass)render_pass->render_pass_),
-           static_cast<void*>((VkFramebuffer)framebuffer->framebuffer_),
-           info.rect.x, info.rect.y, info.rect.width, info.rect.height);
+           (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkRenderPass)render_pass->render_pass_,
+           (void*)(VkFramebuffer)framebuffer->framebuffer_, info.rect.x,
+           info.rect.y, info.rect.width, info.rect.height);
 
   for (const auto& clear_value : info.clear_values) {
     if (clear_value.index() == 0) {
@@ -412,8 +403,7 @@ void CommandBufferVK::BeginRenderPass(const RenderPassBeginInfo& info) const {
 }
 
 void CommandBufferVK::EndRenderPass() const {
-  XG_TRACE("endRenderPass: {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_));
+  XG_TRACE("endRenderPass: {}", (void*)(VkCommandBuffer)cmd_buffer_);
 
   cmd_buffer_.endRenderPass();
 }
@@ -422,7 +412,7 @@ void CommandBufferVK::SetViewport(const SetViewportInfo& info) const {
   std::vector<vk::Viewport> viewports;
   viewports.reserve(info.viewports.size());
 
-  XG_TRACE("setViewport: {}", static_cast<void*>((VkCommandBuffer)cmd_buffer_));
+  XG_TRACE("setViewport: {}", (void*)(VkCommandBuffer)cmd_buffer_);
 
   for (const auto& viewport : info.viewports) {
     viewports.emplace_back(vk::Viewport()
@@ -447,8 +437,7 @@ void CommandBufferVK::SetScissor(const SetScissorInfo& info) const {
   std::vector<vk::Rect2D> scissors;
   scissors.reserve(info.scissors.size());
 
-  XG_TRACE("setScissor: {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
+  XG_TRACE("setScissor: {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
            info.first_scissor);
 
   for (const auto& scissor : info.scissors) {
@@ -479,10 +468,8 @@ void CommandBufferVK::BindDescriptorSets(
   vk_desc_sets.reserve(info.desc_sets.size());
 
   XG_TRACE("bindDescriptorSets: {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           vk::to_string(bind_point),
-           static_cast<void*>(
-               (VkPipelineLayout)pipeline_layout_vk->pipeline_layout_),
+           (void*)(VkCommandBuffer)cmd_buffer_, vk::to_string(bind_point),
+           (void*)(VkPipelineLayout)pipeline_layout_vk->pipeline_layout_,
            info.first_set);
 
   for (const auto& desc_set : info.desc_sets) {
@@ -490,7 +477,7 @@ void CommandBufferVK::BindDescriptorSets(
     vk_desc_sets.emplace_back(desc_set_vk->desc_set_);
 
     XG_TRACE("  descriptorSet: {}",
-             static_cast<void*>((VkDescriptorSet)desc_set_vk->desc_set_));
+             (void*)(VkDescriptorSet)desc_set_vk->desc_set_);
   }
 
   std::vector<uint32_t> dynamic_offsets(info.dynamic_offsets.size());
@@ -514,10 +501,8 @@ void CommandBufferVK::BindPipeline(const Pipeline& pipeline) const {
   const auto bind_point =
       static_cast<vk::PipelineBindPoint>(pipeline_vk.GetBindPoint());
 
-  XG_TRACE("bindPipeline: {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           vk::to_string(bind_point),
-           static_cast<void*>((VkPipeline)pipeline_vk.pipeline_));
+  XG_TRACE("bindPipeline: {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           vk::to_string(bind_point), (void*)(VkPipeline)pipeline_vk.pipeline_);
 
   cmd_buffer_.bindPipeline(bind_point, pipeline_vk.pipeline_);
 }
@@ -525,44 +510,45 @@ void CommandBufferVK::BindPipeline(const Pipeline& pipeline) const {
 void CommandBufferVK::BindVertexBuffers(
     const BindVertexBuffersInfo& info) const {
   std::vector<vk::Buffer> vk_buffers;
-  vk_buffers.reserve(info.buffers.size());
+  std::vector<vk::DeviceSize> vk_offsets;
 
-  XG_TRACE("bindVertexBuffers: {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
+  vk_buffers.reserve(info.buffers.size());
+  vk_offsets.reserve(info.offsets.size());
+
+  XG_TRACE("bindVertexBuffers: {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
            info.first_binding);
 
   int i = 0;
   for (const auto& buf : info.buffers) {
     const auto buf_vk = reinterpret_cast<const BufferVK*>(buf);
     vk_buffers.emplace_back(buf_vk->buffer_);
+    vk_offsets.emplace_back(info.offsets[i]);
 
-    XG_TRACE("Buffer: {} {}", static_cast<void*>((VkBuffer)buf_vk->buffer_),
-             info.offsets[i++]);
+    XG_TRACE("Buffer: {} {}", (void*)(VkBuffer)buf_vk->buffer_,
+             info.offsets[i]);
+    ++i;
   }
-
-  static_assert(sizeof(size_t) == sizeof(vk::DeviceSize));
 
   cmd_buffer_.bindVertexBuffers(static_cast<uint32_t>(info.first_binding),
                                 static_cast<uint32_t>(vk_buffers.size()),
-                                vk_buffers.data(), info.offsets.data());
+                                vk_buffers.data(), vk_offsets.data());
 }
 
 void CommandBufferVK::BindIndexBuffer(const BindIndexBufferInfo& info) const {
   const auto buf_vk = reinterpret_cast<const BufferVK*>(info.buffer);
   const auto index_type = static_cast<vk::IndexType>(info.index_type);
 
-  XG_TRACE("bindIndexBuffer: {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           static_cast<void*>((VkBuffer)buf_vk->buffer_), info.offset,
+  XG_TRACE("bindIndexBuffer: {} {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkBuffer)buf_vk->buffer_, info.offset,
            vk::to_string(index_type));
 
   cmd_buffer_.bindIndexBuffer(buf_vk->buffer_, info.offset, index_type);
 }
 
 void CommandBufferVK::Draw(const DrawInfo& info) const {
-  XG_TRACE("draw: {} {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_), info.vertex_count,
-           info.instance_count, info.first_vertex, info.first_instance);
+  XG_TRACE("draw: {} {} {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           info.vertex_count, info.instance_count, info.first_vertex,
+           info.first_instance);
 
   cmd_buffer_.draw(static_cast<uint32_t>(info.vertex_count),
                    static_cast<uint32_t>(info.instance_count),
@@ -572,7 +558,7 @@ void CommandBufferVK::Draw(const DrawInfo& info) const {
 
 void CommandBufferVK::DrawIndexed(const DrawIndexedInfo& info) const {
   XG_TRACE("drawIndexed: {} {} {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_), info.index_count,
+           (void*)(VkCommandBuffer)cmd_buffer_, info.index_count,
            info.instance_count, info.first_index, info.vertex_offset,
            info.first_instance);
 
@@ -588,9 +574,9 @@ void CommandBufferVK::DrawIndexedIndirect(
   const auto buf_vk = reinterpret_cast<const BufferVK*>(info.buffer);
 
   XG_TRACE("drawIndexedIndirect: {} {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           static_cast<void*>((VkBuffer)buf_vk->buffer_), info.offset,
-           info.draw_count, info.stride);
+           (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkBuffer)buf_vk->buffer_, info.offset, info.draw_count,
+           info.stride);
 
   cmd_buffer_.drawIndexedIndirect(buf_vk->buffer_,
                                   static_cast<vk::DeviceSize>(info.offset),
@@ -602,10 +588,9 @@ void CommandBufferVK::ResetQueryPool(const ResetQueryPoolInfo& info) const {
   const auto query_pool_vk =
       reinterpret_cast<const QueryPoolVK*>(info.query_pool);
 
-  XG_TRACE("resetQueryPool: {} {} {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-           static_cast<void*>((VkQueryPool)query_pool_vk->query_pool_),
-           info.first_query, info.query_count);
+  XG_TRACE("resetQueryPool: {} {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkQueryPool)query_pool_vk->query_pool_, info.first_query,
+           info.query_count);
 
   cmd_buffer_.resetQueryPool(query_pool_vk->query_pool_, info.first_query,
                              info.query_count);
@@ -615,9 +600,8 @@ void CommandBufferVK::BeginQuery(const QueryInfo& info) const {
   const auto query_pool_vk =
       reinterpret_cast<const QueryPoolVK*>(info.query_pool);
 
-  XG_TRACE(
-      "beginQuery: {} {} {}", static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-      static_cast<void*>((VkQueryPool)query_pool_vk->query_pool_), info.query);
+  XG_TRACE("beginQuery: {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkQueryPool)query_pool_vk->query_pool_, info.query);
 
   cmd_buffer_.beginQuery(query_pool_vk->query_pool_, info.query,
                          vk::QueryControlFlags());
@@ -627,9 +611,8 @@ void CommandBufferVK::EndQuery(const QueryInfo& info) const {
   const auto query_pool_vk =
       reinterpret_cast<const QueryPoolVK*>(info.query_pool);
 
-  XG_TRACE(
-      "endQuery: {} {} {}", static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-      static_cast<void*>((VkQueryPool)query_pool_vk->query_pool_), info.query);
+  XG_TRACE("endQuery: {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkQueryPool)query_pool_vk->query_pool_, info.query);
 
   cmd_buffer_.endQuery(query_pool_vk->query_pool_, info.query);
 }
@@ -639,9 +622,8 @@ void CommandBufferVK::SetEvent(const EventInfo& info) const {
   const auto stage_mask =
       static_cast<vk::PipelineStageFlagBits>(info.stage_mask);
 
-  XG_TRACE(
-      "setEvent: {} {} {}", static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-      static_cast<void*>((VkEvent)event_vk->event_), vk::to_string(stage_mask));
+  XG_TRACE("setEvent: {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkEvent)event_vk->event_, vk::to_string(stage_mask));
 
   cmd_buffer_.setEvent(event_vk->event_, stage_mask);
 }
@@ -651,9 +633,8 @@ void CommandBufferVK::ResetEvent(const EventInfo& info) const {
   const auto stage_mask =
       static_cast<vk::PipelineStageFlagBits>(info.stage_mask);
 
-  XG_TRACE(
-      "resetEvent: {} {} {}", static_cast<void*>((VkCommandBuffer)cmd_buffer_),
-      static_cast<void*>((VkEvent)event_vk->event_), vk::to_string(stage_mask));
+  XG_TRACE("resetEvent: {} {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
+           (void*)(VkEvent)event_vk->event_, vk::to_string(stage_mask));
 
   cmd_buffer_.resetEvent(event_vk->event_, stage_mask);
 }
@@ -661,8 +642,7 @@ void CommandBufferVK::ResetEvent(const EventInfo& info) const {
 void CommandBufferVK::NextSubpass(const NextSubpassInfo& info) const {
   const auto contents = static_cast<vk::SubpassContents>(info.contents);
 
-  XG_TRACE("nextSubpass: {} {}",
-           static_cast<void*>((VkCommandBuffer)cmd_buffer_),
+  XG_TRACE("nextSubpass: {} {}", (void*)(VkCommandBuffer)cmd_buffer_,
            vk::to_string(contents));
 
   cmd_buffer_.nextSubpass(contents);

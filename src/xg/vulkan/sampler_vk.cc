@@ -15,7 +15,7 @@ namespace xg {
 
 SamplerVK::~SamplerVK() {
   if (sampler_ && device_) {
-    XG_TRACE("destroySampler: {}", static_cast<void*>((VkSampler)sampler_));
+    XG_TRACE("destroySampler: {}", (void*)(VkSampler)sampler_);
 
     device_.destroySampler(sampler_);
   }

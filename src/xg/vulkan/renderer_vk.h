@@ -55,6 +55,9 @@ class RendererVK : public Renderer {
   vk::DispatchLoaderDynamic dispatch_loader_dynamic_;
   vk::Instance instance_;
   vk::DebugUtilsMessengerEXT debug_msg_;
+  vk::DebugReportCallbackEXT debug_report_;
+  bool debug_msg_available_ = false;
+  bool debug_report_available_ = false;
 
   friend class DeviceVK;
   friend class Factory;

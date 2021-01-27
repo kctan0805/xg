@@ -25,7 +25,7 @@ namespace parser {
 const char* Tinyxml2ErrorString(tinyxml2::XMLError error) {
   switch (error) {
 #define STR(r)        \
-  case tinyxml2::##r: \
+  case tinyxml2::r: \
     return #r
     STR(XML_NO_ATTRIBUTE);
     STR(XML_WRONG_ATTRIBUTE_TYPE);
@@ -312,7 +312,7 @@ ColorSpace StringToColorSpace(const char* value) {
   return ColorSpace::kSrgbNonlinear;
 }
 
-SurfaceTransformFlags xg::parser::StringToSurfaceTransformFlags(
+SurfaceTransformFlags StringToSurfaceTransformFlags(
     const char* value) {
   static std::unordered_map<std::string, SurfaceTransformFlags> mapping{
 #define ENTRY(s) {#s, SurfaceTransformFlags::k##s}

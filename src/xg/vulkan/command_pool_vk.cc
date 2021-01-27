@@ -23,8 +23,7 @@ namespace xg {
 
 CommandPoolVK::~CommandPoolVK() {
   if (cmd_pool_ && device_) {
-    XG_TRACE("destroyCommandPool: {}",
-             static_cast<void*>((VkCommandPool)cmd_pool_));
+    XG_TRACE("destroyCommandPool: {}", (void*)(VkCommandPool)cmd_pool_);
 
     device_.destroyCommandPool(cmd_pool_);
   }
@@ -43,8 +42,7 @@ bool CommandPoolVK::AllocateCommandBuffers(
 
   std::vector<vk::CommandBuffer> vk_cmd_buffers(lcmd_buffers.size());
 
-  XG_TRACE("allocateCommandBuffers: {}",
-           static_cast<void*>((VkCommandPool)cmd_pool_));
+  XG_TRACE("allocateCommandBuffers: {}", (void*)(VkCommandPool)cmd_pool_);
 
   const auto& result =
       device_.allocateCommandBuffers(&alloc_info, vk_cmd_buffers.data());
@@ -58,16 +56,16 @@ bool CommandPoolVK::AllocateCommandBuffers(
     auto cmd_buffer = std::make_shared<CommandBufferVK>();
     if (!cmd_buffer) {
       XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
-      return nullptr;
+      return false;
     }
     cmd_buffer->device_ = device_;
     cmd_buffer->command_pool_ = cmd_pool_;
     cmd_buffer->cmd_buffer_ = vk_cmd_buffer;
     cmd_buffers->emplace_back(cmd_buffer);
 
-    XG_TRACE("  CommandBuffer: {} {}",
-             static_cast<void*>((VkCommandBuffer)vk_cmd_buffer),
-             lcmd_buffers[i++]->id);
+    XG_TRACE("  CommandBuffer: {} {}", (void*)(VkCommandBuffer)vk_cmd_buffer,
+             lcmd_buffers[i]->id);
+    ++i;
   }
   return true;
 }

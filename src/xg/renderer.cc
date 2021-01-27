@@ -46,7 +46,7 @@ Renderer::CreateFramebuffersOfFrame(LayoutFramebuffer* lframebuffer) {
         lframebuffer->lframe->lswapchain->instance);
     frame_count = swapchain->GetFrameCount();
 
-    if (!lframebuffer->width || !lframebuffer->height) {
+    if ((lframebuffer->width == 0) || (lframebuffer->height == 0)) {
       lframebuffer->width = swapchain->GetWidth();
       lframebuffer->height = swapchain->GetHeight();
     }
@@ -153,7 +153,7 @@ Renderer::CreateCommandBuffersOfFrame(
   if (!cmd_pool->AllocateCommandBuffers(lcmd_buffers, &cmd_buffers))
     return nullptr;
 
-  auto& frame_cmd_buffers =
+  auto frame_cmd_buffers =
       std::make_shared<std::vector<std::shared_ptr<CommandBuffer>>>(
           cmd_buffers);
   if (!frame_cmd_buffers) {
@@ -625,7 +625,7 @@ std::shared_ptr<CommandList> Renderer::CreateCommandList(
       default:
         XG_ERROR("unknown command layout: {}",
                  static_cast<int>(lcmd->layout_type));
-        return false;
+        return nullptr;
     }
   }
   return cmd_list;

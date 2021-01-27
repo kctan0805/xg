@@ -17,6 +17,7 @@
 namespace xg {
 namespace parser {
 
+template <>
 bool ParserSingleton<ParserResourceLoader>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
   auto node = std::make_shared<LayoutResourceLoader>();

@@ -12,6 +12,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <limits>
 #include <memory>
 #include <set>
@@ -55,7 +56,7 @@ DeviceVK::~DeviceVK() {
   if (device_) {
     if (pipeline_cache_) {
       XG_TRACE("destroyPipelineCache: {}",
-               static_cast<void*>((VkPipelineCache)pipeline_cache_));
+               (void*)(VkPipelineCache)pipeline_cache_);
       device_.destroyPipelineCache(pipeline_cache_);
     }
 
@@ -181,7 +182,7 @@ bool DeviceVK::CreateDevice(const LayoutDevice& ldevice) {
       return false;
     }
 
-    auto& it = queue_params_map.find(family_candidate);
+    auto it = queue_params_map.find(family_candidate);
     if (it == queue_params_map.end()) {
       auto ret =
           queue_params_map.emplace(family_candidate, std::vector<float>());
@@ -222,12 +223,13 @@ bool DeviceVK::CreateDevice(const LayoutDevice& ldevice) {
 
   for (const auto wanted : wanted_extensions) {
     for (const auto& found : found_extensions) {
-      if (std::string(found.extensionName.data()) == wanted) {
-        if (std::string(found.extensionName.data()) ==
-            VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME) {
+      if (std::strcmp(found.extensionName, wanted) == 0) {
+        if (std::strcmp(found.extensionName,
+                        VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME) == 0) {
           get_mem_req2_ext_enabled = true;
-        } else if (std::string(found.extensionName.data()) ==
-                   VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME) {
+        } else if (std::strcmp(found.extensionName,
+                               VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME) ==
+                   0) {
           dedicated_alloc_ext_enabled = true;
         }
         extensions.emplace_back(wanted);
@@ -237,10 +239,17 @@ bool DeviceVK::CreateDevice(const LayoutDevice& ldevice) {
   }
 
   physical_device_.getFeatures(&physical_device_features_);
-
-  const auto& features2 = physical_device_.getFeatures2<
+#ifdef _WIN32
+  auto features2 = physical_device_.getFeatures2<
       vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceIndexTypeUint8FeaturesEXT,
       vk::PhysicalDeviceShaderAtomicFloatFeaturesEXT>();
+#else
+  auto features2 =
+      physical_device_
+          .getFeatures2<vk::PhysicalDeviceFeatures2,
+                        vk::PhysicalDeviceIndexTypeUint8FeaturesEXT>();
+#endif  // _WIN32
+
   auto index_type_uint8_features =
       features2.get<vk::PhysicalDeviceIndexTypeUint8FeaturesEXT>();
 
@@ -263,12 +272,12 @@ bool DeviceVK::CreateDevice(const LayoutDevice& ldevice) {
     return false;
   }
 
-  auto& properties = physical_device_.getProperties();
+  auto properties = physical_device_.getProperties();
   physical_device_limits_ = properties.limits;
   min_uniform_buffer_offset_align_ =
       static_cast<int>(properties.limits.minUniformBufferOffsetAlignment);
 
-  XG_TRACE("createDevice: {}", static_cast<void*>((VkDevice)device_));
+  XG_TRACE("createDevice: {}", (void*)(VkDevice)device_);
 
   return true;
 }
@@ -282,8 +291,7 @@ bool DeviceVK::CreatePipelineCache() {
     return false;
   }
 
-  XG_TRACE("createPipelineCache: {}",
-           static_cast<void*>((VkPipelineCache)pipeline_cache_));
+  XG_TRACE("createPipelineCache: {}", (void*)(VkPipelineCache)pipeline_cache_);
 
   return true;
 }
@@ -320,9 +328,8 @@ bool DeviceVK::CreateQueues(const LayoutDevice& ldevice,
       queue_vk->family_index_ = static_cast<int>(queue_family_index);
       queue_vk->use_count_ = 1;
 
-      XG_TRACE("getQueue: {} {} {}",
-               static_cast<void*>((VkQueue)queue_vk->queue_), lqueue->id,
-               queue_family_index);
+      XG_TRACE("getQueue: {} {} {}", (void*)(VkQueue)queue_vk->queue_,
+               lqueue->id, queue_family_index);
 
     } else {
       // try to find an appropriate queue to share use
@@ -418,12 +425,12 @@ std::shared_ptr<Fence> DeviceVK::CreateFence(const LayoutFence& lfence) const {
       device_.createFence(&create_info, nullptr, &fence->fence_);
   if (result != vk::Result::eSuccess) {
     XG_ERROR(ResultString(static_cast<Result>(result)));
-    return false;
+    return nullptr;
   }
   fence->device_ = device_;
 
-  XG_TRACE("createFence: {} {} {}", static_cast<void*>((VkFence)fence->fence_),
-           lfence.id, lfence.signaled);
+  XG_TRACE("createFence: {} {} {}", (void*)(VkFence)fence->fence_, lfence.id,
+           lfence.signaled);
 
   return fence;
 }
@@ -446,8 +453,7 @@ std::shared_ptr<Semaphore> DeviceVK::CreateSemaphore(
   }
   semaphore->device_ = device_;
 
-  XG_TRACE("createSemaphore: {} {}",
-           static_cast<void*>((VkSemaphore)semaphore->semaphore_),
+  XG_TRACE("createSemaphore: {} {}", (void*)(VkSemaphore)semaphore->semaphore_,
            lsemaphore.id);
 
   return semaphore;
@@ -617,7 +623,7 @@ std::shared_ptr<ShaderModule> DeviceVK::CreateShaderModule(
   shader_module->device_ = device_;
 
   XG_TRACE("createShaderModule: {} {} {}",
-           static_cast<void*>((VkShaderModule)shader_module->shader_module_),
+           (void*)(VkShaderModule)shader_module->shader_module_,
            lshader_module.id, lshader_module.code.size());
 
   return shader_module;
@@ -665,8 +671,7 @@ std::shared_ptr<DescriptorSetLayout> DeviceVK::CreateDescriptorSetLayout(
   desc_set_layout->device_ = device_;
 
   XG_TRACE("  SetLayout: {} {}",
-           static_cast<void*>(
-               (VkDescriptorSetLayout)desc_set_layout->desc_set_layout_),
+           (void*)(VkDescriptorSetLayout)desc_set_layout->desc_set_layout_,
            ldesc_set_layout.id);
 
   return desc_set_layout;
@@ -689,10 +694,9 @@ std::shared_ptr<PipelineLayout> DeviceVK::CreatePipelineLayout(
         std::static_pointer_cast<DescriptorSetLayoutVK>(llayout->instance);
     desc_set_layouts.emplace_back(layout->desc_set_layout_);
 
-    XG_TRACE(
-        "  SetLayout: {} {}",
-        static_cast<void*>((VkDescriptorSetLayout)layout->desc_set_layout_),
-        llayout->id);
+    XG_TRACE("  SetLayout: {} {}",
+             (void*)(VkDescriptorSetLayout)layout->desc_set_layout_,
+             llayout->id);
   }
 
   for (const auto& range : lpipeline_layout.push_constant_ranges) {
@@ -725,10 +729,9 @@ std::shared_ptr<PipelineLayout> DeviceVK::CreatePipelineLayout(
   }
   pipeline_layout->device_ = device_;
 
-  XG_TRACE(
-      "  PipelineLayout: {} {}",
-      static_cast<void*>((VkPipelineLayout)pipeline_layout->pipeline_layout_),
-      lpipeline_layout.id);
+  XG_TRACE("  PipelineLayout: {} {}",
+           (void*)(VkPipelineLayout)pipeline_layout->pipeline_layout_,
+           lpipeline_layout.id);
 
   return pipeline_layout;
 }
@@ -747,7 +750,7 @@ Result DeviceVK::InitComputePipelines(
   std::vector<vk::Pipeline> vk_pipelines(lcompute_pipelines.size());
 
   XG_TRACE("createComputePipelines: {}",
-           static_cast<void*>((VkPipelineCache)pipeline_cache_));
+           (void*)(VkPipelineCache)pipeline_cache_);
 
   for (const auto& lcompute_pipeline : lcompute_pipelines) {
     // stage
@@ -763,7 +766,7 @@ Result DeviceVK::InitComputePipelines(
             .setPName(lstage->name.c_str());
 
     XG_TRACE("  Stage: {} {} {}", vk::to_string(stage),
-             static_cast<void*>((VkShaderModule)shader_module->shader_module_),
+             (void*)(VkShaderModule)shader_module->shader_module_,
              lstage->name);
 
     if (lstage->lspec_info) {
@@ -813,10 +816,9 @@ Result DeviceVK::InitComputePipelines(
     const auto& pipeline_layout =
         std::static_pointer_cast<PipelineLayoutVK>(lpipeline_layout->instance);
 
-    XG_TRACE(
-        "  Layout: {} {}",
-        static_cast<void*>((VkPipelineLayout)pipeline_layout->pipeline_layout_),
-        lpipeline_layout->id);
+    XG_TRACE("  Layout: {} {}",
+             (void*)(VkPipelineLayout)pipeline_layout->pipeline_layout_,
+             lpipeline_layout->id);
 
     auto create_info = vk::ComputePipelineCreateInfo()
                            .setStage(shader_stage_create_info)
@@ -840,7 +842,7 @@ Result DeviceVK::InitComputePipelines(
     pipeline_vk->device_ = device_;
     pipeline_vk->pipeline_ = vk_pipeline;
 
-    XG_TRACE("  Pipeline: {} {}", static_cast<void*>((VkPipeline)vk_pipeline),
+    XG_TRACE("  Pipeline: {} {}", (void*)(VkPipeline)vk_pipeline,
              lcompute_pipelines[i]->id);
   }
   return Result::kSuccess;
@@ -890,7 +892,7 @@ Result DeviceVK::InitGraphicsPipelines(
   std::vector<vk::Pipeline> vk_pipelines(lgraphics_pipelines.size());
 
   XG_TRACE("createGraphicsPipelines: {}",
-           static_cast<void*>((VkPipelineCache)pipeline_cache_));
+           (void*)(VkPipelineCache)pipeline_cache_);
 
   for (const auto& lgraphics_pipeline : lgraphics_pipelines) {
     auto shader_stage_create_infos =
@@ -911,10 +913,9 @@ Result DeviceVK::InitGraphicsPipelines(
               .setModule(shader_module->shader_module_)
               .setPName(lstage->name.c_str());
 
-      XG_TRACE(
-          "  Stage: {} {} {}", vk::to_string(stage),
-          static_cast<void*>((VkShaderModule)shader_module->shader_module_),
-          lstage->name);
+      XG_TRACE("  Stage: {} {} {}", vk::to_string(stage),
+               (void*)(VkShaderModule)shader_module->shader_module_,
+               lstage->name);
 
       if (lstage->lspec_info) {
         const auto& lspec_info = lstage->lspec_info;
@@ -1291,10 +1292,9 @@ Result DeviceVK::InitGraphicsPipelines(
     const auto& pipeline_layout =
         std::static_pointer_cast<PipelineLayoutVK>(lpipeline_layout->instance);
 
-    XG_TRACE(
-        "  Layout: {} {}",
-        static_cast<void*>((VkPipelineLayout)pipeline_layout->pipeline_layout_),
-        lpipeline_layout->id);
+    XG_TRACE("  Layout: {} {}",
+             (void*)(VkPipelineLayout)pipeline_layout->pipeline_layout_,
+             lpipeline_layout->id);
 
     // render pass
     const auto& lrender_pass = lgraphics_pipeline->lrender_pass;
@@ -1303,8 +1303,7 @@ Result DeviceVK::InitGraphicsPipelines(
         std::static_pointer_cast<RenderPassVK>(lrender_pass->instance);
 
     XG_TRACE("  RenderPass: {} {}",
-             static_cast<void*>((VkRenderPass)render_pass->render_pass_),
-             lrender_pass->id);
+             (void*)(VkRenderPass)render_pass->render_pass_, lrender_pass->id);
 
     auto create_info =
         vk::GraphicsPipelineCreateInfo()
@@ -1341,7 +1340,7 @@ Result DeviceVK::InitGraphicsPipelines(
     pipeline_vk->device_ = device_;
     pipeline_vk->pipeline_ = vk_pipeline;
 
-    XG_TRACE("  Pipeline: {} {}", static_cast<void*>((VkPipeline)vk_pipeline),
+    XG_TRACE("  Pipeline: {} {}", (void*)(VkPipeline)vk_pipeline,
              lgraphics_pipelines[i]->id);
   }
   return Result::kSuccess;
@@ -1399,8 +1398,7 @@ std::shared_ptr<DescriptorPool> DeviceVK::CreateDescriptorPool(
   desc_pool->device_ = device_;
 
   XG_TRACE("  DescriptorPool: {} {}",
-           static_cast<void*>((VkDescriptorPool)desc_pool->desc_pool_),
-           ldesc_pool.id);
+           (void*)(VkDescriptorPool)desc_pool->desc_pool_, ldesc_pool.id);
 
   return desc_pool;
 }
@@ -1464,7 +1462,7 @@ std::shared_ptr<Sampler> DeviceVK::CreateSampler(
   sampler->device_ = device_;
 
   XG_TRACE("createSampler: {} {} {} {} {} {} {} {} {} {}",
-           static_cast<void*>((VkSampler)sampler->sampler_), lsampler.id,
+           (void*)(VkSampler)sampler->sampler_, lsampler.id,
            vk::to_string(mag_filter), vk::to_string(min_filter),
            vk::to_string(mipmap_mode), vk::to_string(address_mode_u),
            vk::to_string(address_mode_v), vk::to_string(address_mode_w),
@@ -1497,8 +1495,8 @@ std::shared_ptr<QueryPool> DeviceVK::CreateQueryPool(
   query_pool->device_ = device_;
 
   XG_TRACE("createQueryPool: {} {} {} {}",
-           static_cast<void*>((VkQueryPool)query_pool->query_pool_),
-           lquery_pool.id, vk::to_string(query_type), lquery_pool.query_count);
+           (void*)(VkQueryPool)query_pool->query_pool_, lquery_pool.id,
+           vk::to_string(query_type), lquery_pool.query_count);
 
   return query_pool;
 }
@@ -1531,8 +1529,8 @@ Result DeviceVK::UpdateDescriptorSets(
               .setDescriptorType(desc_type);
 
       XG_TRACE("  descriptorWrite: {} {} {} {} {}", ldesc_set->id,
-               static_cast<void*>((VkDescriptorSet)desc_set->desc_set_),
-               ldesc->binding, ldesc->desc_count, vk::to_string(desc_type));
+               (void*)(VkDescriptorSet)desc_set->desc_set_, ldesc->binding,
+               ldesc->desc_count, vk::to_string(desc_type));
 
       switch (ldesc->desc_type) {
         case DescriptorType::kSampler:
@@ -1565,11 +1563,10 @@ Result DeviceVK::UpdateDescriptorSets(
               vk_desc_image_info.setSampler(sampler->sampler_);
             }
 
-            XG_TRACE(
-                "    ImageInfo: {} {} {}",
-                static_cast<void*>((VkSampler)vk_desc_image_info.sampler),
-                static_cast<void*>((VkImageView)vk_desc_image_info.imageView),
-                vk::to_string(image_layout));
+            XG_TRACE("    ImageInfo: {} {} {}",
+                     (void*)(VkSampler)vk_desc_image_info.sampler,
+                     (void*)(VkImageView)vk_desc_image_info.imageView,
+                     vk::to_string(image_layout));
 
             vk_desc_image_infos->emplace_back(std::move(vk_desc_image_info));
           }
@@ -1601,7 +1598,7 @@ Result DeviceVK::UpdateDescriptorSets(
             vk_desc_buffer_infos->emplace_back(std::move(vk_desc_buffer_info));
 
             XG_TRACE("    BufferInfo: {} {} {}",
-                     static_cast<void*>((VkBuffer)buffer->buffer_),
+                     (void*)(VkBuffer)buffer->buffer_,
                      ldesc_buffer_info->offset, ldesc_buffer_info->range);
           }
           write.setPBufferInfo(vk_desc_buffer_infos->data());
@@ -1679,8 +1676,7 @@ std::shared_ptr<Event> DeviceVK::CreateEvent(const LayoutEvent& levent) const {
   }
   event->device_ = device_;
 
-  XG_TRACE("createEvent: {} {}", static_cast<void*>((VkEvent)event->event_),
-           levent.id);
+  XG_TRACE("createEvent: {} {}", (void*)(VkEvent)event->event_, levent.id);
 
   return event;
 }

@@ -66,7 +66,7 @@ Result ImageVK::Init(const LayoutImage& limage) {
   }
 
   XG_TRACE("vmaCreateImage: {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}",
-           static_cast<void*>(image_), limage.id, vk::to_string(flags),
+           (void*)image_, limage.id, vk::to_string(flags),
            vk::to_string(image_type), vk::to_string(format),
            limage.extent.width, limage.extent.height, limage.extent.depth,
            limage.mip_levels, limage.array_layers, vk::to_string(tiling),
@@ -79,11 +79,11 @@ Result ImageVK::Init(const LayoutImage& limage) {
 
 void ImageVK::Exit() {
   if (image_ && vma_allocator_) {
-    XG_TRACE("vmaDestroyImage: {}", static_cast<void*>(image_));
+    XG_TRACE("vmaDestroyImage: {}", (void*)image_);
 
     vmaDestroyImage(vma_allocator_, image_, alloc_);
-    image_ = nullptr;
-    alloc_ = nullptr;
+    image_ = VK_NULL_HANDLE;
+    alloc_ = VK_NULL_HANDLE;
   }
 }
 

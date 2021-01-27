@@ -19,8 +19,7 @@
 #include "xg/viewer.h"
 
 std::shared_ptr<xg::Layout> Application::CreateLayout() const {
-  auto layout = xg::Parser::Get().ParseFile(
-      "../../../app/hello_world/layouts/hello_world.xml");
+  auto layout = xg::Parser::Get().ParseFile("hello_world.xml");
 
   return layout;
 }
@@ -36,7 +35,7 @@ bool Application::Init(xg::Engine* engine) {
 }
 
 xg::Result Application::OnUpdate(std::shared_ptr<xg::Viewer> viewer) {
-  auto& camera = viewer->GetCamera();
+  auto camera = viewer->GetCamera();
 
   // update common uniform buffer
   auto uniform_data = static_cast<glm::mat4*>(draw_update_data_->Map());

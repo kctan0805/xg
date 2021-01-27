@@ -16,7 +16,7 @@ namespace xg {
 PipelineLayoutVK::~PipelineLayoutVK() {
   if (pipeline_layout_ && device_) {
     XG_TRACE("destroyPipelineLayout: {}",
-             static_cast<void*>((VkPipelineLayout)pipeline_layout_));
+             (void*)(VkPipelineLayout)pipeline_layout_);
 
     device_.destroyPipelineLayout(pipeline_layout_);
   }

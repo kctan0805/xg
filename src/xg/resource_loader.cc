@@ -128,7 +128,7 @@ void ResourceLoader::Finish() {
 
   std::lock_guard<std::mutex> lock(mutex_);
 
-  auto& future = barrier_.get_future();
+  auto future = barrier_.get_future();
   future.wait();
 
   assert(context_);

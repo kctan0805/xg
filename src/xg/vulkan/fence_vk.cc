@@ -18,22 +18,23 @@ namespace xg {
 
 FenceVK::~FenceVK() {
   if (fence_ && device_) {
-    XG_TRACE("destroyFence: {}", static_cast<void*>((VkFence)fence_));
+    XG_TRACE("destroyFence: {}", (void*)(VkFence)fence_);
 
     device_.destroyFence(fence_);
   }
 }
 
 void FenceVK::Reset() {
-  //XG_TRACE("resetFences: {}", static_cast<void*>((VkFence)fence_));
+  // XG_TRACE("resetFences: {}", (void*)(VkFence)fence_);
 
   device_.resetFences(1, &fence_);
 }
 
 void FenceVK::Wait() {
-  //XG_TRACE("waitForFences: {}", static_cast<void*>((VkFence)fence_));
+  // XG_TRACE("waitForFences: {}", (void*)(VkFence)fence_);
 
-  device_.waitForFences(1, &fence_, VK_TRUE, std::numeric_limits<uint64_t>::max());
+  device_.waitForFences(1, &fence_, VK_TRUE,
+                        std::numeric_limits<uint64_t>::max());
 }
 
 bool FenceVK::IsSignaled() const {

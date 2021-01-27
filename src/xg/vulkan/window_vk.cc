@@ -46,8 +46,7 @@ void WindowVK::GetInstanceExtensions(std::vector<const char*>* extensions) {
 
 WindowVK::~WindowVK() {
   if (instance_ && surface_) {
-    XG_TRACE("destroySurfaceKHR: {}",
-             static_cast<void*>((VkSurfaceKHR)surface_));
+    XG_TRACE("destroySurfaceKHR: {}", (void*)(VkSurfaceKHR)surface_);
 
     instance_.destroySurfaceKHR(surface_);
   }
@@ -80,8 +79,7 @@ bool WindowVK::CreateSurface(const LayoutWindow& lwin) {
     return false;
   }
 
-  XG_TRACE("SDL_Vulkan_CreateSurface: {}",
-           static_cast<void*>((VkSurfaceKHR)surface_));
+  XG_TRACE("SDL_Vulkan_CreateSurface: {}", (void*)(VkSurfaceKHR)surface_);
 
   return true;
 }

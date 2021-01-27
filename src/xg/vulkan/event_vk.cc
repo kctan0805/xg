@@ -15,7 +15,7 @@ namespace xg {
 
 EventVK::~EventVK() {
   if (event_ && device_) {
-    XG_TRACE("destroyEvent: {}", static_cast<void*>((VkEvent)event_));
+    XG_TRACE("destroyEvent: {}", (void*)(VkEvent)event_);
 
     device_.destroyEvent(event_);
   }

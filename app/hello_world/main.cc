@@ -9,20 +9,16 @@
 #include <memory>
 #include <utility>
 
-#ifdef _MSC_VER
-#define SDL_MAIN_HANDLED
-
-#ifndef NDEBUG
+#if defined(_MSC_VER) && !defined(NDEBUG)
 #include <vld.h>  // Visual Leak Detector
 #endif
-#endif  // _MSC_VER
 
 #include "SDL_main.h"
 #include "hello_world.h"
 #include "xg/engine.h"
 #include "xg/layout.h"
 
-int main() {
+int SDL_main(int argc, char* argv[]) {
   Application app;
 
   auto layout = app.CreateLayout();

@@ -25,16 +25,12 @@ class Task {
  public:
   Task() = default;
   virtual ~Task() = default;
-  Task(const Task&) = default;
-  Task& operator=(const Task&) = default;
-  Task(Task&&) = default;
-  Task& operator=(Task&&) = default;
 
   virtual void Run(std::shared_ptr<Task> self) {}
 
   virtual void Finish() {
     std::lock_guard<std::mutex> lock(mutex_);
-    auto& future = barrier_.get_future();
+    auto future = barrier_.get_future();
     future.wait();
   }
 

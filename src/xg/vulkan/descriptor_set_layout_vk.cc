@@ -16,7 +16,7 @@ namespace xg {
 DescriptorSetLayoutVK::~DescriptorSetLayoutVK() {
   if (desc_set_layout_ && device_) {
     XG_TRACE("destroyDescriptorSetLayout: {}",
-             static_cast<void*>((VkDescriptorSetLayout)desc_set_layout_));
+             (void*)(VkDescriptorSetLayout)desc_set_layout_);
 
     device_.destroyDescriptorSetLayout(desc_set_layout_);
   }

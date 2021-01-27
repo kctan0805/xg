@@ -61,14 +61,14 @@ Result BufferVK::Init(const LayoutBuffer& lbuffer) {
   mem_usage_ = lbuffer.mem_usage;
   mapped_data_ = alloc_info.pMappedData;
 
-  XG_TRACE("vmaCreateBuffer: {} {}", static_cast<void*>(buffer_), lbuffer.id);
+  XG_TRACE("vmaCreateBuffer: {} {}", (void*)buffer_, lbuffer.id);
 
   return Result::kSuccess;
 }
 
 void BufferVK::Exit() {
   if (buffer_ && vma_allocator_) {
-    XG_TRACE("vmaDestroyBuffer: {}", static_cast<void*>(buffer_));
+    XG_TRACE("vmaDestroyBuffer: {}", (void*)buffer_);
     vmaDestroyBuffer(vma_allocator_, buffer_, alloc_);
   }
 }
