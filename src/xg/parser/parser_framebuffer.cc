@@ -44,8 +44,8 @@ bool ParserSingleton<ParserFramebuffer>::ParseElement(
     if (strcmp(name, "Attachment") == 0) {
       LayoutFramebufferAttachment child_node;
 
-      child_node.lswapchain_id = child->Attribute("swapchain");
       child_node.limage_view_id = child->Attribute("imageView");
+      child_node.lswapchain_id = child->Attribute("swapchain");
 
       node->lattachments.emplace_back(child_node);
     }

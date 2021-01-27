@@ -16,7 +16,7 @@
   <ImageView id="mainDepthBufferImageView" image="mainDepthBufferImage" format="D32Sfloat" aspectMask="Depth"/>
 
   <RenderPass id="mainRenderPass">
-    <Attachment id="mainColorAttachment" format="R8G8B8A8Unorm" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc"/>
+    <Attachment id="mainColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc" swapchain="mainSwapchain"/>
     <Attachment id="mainDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
     <Subpass id="mainSubpass">
       <ColorAttachment attachment="mainColorAttachment" layout="ColorAttachmentOptimal"/>

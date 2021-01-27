@@ -687,13 +687,14 @@
         <xs:element maxOccurs="unbounded" name="Attachment">
           <xs:complexType>
             <xs:attribute name="id" type="xs:ID" use="required" />
-            <xs:attribute name="format" type="FormatType" use="required" />
+            <xs:attribute name="format" type="FormatType" />
             <xs:attribute name="loadOp" type="AttachmentLoadOpType" default="DontCare" />
             <xs:attribute name="storeOp" type="AttachmentStoreOpType" default="DontCare" />
             <xs:attribute name="stencilLoadOp" type="AttachmentLoadOpType" default="DontCare" />
             <xs:attribute name="stencilStoreOp" type="AttachmentStoreOpType" default="DontCare" />
             <xs:attribute name="initialLayout" type="ImageLayoutType" default="Undefined" />
             <xs:attribute name="finalLayout" type="ImageLayoutType" default="Undefined" />
+            <xs:attribute name="swapchain" type="xs:IDREF" />
           </xs:complexType>
         </xs:element>
         <xs:element maxOccurs="unbounded" name="Subpass">
@@ -814,8 +815,8 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" name="Attachment">
           <xs:complexType>
-            <xs:attribute name="swapchain" type="xs:IDREF" />
             <xs:attribute name="imageView" type="xs:IDREF" />
+            <xs:attribute name="swapchain" type="xs:IDREF" />            
           </xs:complexType>
         </xs:element>
       </xs:sequence>

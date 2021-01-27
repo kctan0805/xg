@@ -568,6 +568,7 @@ struct LayoutAttachment : LayoutBase {
   AttachmentStoreOp stencil_store_op = AttachmentStoreOp::kDontCare;
   ImageLayout initial_layout = ImageLayout::kUndefined;
   ImageLayout final_layout = ImageLayout::kUndefined;
+  std::shared_ptr<LayoutSwapchain> lswapchain;
 
   template <class Archive>
   void serialize(Archive& archive) {
@@ -575,6 +576,8 @@ struct LayoutAttachment : LayoutBase {
             store_op, stencil_load_op, stencil_store_op, initial_layout,
             final_layout);
   }
+
+  const char* lswapchain_id = nullptr;
 };
 
 struct LayoutColorAttachment;
@@ -1119,16 +1122,16 @@ struct LayoutFramebufferAttachment : LayoutBase {
   LayoutFramebufferAttachment()
       : LayoutBase{LayoutType::kFramebufferAttachment} {}
 
-  std::shared_ptr<LayoutSwapchain> lswapchain;
   std::shared_ptr<LayoutImageView> limage_view;
+  std::shared_ptr<LayoutSwapchain> lswapchain;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lswapchain, limage_view);
+    archive(cereal::base_class<LayoutBase>(this), limage_view, lswapchain);
   }
 
-  const char* lswapchain_id = nullptr;
   const char* limage_view_id = nullptr;
+  const char* lswapchain_id = nullptr;
 };
 
 struct LayoutSemaphore : LayoutBase {

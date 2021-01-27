@@ -44,9 +44,8 @@ Renderer::CreateFramebuffersOfFrame(LayoutFramebuffer* lframebuffer) {
   } else {
     const auto& swapchain = std::static_pointer_cast<Swapchain>(
         lframebuffer->lframe->lswapchain->instance);
-    frame_count = swapchain->GetFrameCount();
-
-    if ((lframebuffer->width == 0) || (lframebuffer->height == 0)) {
+    if (swapchain) {
+      frame_count = swapchain->GetFrameCount();
       lframebuffer->width = swapchain->GetWidth();
       lframebuffer->height = swapchain->GetHeight();
     }

@@ -450,15 +450,13 @@ bool Engine::CreateImages(const Layout& layout) {
   for (const auto& limage : layout.limages) {
     if (!limage->realize) continue;
 
-    if ((limage->extent.width == 0) || (limage->extent.height == 0)) {
-      if (limage->lswapchain) {
-        const auto& swapchain =
-            std::static_pointer_cast<Swapchain>(limage->lswapchain->instance);
-        limage->extent.width = swapchain->GetWidth();
-        limage->extent.height = swapchain->GetHeight();
-      } else {
-        continue;
-      }
+    if (limage->lswapchain) {
+      const auto& swapchain =
+          std::static_pointer_cast<Swapchain>(limage->lswapchain->instance);
+      limage->extent.width = swapchain->GetWidth();
+      limage->extent.height = swapchain->GetHeight();
+    } else if ((limage->extent.width == 0) || (limage->extent.height == 0)) {
+      continue;
     }
 
     auto image = device_->CreateImage(*limage);
@@ -760,6 +758,14 @@ bool Engine::CreateRenderPasses(const Layout& layout) {
   for (const auto& lrender_pass : layout.lrender_passes) {
     if (!lrender_pass->realize) continue;
 
+    for (auto lattachment : lrender_pass->lattachments) {
+      if (lattachment->lswapchain) {
+        const auto& swapchain = std::static_pointer_cast<Swapchain>(
+            lattachment->lswapchain->instance);
+        lattachment->format = swapchain->GetFormat();
+      }
+    }
+
     auto render_pass = device_->CreateRenderPass(*lrender_pass);
     if (!render_pass) return false;
 
@@ -976,13 +982,11 @@ bool Engine::CreateCameras(const Layout& layout) {
   for (const auto& lcamera : layout.lcameras) {
     if (!lcamera->realize) continue;
 
-    if ((lcamera->width == 0.0f) || (lcamera->height == 0.0f)) {
-      if (lcamera->lswapchain) {
-        const auto& swapchain =
-            std::static_pointer_cast<Swapchain>(lcamera->lswapchain->instance);
-        lcamera->width = static_cast<float>(swapchain->GetWidth());
-        lcamera->height = static_cast<float>(swapchain->GetHeight());
-      }
+    if (lcamera->lswapchain) {
+      const auto& swapchain =
+          std::static_pointer_cast<Swapchain>(lcamera->lswapchain->instance);
+      lcamera->width = static_cast<float>(swapchain->GetWidth());
+      lcamera->height = static_cast<float>(swapchain->GetHeight());
     }
 
     auto camera = renderer_->CreateCamera(*lcamera);

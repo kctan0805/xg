@@ -670,6 +670,18 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     }
   }
 
+  for (auto lrender_pass : layout->lrender_passes) {
+    for (auto lattachment : lrender_pass->lattachments) {
+      if (lattachment->lswapchain_id) {
+        const auto it = node_id_map.find(lattachment->lswapchain_id);
+        assert(it != node_id_map.end());
+        lattachment->lswapchain =
+            std::static_pointer_cast<LayoutSwapchain>(it->second);
+        assert(lattachment->lswapchain);
+      }
+    }
+  }
+
   for (auto lswapchain : layout->lswapchains) {
     if (lswapchain->lwin == nullptr) {
       assert(lswapchain->lwin_id);
@@ -993,18 +1005,18 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     }
 
     for (auto& lattachment : lframebuffer->lattachments) {
-      if (lattachment.lswapchain_id) {
-        const auto it = node_id_map.find(lattachment.lswapchain_id);
-        assert(it != node_id_map.end());
-        lattachment.lswapchain =
-            std::static_pointer_cast<LayoutSwapchain>(it->second);
-        assert(lattachment.lswapchain);
-      } else if (lattachment.limage_view_id) {
+      if (lattachment.limage_view_id) {
         const auto it = node_id_map.find(lattachment.limage_view_id);
         assert(it != node_id_map.end());
         lattachment.limage_view =
             std::static_pointer_cast<LayoutImageView>(it->second);
         assert(lattachment.limage_view);
+      } else if (lattachment.lswapchain_id) {
+        const auto it = node_id_map.find(lattachment.lswapchain_id);
+        assert(it != node_id_map.end());
+        lattachment.lswapchain =
+            std::static_pointer_cast<LayoutSwapchain>(it->second);
+        assert(lattachment.lswapchain);
       }
     }
   }

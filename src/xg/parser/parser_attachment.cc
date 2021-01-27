@@ -51,6 +51,8 @@ bool ParserSingleton<ParserAttachment>::ParseElement(
   value = element->Attribute("finalLayout");
   if (value) node->final_layout = StringToImageLayout(value);
 
+  node->lswapchain_id = element->Attribute("swapchain");
+
   status->node = node;
 
   return ParserBase::Get().ParseElement(element, status);
