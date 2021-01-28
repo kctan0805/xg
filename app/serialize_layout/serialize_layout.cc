@@ -19,8 +19,7 @@
 #include "xg/viewer.h"
 
 std::shared_ptr<xg::Layout> Application::CreateLayout() const {
-  auto layout = xg::Parser::Get().ParseFile(
-      "../../../app/serialize_layout/layouts/serialize_layout.xml");
+  auto layout = xg::Parser::Get().ParseFile("serialize_layout.xml");
   return layout;
 }
 

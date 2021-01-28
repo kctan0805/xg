@@ -521,7 +521,7 @@ struct LayoutSwapchain : LayoutBase {
   int image_array_layers = 1;
   ImageUsage image_usage = ImageUsage::kColorAttachment;
   SurfaceTransformFlags pre_transform = SurfaceTransformFlags::kIdentity;
-  CompositeAlpha composite_alpha = CompositeAlpha::kInherit;
+  CompositeAlpha composite_alpha = CompositeAlpha::kOpaque;
   PresentMode present_mode = PresentMode::kImmediate;
   bool clipped = true;
 
@@ -1089,8 +1089,8 @@ struct LayoutDescriptor : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), binding, desc_type,
-            ldesc_image_infos, ldesc_buffer_infos);
+    archive(cereal::base_class<LayoutBase>(this), binding, desc_count,
+            desc_type, ldesc_image_infos, ldesc_buffer_infos);
   }
 };
 

@@ -69,7 +69,7 @@ void WindowSDL::PollEvents() {
 
       case SDL_WINDOWEVENT: {
         if (SDL_GetWindowID(window_) == e.window.windowID) {
-          switch (e.window.type) {
+          switch (e.window.event) {
             case SDL_WINDOWEVENT_RESIZED:
               resize_handler_(e.window.data1, e.window.data2);
               break;

@@ -18,8 +18,7 @@
 #include "xg/viewer.h"
 
 std::shared_ptr<xg::Layout> Application::CreateLayout() const {
-  auto layout =
-      xg::Parser::Get().ParseFile("../../../app/multiwin/layouts/multiwin.xml");
+  auto layout = xg::Parser::Get().ParseFile("multiwin.xml");
 
   return layout;
 }

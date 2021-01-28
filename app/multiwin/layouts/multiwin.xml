@@ -3,7 +3,7 @@
   <Constant id="winWidth" value="320"/>
   <Constant id="winHeight" value="480"/>
 
-  <Renderer appName="multiwin" debug="true">
+  <Renderer appName="multiwin" debug="true" validation="true">
     <Window id="mainWindow" xpos="30" ypos="30" width="winWidth" height="winHeight" title="Multiwin #1" resizable="false"/>
     <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
 

@@ -27,17 +27,34 @@ add_executable(serialize_layout
 )
 
 target_link_libraries(serialize_layout
+    SDL2main
     xg
 )
 
 file(COPY
     ${image_files}
-    ${layout_files}
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+configure_file(layouts/serialize_layout.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 file(MAKE_DIRECTORY
     ${CMAKE_CURRENT_BINARY_DIR}/shaders
 )
 
-set_property(SOURCE ${image_files} PROPERTY VS_DEPLOYMENT_CONTENT 1)
+set_property(SOURCE 
+    ${image_files} 
+    ${layout_files}
+    PROPERTY VS_DEPLOYMENT_CONTENT 1
+)
+
+add_executable(unserialize_layout
+    ${src}
+)
+
+target_link_libraries(unserialize_layout
+    SDL2main
+    xg
+)
+
+target_compile_definitions(unserialize_layout PRIVATE UNSERIALIZE_LAYOUT)

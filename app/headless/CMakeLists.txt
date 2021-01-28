@@ -23,11 +23,13 @@ target_link_libraries(headless
     xg
 )
 
-file(COPY
-    ${layout_files}
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)
+configure_file(layouts/headless.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 file(MAKE_DIRECTORY
     ${CMAKE_CURRENT_BINARY_DIR}/shaders
+)
+
+set_property(SOURCE 
+    ${layout_files}
+    PROPERTY VS_DEPLOYMENT_CONTENT 1
 )

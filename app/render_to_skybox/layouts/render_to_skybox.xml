@@ -3,7 +3,7 @@
   <Constant id="winWidth" value="640"/>
   <Constant id="winHeight" value="480"/>
 
-  <Renderer appName="render_to_skybox">
+  <Renderer appName="render_to_skybox" debug="true" validation="true">
     <Window id="mainWindow" width="winWidth" height="winHeight" title="Skybox" resizable="true"/>
     <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
 
@@ -159,8 +159,8 @@
   </RenderPass>
 
   <PipelineLayout id="cubemapPipelineLayout"/>
-  <ShaderModule id="cubemapVertexShader" file="cubemap.vert.spv"/>
-  <ShaderModule id="cubemapFragmentShader" file="cubemap.frag.spv"/>
+  <ShaderModule id="cubemapVertexShader" file="shaders/cubemap.vert.spv"/>
+  <ShaderModule id="cubemapFragmentShader" file="shaders/cubemap.frag.spv"/>
 
   <GraphicsPipeline id="cubemapPipeline0" layout="cubemapPipelineLayout" renderPass="cubemapRenderPass" subpass="cubemapSubpass0">
     <Stage stage="Vertex" module="cubemapVertexShader"/>

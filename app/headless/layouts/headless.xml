@@ -2,7 +2,7 @@
 <Engine>
   <Constant id="elementCount" value="32"/>
 
-  <Renderer appName="headless" debug="true">
+  <Renderer appName="headless" debug="true" validation="true">
     <Device>
       <Queue id="mainQueue" queueFamily="Compute"/>
     </Device>

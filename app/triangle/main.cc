@@ -13,11 +13,12 @@
 #include <vld.h>  // Visual Leak Detector
 #endif
 
+#include "SDL_main.h"
 #include "triangle.h"
 #include "xg/engine.h"
 #include "xg/layout.h"
 
-int main() {
+int SDL_main(int argc, char* argv[]) {
   Application app;
 
   auto layout = app.CreateLayout();

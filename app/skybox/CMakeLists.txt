@@ -27,18 +27,21 @@ add_executable(skybox
     ${src}
 )
 
+set_target_properties(skybox PROPERTIES WIN32_EXECUTABLE TRUE)
+
 target_link_libraries(skybox
+    SDL2main
     xg
 )
 
-file(COPY
-    ${image_files}
-    ${layout_files}
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)
+configure_file(layouts/skybox.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 file(MAKE_DIRECTORY
     ${CMAKE_CURRENT_BINARY_DIR}/shaders
 )
 
-set_property(SOURCE ${image_files} PROPERTY VS_DEPLOYMENT_CONTENT 1)
+set_property(SOURCE 
+    ${image_files} 
+    ${layout_files}
+    PROPERTY VS_DEPLOYMENT_CONTENT 1
+)

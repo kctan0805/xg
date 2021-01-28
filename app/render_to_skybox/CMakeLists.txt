@@ -20,15 +20,20 @@ add_executable(render_to_skybox
     ${src}
 )
 
+set_target_properties(render_to_skybox PROPERTIES WIN32_EXECUTABLE TRUE)
+
 target_link_libraries(render_to_skybox
+    SDL2main
     xg
 )
 
-file(COPY
-    ${layout_files}
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)
+configure_file(layouts/render_to_skybox.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 file(MAKE_DIRECTORY
     ${CMAKE_CURRENT_BINARY_DIR}/shaders
+)
+
+set_property(SOURCE 
+    ${layout_files}
+    PROPERTY VS_DEPLOYMENT_CONTENT 1
 )

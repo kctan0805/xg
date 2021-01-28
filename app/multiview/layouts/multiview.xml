@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Engine>
-  <Renderer appName="multiview" debug="true">
+  <Renderer appName="multiview" debug="true" validation="true">
     <Window id="mainWindow" width="640" height="480" title="Multiview" resizable="false"/>
     <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" imageUsage="ColorAttachment TransferDst" presentMode="Mailbox"/>
 

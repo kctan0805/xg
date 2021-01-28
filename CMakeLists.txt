@@ -27,8 +27,6 @@ endif()
 project(xg)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/third_party/embed)
-
 include_directories(
     ${CMAKE_BINARY_DIR}/third_party/SDL/include
     third_party

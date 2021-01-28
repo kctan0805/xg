@@ -20,15 +20,20 @@ add_executable(triangle
     ${src}
 )
 
+set_target_properties(triangle PROPERTIES WIN32_EXECUTABLE TRUE)
+
 target_link_libraries(triangle
+    SDL2main
     xg
 )
 
-file(COPY
-    ${layout_files}
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)
+configure_file(layouts/triangle.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 file(MAKE_DIRECTORY
     ${CMAKE_CURRENT_BINARY_DIR}/shaders
+)
+
+set_property(SOURCE 
+    ${layout_files}
+    PROPERTY VS_DEPLOYMENT_CONTENT 1
 )

@@ -14,10 +14,11 @@
 #endif
 
 #include "render_to_skybox.h"
+#include "SDL_main.h"
 #include "xg/engine.h"
 #include "xg/layout.h"
 
-int main() {
+int SDL_main(int argc, char* argv[]) {
   Application app;
 
   auto layout = app.CreateLayout();
@@ -28,7 +29,7 @@ int main() {
   if (!engine.Init(std::move(layout))) return EXIT_FAILURE;
   if (!app.Init(&engine)) return EXIT_FAILURE;
 
-  auto result = engine.Run();
+  engine.Run();
 
   return 0;
 }

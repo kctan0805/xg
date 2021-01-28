@@ -25,8 +25,7 @@
 static const int kElementCount = 32;
 
 std::shared_ptr<xg::Layout> Application::CreateLayout() {
-  auto layout =
-      xg::Parser::Get().ParseFile("../../../app/headless/layouts/headless.xml");
+  auto layout = xg::Parser::Get().ParseFile("headless.xml");
 
   auto lbuffer_loader = std::static_pointer_cast<xg::LayoutBufferLoader>(
       layout->Find("deviceBufferLoader"));

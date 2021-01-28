@@ -19,8 +19,7 @@
 #include "xg/viewer.h"
 
 std::shared_ptr<xg::Layout> Application::CreateLayout() const {
-  auto layout =
-      xg::Parser::Get().ParseFile("../../../app/skybox/layouts/skybox.xml");
+  auto layout = xg::Parser::Get().ParseFile("skybox.xml");
 
   return layout;
 }

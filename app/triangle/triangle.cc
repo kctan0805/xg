@@ -14,8 +14,7 @@
 #include "xg/parser.h"
 
 std::shared_ptr<xg::Layout> Application::CreateLayout() const {
-  auto layout = xg::Parser::Get().ParseFile(
-      "../../../app/triangle/layouts/triangle.xml");
+  auto layout = xg::Parser::Get().ParseFile("triangle.xml");
 
   return layout;
 }

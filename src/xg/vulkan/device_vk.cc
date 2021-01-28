@@ -513,7 +513,7 @@ std::shared_ptr<Swapchain> DeviceVK::CreateSwapchain(
   const auto& found_surface_formats =
       physical_device_.getSurfaceFormatsKHR(win->surface_);
 
-  auto surface_format = vk::Format::eB8G8R8A8Unorm;
+  auto surface_format = vk::Format::eR8G8B8A8Unorm;
   auto surface_colorspace = vk::ColorSpaceKHR::eSrgbNonlinear;
 
   if (found_surface_formats.size() > 1 ||
@@ -565,6 +565,11 @@ std::shared_ptr<Swapchain> DeviceVK::CreateSwapchain(
         static_cast<vk::SurfaceTransformFlagBitsKHR>(lswapchain->pre_transform);
   }
   lswapchain->pre_transform = static_cast<SurfaceTransformFlags>(pre_transform);
+
+  if (surface_capabilities.supportedCompositeAlpha &
+      vk::CompositeAlphaFlagBitsKHR::eInherit) {
+    lswapchain->composite_alpha = CompositeAlpha::kInherit;
+  }
 
   const auto& found_present_modes =
       physical_device_.getSurfacePresentModesKHR(win->surface_);

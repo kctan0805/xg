@@ -3,7 +3,7 @@
   <Constant id="winWidth" value="640"/>
   <Constant id="winHeight" value="480"/>
 
-  <Renderer appName="skybox" debug="true">
+  <Renderer appName="skybox" debug="true" validation="true">
     <Window id="mainWindow" width="winWidth" height="winHeight" title="Skybox" resizable="true"/>
     <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
 

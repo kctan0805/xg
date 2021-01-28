@@ -22,9 +22,7 @@ and has following features:
 - [headless](app/headless/) compute-only example.
 - [multiview](app/multiview/) simple multi-view example.
 - [multiwin](app/multiwin/) simple multi-window example.
-- [change layout](app/change_layout/) change layout runtime example.
 - [serialize layout](app/serialize_layout/) serialize layout example.
-- [embedded layout](app/embed_layout/) embedded serialized layout to execute file.
 - [skybox](app/skybox/) skybox example.
 - [render_to_skybox](app/render_to_skybox/) render to skybox example.
 
@@ -32,7 +30,6 @@ and has following features:
 ## Dependencies
 
 - [cereal - A C++11 library for serialization](https://github.com/USCiLab/cereal)
-- [Embed](https://github.com/magcks/embed)
 - [C++ Mathematical Expression Toolkit Library Documentation](https://github.com/ArashPartow/exprtk)
 - [SDL](https://github.com/SDL-mirror/SDL)
 - [KTX](https://github.com/KhronosGroup/KTX-Software)
