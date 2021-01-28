@@ -42,7 +42,7 @@ and has following features:
 - [Zstandard](https://github.com/facebook/zstd)
 
 
-## Install
+## Build
 
 ### Windows
 
@@ -51,6 +51,12 @@ and has following features:
 - [Visual Leak Detector](https://kinddragon.github.io/vld/)
 
 There is a [batch file](build_vs2017.cmd) to generate solution files for Visual Studio Express 2017.
+
+### Android
+
+- [Android Studio](https://developer.android.com/studio)
+
+Open android/<dir>/build.gradle on Android Studio to build.
 
 
 ## TODO

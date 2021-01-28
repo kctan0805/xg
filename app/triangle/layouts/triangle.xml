@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Engine>
-  <Constant id="winWidth" value="512"/>
-  <Constant id="winHeight" value="512"/>
-
   <Renderer appName="triangle" debug="true">
-    <Window id="mainWindow" width="winWidth" height="winHeight" title="Triangle" resizable="true"/>
+    <Window id="mainWindow" width="512" height="512" title="Triangle" resizable="true"/>
     <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
 
     <Device>
@@ -15,7 +12,7 @@
   <CommandPool id="mainCommandPool" queue="mainQueue"/>
 
   <RenderPass id="mainRenderPass">
-    <Attachment id="mainColorAttachment" format="B8G8R8A8Unorm" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc"/>
+    <Attachment id="mainColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc" swapchain="mainSwapchain"/>
     <Subpass id="mainSubpass">
       <ColorAttachment attachment="mainColorAttachment" layout="ColorAttachmentOptimal"/>
     </Subpass>
@@ -42,9 +39,9 @@
       <VertexAttributeDescription location="1" binding="0" format="R32G32B32Sfloat" offset="2*4"/>
     </VertexInputState>
     <InputAssemblyState topology="TriangleList"/>
-    <ViewportState>
-      <Viewport width="winWidth" height="winHeight" maxDepth="1.0"/>
-      <Scissor width="winWidth" height="winHeight"/>
+    <ViewportState swapchain="mainSwapchain">
+      <Viewport maxDepth="1.0"/>
+      <Scissor/>
     </ViewportState>
     <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise" lineWidth="1.0"/>
     <MultisampleState/>
