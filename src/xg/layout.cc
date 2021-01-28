@@ -125,28 +125,12 @@ bool Layout::Serialize(const std::string& filepath) {
 }
 
 std::shared_ptr<Layout> Layout::Deserialize(const std::string& filepath) {
-  std::ifstream file(filepath, std::ios::binary);
+  std::vector<uint8_t> data;
+  if (!LoadFile(filepath, &data)) return nullptr;
 
-  if (!file.is_open()) {
-    XG_ERROR("failed to open file: {}", filepath);
-    return nullptr;
-  }
-
-  cereal::BinaryInputArchive archive(file);
-  std::shared_ptr<xg::Layout> layout;
-  archive(layout);
-
-  file.close();
-
-  return layout;
-}
-
-std::shared_ptr<Layout> Layout::Deserialize(const uint8_t* data,
-                                            size_t length) {
   std::stringstream stream = std::stringstream(
-      std::string(reinterpret_cast<char*>(const_cast<unsigned char*>(data)),
-                  length),
-                    std::stringstream::in);
+      std::string(reinterpret_cast<char*>(data.data()), data.size()),
+      std::stringstream::in);
 
   cereal::BinaryInputArchive archive(stream);
   std::shared_ptr<xg::Layout> layout;

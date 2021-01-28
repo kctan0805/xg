@@ -6,7 +6,7 @@ import android.widget.TextView
 
 class MainActivity : SDLActivity() {
     override fun getLibraries(): Array<String> {
-        return arrayOf("hidapi", "native-lib")
+        return arrayOf("native-lib")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1955,8 +1955,6 @@ struct Layout : std::enable_shared_from_this<Layout> {
 
   bool Serialize(const std::string& filepath);
   static std::shared_ptr<Layout> Deserialize(const std::string& filepath);
-  static std::shared_ptr<Layout> Deserialize(const uint8_t* data,
-                                             size_t length);
 };
 
 }  // namespace xg
