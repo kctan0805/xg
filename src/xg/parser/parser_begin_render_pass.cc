@@ -38,19 +38,19 @@ bool ParserSingleton<ParserBeginRenderPass>::ParseElement(
     if (strcmp(name, "RenderArea") == 0) {
       const char* value = child->Attribute("x");
       if (value)
-        node->rect.x = static_cast<int>(Expression::Get().Evaluate(value));
+        node->rect_x = Expression::Get().Evaluate(value);
 
       value = child->Attribute("y");
       if (value)
-        node->rect.y = static_cast<int>(Expression::Get().Evaluate(value));
+        node->rect_y = Expression::Get().Evaluate(value);
 
       value = child->Attribute("width");
       if (value)
-        node->rect.width = static_cast<int>(Expression::Get().Evaluate(value));
+        node->rect_width = Expression::Get().Evaluate(value);
 
       value = child->Attribute("height");
       if (value)
-        node->rect.height = static_cast<int>(Expression::Get().Evaluate(value));
+        node->rect_height = Expression::Get().Evaluate(value);
 
     } else if (strcmp(name, "ClearValues") == 0) {
       for (auto elem = child->FirstChildElement(); elem;

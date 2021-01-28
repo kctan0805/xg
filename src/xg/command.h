@@ -9,6 +9,7 @@
 #ifndef XG_COMMAND_H_
 #define XG_COMMAND_H_
 
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -183,7 +184,10 @@ class CommandBeginRenderPass : public CommandBase {
 
  protected:
   RenderPassBeginInfo info_ = {};
-  bool auto_render_area_ = false;
+  float rect_x_ = 0.0f;
+  float rect_y_ = 0.0f;
+  float rect_width_ = 0.0f;
+  float rect_height_ = 0.0f;
   std::shared_ptr<std::vector<std::shared_ptr<Framebuffer>>>
       frame_framebuffers_;
 
@@ -321,6 +325,11 @@ class CommandDrawIndexedIndirect : public CommandBase {
   friend class Renderer;
 };
 
+struct CommandImageBlitOffsets {
+  std::array<float, 2> src_offsets[2];
+  std::array<float, 2> dst_offsets[2];
+};
+
 class CommandBlitImage : public CommandBase {
  public:
   virtual ~CommandBlitImage() = default;
@@ -330,6 +339,7 @@ class CommandBlitImage : public CommandBase {
 
  protected:
   BlitImageInfo info_ = {};
+  std::vector<CommandImageBlitOffsets> offsets_;
 
   Swapchain* src_swapchain_ = nullptr;
   Swapchain* dst_swapchain_ = nullptr;

@@ -37,3 +37,7 @@ file(COPY
 )
 
 set_property(SOURCE ${image_files} PROPERTY VS_DEPLOYMENT_CONTENT 1)
+
+file(MAKE_DIRECTORY
+    ${CMAKE_CURRENT_BINARY_DIR}/shaders
+)

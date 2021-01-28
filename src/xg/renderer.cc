@@ -46,8 +46,8 @@ Renderer::CreateFramebuffersOfFrame(LayoutFramebuffer* lframebuffer) {
         lframebuffer->lframe->lswapchain->instance);
     if (swapchain) {
       frame_count = swapchain->GetFrameCount();
-      lframebuffer->width = swapchain->GetWidth();
-      lframebuffer->height = swapchain->GetHeight();
+      lframebuffer->width = static_cast<float>(swapchain->GetWidth());
+      lframebuffer->height = static_cast<float>(swapchain->GetHeight());
     }
   }
 

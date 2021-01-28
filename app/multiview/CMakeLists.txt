@@ -26,14 +26,26 @@ add_executable(multiview
     ${src}
 )
 
+set_target_properties(multiview PROPERTIES WIN32_EXECUTABLE TRUE)
+
 target_link_libraries(multiview
+    SDL2main
     xg
 )
 
 file(COPY
     ${image_files}
-    ${layout_files}
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set_property(SOURCE ${image_files} PROPERTY VS_DEPLOYMENT_CONTENT 1)
+configure_file(layouts/multiview.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+
+file(MAKE_DIRECTORY
+    ${CMAKE_CURRENT_BINARY_DIR}/shaders
+)
+
+set_property(SOURCE 
+    ${image_files} 
+    ${layout_files}
+    PROPERTY VS_DEPLOYMENT_CONTENT 1
+)

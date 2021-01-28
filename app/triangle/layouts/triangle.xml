@@ -30,8 +30,8 @@
   </RenderPass>
 
   <PipelineLayout id="drawPipelineLayout"/>
-  <ShaderModule id="drawVertexShader" file="triangle.vert.spv"/>
-  <ShaderModule id="drawFragmentShader" file="triangle.frag.spv"/>
+  <ShaderModule id="drawVertexShader" file="shaders/triangle.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="shaders/triangle.frag.spv"/>
 
   <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
     <Stage stage="Vertex" module="drawVertexShader"/>

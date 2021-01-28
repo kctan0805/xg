@@ -48,8 +48,8 @@
     <SetLayout descriptorSetLayout="drawMaterialDescriptorSetLayout"/>
   </PipelineLayout>
 
-  <ShaderModule id="drawVertexShader" file="change_layout.vert.spv"/>
-  <ShaderModule id="drawFragmentShader" file="change_layout.frag.spv"/>
+  <ShaderModule id="drawVertexShader" file="shaders/change_layout.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="shaders/change_layout.frag.spv"/>
 
   <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
     <Stage stage="Vertex" module="drawVertexShader" name="main"/>

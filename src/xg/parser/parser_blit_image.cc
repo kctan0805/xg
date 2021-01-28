@@ -43,7 +43,7 @@ bool ParserSingleton<ParserBlitImage>::ParseElement(
     const char* name = child->Name();
 
     if (strcmp(name, "Region") == 0) {
-      ImageBlit region = {};
+      LayoutImageBlit region = {};
       region.src_subresource.aspect_mask = ImageAspectFlags::kColor;
       region.src_subresource.layer_count = 1;
       region.dst_subresource.aspect_mask = ImageAspectFlags::kColor;
@@ -68,40 +68,34 @@ bool ParserSingleton<ParserBlitImage>::ParseElement(
 
           value = elem->Attribute("x0");
           if (value) {
-            region.src_offsets[0].x =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.src_offsets[0][0] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("y0");
           if (value) {
-            region.src_offsets[0].y =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.src_offsets[0][1] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("z0");
           if (value) {
-            region.src_offsets[0].z =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.src_offsets[0][2] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("x1");
           if (value) {
-            region.src_offsets[1].x =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.src_offsets[1][0] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("y1");
           if (value) {
-            region.src_offsets[1].y =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.src_offsets[1][1] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("z1");
           if (value) {
-            region.src_offsets[1].z =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.src_offsets[1][2] = Expression::Get().Evaluate(value);
           } else {
-            region.src_offsets[1].z = 1;
+            region.src_offsets[1][2] = 1.0f;
           }
 
         } else if (strcmp(name, "Destination") == 0) {
@@ -119,40 +113,34 @@ bool ParserSingleton<ParserBlitImage>::ParseElement(
 
           value = elem->Attribute("x0");
           if (value) {
-            region.dst_offsets[0].x =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.dst_offsets[0][0] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("y0");
           if (value) {
-            region.dst_offsets[0].y =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.dst_offsets[0][1] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("z0");
           if (value) {
-            region.dst_offsets[0].z =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.dst_offsets[0][2] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("x1");
           if (value) {
-            region.dst_offsets[1].x =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.dst_offsets[1][0] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("y1");
           if (value) {
-            region.dst_offsets[1].y =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.dst_offsets[1][1] = Expression::Get().Evaluate(value);
           }
 
           value = elem->Attribute("z1");
           if (value) {
-            region.dst_offsets[1].z =
-                static_cast<int>(Expression::Get().Evaluate(value));
+            region.dst_offsets[1][2] = Expression::Get().Evaluate(value);
           } else {
-            region.dst_offsets[1].z = 1;
+            region.dst_offsets[1][2] = 1.0f;
           }
         }
       }

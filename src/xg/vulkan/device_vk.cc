@@ -1076,14 +1076,16 @@ Result DeviceVK::InitGraphicsPipelines(
     for (const auto& lscissor : lviewport_state->lscissors) {
       scissors->emplace_back(
           vk::Rect2D()
-              .setOffset(
-                  vk::Offset2D().setX(lscissor->rect.x).setY(lscissor->rect.y))
-              .setExtent(vk::Extent2D()
-                             .setWidth(lscissor->rect.width)
-                             .setHeight(lscissor->rect.height)));
+              .setOffset(vk::Offset2D()
+                             .setX(static_cast<int32_t>(lscissor->x))
+                             .setY(static_cast<int32_t>(lscissor->y)))
+              .setExtent(
+                  vk::Extent2D()
+                      .setWidth(static_cast<uint32_t>(lscissor->width))
+                      .setHeight(static_cast<uint32_t>(lscissor->height))));
 
-      XG_TRACE("  ViewportState: Scissor: {} {} {} {}", lscissor->rect.x,
-               lscissor->rect.y, lscissor->rect.width, lscissor->rect.height);
+      XG_TRACE("  ViewportState: Scissor: {} {} {} {}", lscissor->x,
+               lscissor->y, lscissor->width, lscissor->height);
     }
     viewport_state_scissors.emplace_back(scissors);
 

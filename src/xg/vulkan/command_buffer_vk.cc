@@ -444,14 +444,14 @@ void CommandBufferVK::SetScissor(const SetScissorInfo& info) const {
     scissors.emplace_back(
         vk::Rect2D()
             .setOffset(vk::Offset2D()
-                           .setX(static_cast<int32_t>(scissor.x))
-                           .setY(static_cast<int32_t>(scissor.y)))
+                           .setX(static_cast<int32_t>(scissor[0]))
+                           .setY(static_cast<int32_t>(scissor[1])))
             .setExtent(vk::Extent2D()
-                           .setWidth(static_cast<uint32_t>(scissor.width))
-                           .setHeight(static_cast<uint32_t>(scissor.height))));
+                           .setWidth(static_cast<uint32_t>(scissor[2]))
+                           .setHeight(static_cast<uint32_t>(scissor[3]))));
 
-    XG_TRACE("  Scissor: {} {} {} {} {} {}", scissor.x, scissor.y,
-             scissor.width, scissor.height);
+    XG_TRACE("  Scissor: {} {} {} {} {} {}", scissor[0], scissor[1], scissor[2],
+             scissor[3]);
   }
 
   cmd_buffer_.setScissor(static_cast<uint32_t>(info.first_scissor),

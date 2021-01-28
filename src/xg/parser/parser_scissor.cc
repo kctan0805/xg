@@ -35,18 +35,16 @@ bool ParserSingleton<ParserScissor>::ParseElement(
   }
 
   const char* value = element->Attribute("x");
-  if (value) node->rect.x = static_cast<int>(Expression::Get().Evaluate(value));
+  if (value) node->x = Expression::Get().Evaluate(value);
 
   value = element->Attribute("y");
-  if (value) node->rect.y = static_cast<int>(Expression::Get().Evaluate(value));
+  if (value) node->y = Expression::Get().Evaluate(value);
 
   value = element->Attribute("width");
-  if (value)
-    node->rect.width = static_cast<int>(Expression::Get().Evaluate(value));
+  if (value) node->width = Expression::Get().Evaluate(value);
 
   value = element->Attribute("height");
-  if (value)
-    node->rect.height = static_cast<int>(Expression::Get().Evaluate(value));
+  if (value) node->height = Expression::Get().Evaluate(value);
 
   status->node = node;
 

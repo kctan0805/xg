@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Engine>
-  <Constant id="winWidth" value="640"/>
-  <Constant id="winHeight" value="480"/>
-
   <Renderer appName="multiview" debug="true">
-    <Window id="mainWindow" width="winWidth" height="winHeight" title="Multiview" resizable="false"/>
+    <Window id="mainWindow" width="640" height="480" title="Multiview" resizable="false"/>
     <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" imageUsage="ColorAttachment TransferDst" presentMode="Mailbox"/>
 
     <Device>
@@ -15,17 +12,17 @@
   <CommandPool id="mainCommandPool" queue="mainQueue"/>
   <DescriptorPool id="mainDescriptorPool"/>
 
-  <Image id="mainColorBufferImage" format="B8G8R8A8Unorm" width="winWidth/2" height="winHeight" arrayLayers="2" usage="ColorAttachment TransferSrc"/>
+  <Image id="mainColorBufferImage" width="0.5" arrayLayers="2" usage="ColorAttachment TransferSrc" swapchain="mainSwapchain"/>
   <ImageView id="mainColorBufferImageView" image="mainColorBufferImage" viewType="2DArray" format="B8G8R8A8Unorm" layerCount="2"/>
 
-  <Image id="mainDepthBufferImage" format="D32Sfloat" width="winWidth/2" height="winHeight" arrayLayers="2" usage="DepthStencilAttachment"/>
+  <Image id="mainDepthBufferImage" format="D32Sfloat" width="0.5" arrayLayers="2" usage="DepthStencilAttachment" swapchain="mainSwapchain"/>
   <ImageView id="mainDepthBufferImageView" image="mainDepthBufferImage" viewType="2DArray" format="D32Sfloat" aspectMask="Depth" layerCount="2"/>
 
   <RenderPass id="mainRenderPass">
     <Multiview>
       <ViewMask value="3"/>
     </Multiview>
-    <Attachment id="mainColorAttachment" format="B8G8R8A8Unorm" loadOp="Clear" storeOp="Store" finalLayout="TransferSrcOptimal"/>
+    <Attachment id="mainColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="TransferSrcOptimal" swapchain="mainSwapchain"/>
     <Attachment id="mainDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
     <Subpass id="mainSubpass">
       <ColorAttachment attachment="mainColorAttachment" layout="ColorAttachmentOptimal"/>
@@ -57,8 +54,8 @@
     <SetLayout descriptorSetLayout="drawMaterialDescriptorSetLayout"/>
   </PipelineLayout>
 
-  <ShaderModule id="drawVertexShader" file="multiview.vert.spv"/>
-  <ShaderModule id="drawFragmentShader" file="multiview.frag.spv"/>
+  <ShaderModule id="drawVertexShader" file="shaders/multiview.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="shaders/multiview.frag.spv"/>
 
   <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
     <Stage stage="Vertex" module="drawVertexShader" name="main"/>
@@ -70,9 +67,9 @@
       <VertexAttributeDescription location="2" binding="0" format="R32G32Sfloat" offset="24"/>
     </VertexInputState>
     <InputAssemblyState topology="TriangleList"/>
-    <ViewportState>
-      <Viewport width="winWidth/2" height="winHeight" maxDepth="1.0"/>
-      <Scissor width="winWidth/2" height="winHeight"/>
+    <ViewportState swapchain="mainSwapchain">
+      <Viewport width="0.5" maxDepth="1.0"/>
+      <Scissor width="0.5"/>
     </ViewportState>
     <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise" lineWidth="1.0"/>
     <MultisampleState/>
@@ -88,7 +85,7 @@
     <Descriptor binding="0" descriptorType="UniformBuffer"><BufferInfo buffer="drawCommonUniformBuffer"/></Descriptor>
   </DescriptorSet>
 
-  <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass" width="winWidth/2" height="winHeight">
+  <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass" width="0.5" swapchain="mainSwapchain">
     <Attachment imageView="mainColorBufferImageView"/>
     <Attachment imageView="mainDepthBufferImageView"/>
   </Framebuffer>
@@ -171,7 +168,7 @@
   <CommandGroup id="mainCommandGroup">
     <CommandList>
       <BeginRenderPass renderPass="mainRenderPass" framebuffer="mainFramebuffer">
-        <RenderArea x="0" y="0" width="winWidth/2" height="winHeight"/>
+        <RenderArea/>
         <ClearValues>
           <ClearColorValue value="0.0 0.0 0.0 1.0"/>
           <ClearDepthStencilValue depth="1.0" stencil="0"/>
@@ -199,12 +196,12 @@
 
       <BlitImage srcImage="mainColorBufferImage" srcImageLayout="TransferSrcOptimal" dstSwapchain="mainSwapchain" dstImageLayout="TransferDstOptimal">
         <Region>
-          <Source x0="0" y0="0" x1="winWidth/2" y1="winHeight"/>
-          <Destination x0="0" y0="0" x1="winWidth/2" y1="winHeight"/>
+          <Source x0="0.0" y0="0.0" x1="0.0" y1="0.0"/>
+          <Destination x0="0.0" y0="0.0" x1="0.5" y1="0.0"/>
         </Region>
         <Region>
-          <Source x0="0" y0="0" x1="winWidth/2" y1="winHeight" baseArrayLayer="1"/>
-          <Destination x0="winWidth/2" y0="0" x1="winWidth" y1="winHeight"/>
+          <Source x0="0.0" y0="0.0" x1="0.0" y1="0.0" baseArrayLayer="1"/>
+          <Destination x0="0.5" y0="0.0" x1="0.0" y1="0.0"/>
         </Region>
       </BlitImage>
 
@@ -217,13 +214,13 @@
     </CommandList>
   </CommandGroup>
 
-  <Camera id="mainCamera">
-    <Perspective fov="60" width="winWidth/2" height="winHeight" zNear="0.1" zFar="10.0"/>
+  <Camera id="mainCamera" swapchain="mainSwapchain">
+    <Perspective fov="60" width="0.5" zNear="0.1" zFar="10.0"/>
     <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
 
-  <Camera id="subCamera">
-    <Perspective fov="60" width="winWidth/2" height="winHeight" zNear="0.1" zFar="10.0"/>
+  <Camera id="subCamera" swapchain="mainSwapchain">
+    <Perspective fov="60" width="0.5" zNear="0.1" zFar="10.0"/>
     <LookAt eye="-2.5 -2.5 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
 

@@ -86,14 +86,14 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
       lbuffer.size = ktxTexture_GetDataSize(ktx_texture);
 
       if (limage->instance) {
-        assert(ktx_texture->baseWidth == limage->extent.width);
-        assert(ktx_texture->baseHeight == limage->extent.height);
+        assert(static_cast<float>(ktx_texture->baseWidth) == limage->width);
+        assert(static_cast<float>(ktx_texture->baseHeight) == limage->height);
         assert(ktx_texture->numLevels == limage->mip_levels);
         assert(ktx_texture->numLayers * ktx_texture->numFaces ==
                limage->array_layers);
       } else {
-        limage->extent.width = ktx_texture->baseWidth;
-        limage->extent.height = ktx_texture->baseHeight;
+        limage->width = static_cast<float>(ktx_texture->baseWidth);
+        limage->height = static_cast<float>(ktx_texture->baseHeight);
         limage->mip_levels = ktx_texture->numLevels;
         limage->array_layers = ktx_texture->numFaces * ktx_texture->numLayers;
 
@@ -114,11 +114,11 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
       }
 
       if (limage->instance) {
-        assert(width == limage->extent.width);
-        assert(height == limage->extent.height);
+        assert(static_cast<float>(width) == limage->width);
+        assert(static_cast<float>(height) == limage->height);
       } else {
-        limage->extent.width = width;
-        limage->extent.height = height;
+        limage->width = static_cast<float>(width);
+        limage->height = static_cast<float>(height);
 
         auto image = device->CreateImage(*limage);
         if (!image) return;
@@ -196,8 +196,10 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
           buf_image_copy.image_subresource.base_array_layer =
               static_cast<int>(layer * ktx_texture->numFaces + face);
           buf_image_copy.image_subresource.layer_count = 1;
-          buf_image_copy.image_extent.width = limage->extent.width >> level;
-          buf_image_copy.image_extent.height = limage->extent.height >> level;
+          buf_image_copy.image_extent.width =
+              static_cast<int>(limage->width) >> level;
+          buf_image_copy.image_extent.height =
+              static_cast<int>(limage->height) >> level;
           buf_image_copy.image_extent.depth = 1;
           buf_image_copy.buffer_offset = offset;
 
@@ -210,8 +212,8 @@ void ImageLoader::Run(std::shared_ptr<Task> self) {
     BufferImageCopy buf_image_copy = {};
     buf_image_copy.image_subresource.aspect_mask = ImageAspectFlags::kColor;
     buf_image_copy.image_subresource.layer_count = 1;
-    buf_image_copy.image_extent.width = limage->extent.width;
-    buf_image_copy.image_extent.height = limage->extent.height;
+    buf_image_copy.image_extent.width = static_cast<int>(limage->width);
+    buf_image_copy.image_extent.height = static_cast<int>(limage->height);
     buf_image_copy.image_extent.depth = 1;
 
     copy_image_info.regions.emplace_back(buf_image_copy);

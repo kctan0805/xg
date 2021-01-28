@@ -33,14 +33,12 @@ bool ParserSingleton<ParserImage>::ParseElement(
   if (value) node->format = StringToFormat(value);
 
   value = element->Attribute("width");
-  if (value)
-    node->extent.width = static_cast<int>(Expression::Get().Evaluate(value));
+  if (value) node->width = Expression::Get().Evaluate(value);
 
   value = element->Attribute("height");
-  if (value)
-    node->extent.height = static_cast<int>(Expression::Get().Evaluate(value));
+  if (value) node->height = Expression::Get().Evaluate(value);
 
-  element->QueryIntAttribute("depth", &node->extent.depth);
+  element->QueryIntAttribute("depth", &node->depth);
   element->QueryIntAttribute("mipLevels", &node->mip_levels);
 
   value = element->Attribute("arrayLayers");

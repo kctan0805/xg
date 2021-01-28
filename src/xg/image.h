@@ -24,8 +24,16 @@ class Image {
   virtual Result Init(const LayoutImage& limage) = 0;
   virtual void Exit() = 0;
 
+  int GetWidth() const { return width_; }
+  int GetHeight() const { return height_; }
+  Format GetFormat() const { return format_; }
+
  protected:
   Image() = default;
+
+  int width_ = 0;
+  int height_ = 0;
+  Format format_ = Format::kUndefined;
 };
 
 }  // namespace xg

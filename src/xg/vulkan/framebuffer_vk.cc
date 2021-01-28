@@ -70,8 +70,8 @@ Result FramebufferVK::Init(const LayoutFramebuffer& lframebuffer) {
     XG_ERROR(ResultString(static_cast<Result>(result)));
     return static_cast<Result>(result);
   }
-  width_ = lframebuffer.width;
-  height_ = lframebuffer.height;
+  width_ = static_cast<int>(lframebuffer.width);
+  height_ = static_cast<int>(lframebuffer.height);
 
   XG_TRACE("  Framebuffer: {} {} ", (void*)(VkFramebuffer)framebuffer_,
            lframebuffer.id);

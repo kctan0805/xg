@@ -129,6 +129,9 @@ Result SwapchainVK::Init(const LayoutSwapchain& lswapchain) {
 
     XG_TRACE("getSwapchainImagesKHR: {}", (void*)(VkImage)vk_image);
 
+    image->width_ = lswapchain.width;
+    image->height_ = lswapchain.height;
+    image->format_ = lswapchain.image_format;
     image->image_ = vk_image;
 
     auto image_view = static_cast<ImageViewVK*>(image_views_[i].get());

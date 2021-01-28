@@ -18,8 +18,7 @@
 #include "xg/viewer.h"
 
 std::shared_ptr<xg::Layout> Application::CreateLayout() const {
-  auto layout = xg::Parser::Get().ParseFile(
-      "../../../app/multiview/layouts/multiview.xml");
+  auto layout = xg::Parser::Get().ParseFile("multiview.xml");
 
   return layout;
 }
@@ -50,8 +49,7 @@ xg::Result Application::OnUpdate(std::shared_ptr<xg::Viewer> viewer) {
   auto& camera = viewer->GetCamera();
 
   // update instance uniform buffer
-  auto uniform_data =
-      static_cast<glm::mat4*>(draw_update_data_->Map());
+  auto uniform_data = static_cast<glm::mat4*>(draw_update_data_->Map());
   assert(uniform_data);
   uniform_data[0] = camera->GetViewMatrix();
   uniform_data[1] = sub_camera_->GetViewMatrix();

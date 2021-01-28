@@ -1002,6 +1002,14 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
       lframebuffer->lrender_pass =
           std::static_pointer_cast<LayoutRenderPass>(it->second);
       assert(lframebuffer->lrender_pass);
+
+      if (lframebuffer->lswapchain_id) {
+        const auto it = node_id_map.find(lframebuffer->lswapchain_id);
+        assert(it != node_id_map.end());
+        lframebuffer->lswapchain =
+            std::static_pointer_cast<LayoutSwapchain>(it->second);
+        assert(lframebuffer->lswapchain);
+      }
     }
 
     for (auto& lattachment : lframebuffer->lattachments) {

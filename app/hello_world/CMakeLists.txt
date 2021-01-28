@@ -1,5 +1,4 @@
 file(GLOB image_files
-    images/*.jpg
     images/*.ktx
 )
 source_group(images FILES ${image_files})
@@ -36,12 +35,17 @@ target_link_libraries(hello_world
 
 file(COPY
     ${image_files}
-    ${layout_files}
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+configure_file(layouts/hello_world.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 file(MAKE_DIRECTORY
     ${CMAKE_CURRENT_BINARY_DIR}/shaders
 )
 
-set_property(SOURCE ${image_files} PROPERTY VS_DEPLOYMENT_CONTENT 1)
+set_property(SOURCE 
+    ${image_files} 
+    ${layout_files}
+    PROPERTY VS_DEPLOYMENT_CONTENT 1
+)

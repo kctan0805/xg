@@ -826,6 +826,7 @@
       <xs:attribute name="width" type="xs:string" />
       <xs:attribute name="height" type="xs:string" />
       <xs:attribute name="layers" type="xs:unsignedByte" default="1" />
+      <xs:attribute name="swapchain" type="xs:IDREF" />            
     </xs:complexType>
   </xs:element>
 

@@ -28,3 +28,7 @@ file(COPY
     ${layout_files}
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+file(MAKE_DIRECTORY
+    ${CMAKE_CURRENT_BINARY_DIR}/shaders
+)

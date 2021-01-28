@@ -19,7 +19,7 @@
     <SetLayout descriptorSetLayout="computeDescriptorSetLayout"/>
   </PipelineLayout>
 
-  <ShaderModule id="computeShader" file="headless.comp.spv"/>
+  <ShaderModule id="computeShader" file="shaders/headless.comp.spv"/>
 
   <Data id="computeConstants">
     <UInt32Values>elementCount</UInt32Values>

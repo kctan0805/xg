@@ -188,8 +188,8 @@ Result Viewer::Resize() {
   for (auto& limage : resizer_.limages) {
     auto image = static_cast<Image*>(limage->instance.get());
 
-    limage->extent.width = width;
-    limage->extent.height = height;
+    limage->width = static_cast<float>(width);
+    limage->height = static_cast<float>(height);
 
     result = image->Init(*limage);
     if (result != Result::kSuccess) return result;
@@ -212,10 +212,9 @@ Result Viewer::Resize() {
       lviewport->viewport.height = static_cast<float>(width) / aspect;
     }
     for (auto& lscissor : lpipeline->lviewport_state->lscissors) {
-      float aspect =
-          static_cast<float>(lscissor->rect.width) / lscissor->rect.height;
-      lscissor->rect.width = width;
-      lscissor->rect.height = static_cast<int>(width / aspect);
+      float aspect = lscissor->width / lscissor->height;
+      lscissor->width = static_cast<float>(width);
+      lscissor->height = static_cast<float>(width) / aspect;
     }
     pipelines.emplace_back(
         std::static_pointer_cast<Pipeline>(lpipeline->instance));
@@ -225,8 +224,8 @@ Result Viewer::Resize() {
   if (result != Result::kSuccess) return result;
 
   for (auto& lframebuffer : resizer_.lframebuffers) {
-    lframebuffer->width = width;
-    lframebuffer->height = height;
+    lframebuffer->width = static_cast<float>(width);
+    lframebuffer->height = static_cast<float>(height);
 
     if (lframebuffer->lframe) {
       auto framebuffers =

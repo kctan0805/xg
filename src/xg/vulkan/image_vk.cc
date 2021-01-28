@@ -39,9 +39,9 @@ Result ImageVK::Init(const LayoutImage& limage) {
           .setImageType(image_type)
           .setFormat(format)
           .setExtent(vk::Extent3D()
-                         .setWidth(static_cast<uint32_t>(limage.extent.width))
-                         .setHeight(static_cast<uint32_t>(limage.extent.height))
-                         .setDepth(static_cast<uint32_t>(limage.extent.depth)))
+                         .setWidth(static_cast<uint32_t>(limage.width))
+                         .setHeight(static_cast<uint32_t>(limage.height))
+                         .setDepth(static_cast<uint32_t>(limage.depth)))
           .setMipLevels(limage.mip_levels)
           .setArrayLayers(limage.array_layers)
           .setTiling(tiling)
@@ -67,12 +67,15 @@ Result ImageVK::Init(const LayoutImage& limage) {
 
   XG_TRACE("vmaCreateImage: {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}",
            (void*)image_, limage.id, vk::to_string(flags),
-           vk::to_string(image_type), vk::to_string(format),
-           limage.extent.width, limage.extent.height, limage.extent.depth,
-           limage.mip_levels, limage.array_layers, vk::to_string(tiling),
-           vk::to_string(usage), vk::to_string(initial_layout),
-           static_cast<int>(limage.alloc_flags),
+           vk::to_string(image_type), vk::to_string(format), limage.width,
+           limage.height, limage.depth, limage.mip_levels, limage.array_layers,
+           vk::to_string(tiling), vk::to_string(usage),
+           vk::to_string(initial_layout), static_cast<int>(limage.alloc_flags),
            static_cast<int>(limage.mem_usage));
+
+  width_ = static_cast<int>(limage.width);
+  height_ = static_cast<int>(limage.height);
+  format_ = limage.format;
 
   return Result::kSuccess;
 }

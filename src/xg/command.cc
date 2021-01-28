@@ -8,6 +8,7 @@
 
 #include "xg/command.h"
 
+#include <array>
 #include <cassert>
 #include <memory>
 #include <string>
@@ -338,9 +339,17 @@ void CommandBeginRenderPass::Init(
         lbegin_render_pass.lframebuffer->instance.get());
   }
 
-  info_.rect = lbegin_render_pass.rect;
   info_.clear_values = lbegin_render_pass.clear_values;
-  auto_render_area_ = (!info_.rect.width || !info_.rect.height) ? true : false;
+
+  rect_x_ = lbegin_render_pass.rect_x;
+  rect_y_ = lbegin_render_pass.rect_y;
+  rect_width_ = lbegin_render_pass.rect_width;
+  rect_height_ = lbegin_render_pass.rect_height;
+
+  info_.rect.x = static_cast<int>(rect_x_);
+  info_.rect.y = static_cast<int>(rect_y_);
+  info_.rect.width = static_cast<int>(rect_width_);
+  info_.rect.height = static_cast<int>(rect_height_);
 }
 
 void CommandBeginRenderPass::Build(const CommandInfo& cmd_info) const {
@@ -350,10 +359,29 @@ void CommandBeginRenderPass::Build(const CommandInfo& cmd_info) const {
     info.framebuffer =
         const_cast<Framebuffer*>((*frame_framebuffers_)[cmd_info.frame].get());
   }
-  if (auto_render_area_) {
-    info.rect.width = info.framebuffer->GetWidth();
-    info.rect.height = info.framebuffer->GetHeight();
+
+  if (rect_x_ < 1.0f) {
+    info.rect.x = static_cast<int>(rect_x_ * info.framebuffer->GetWidth());
   }
+
+  if (rect_y_ < 1.0f) {
+    info.rect.y = static_cast<int>(rect_y_ * info.framebuffer->GetHeight());
+  }
+
+  if (rect_width_ == 0.0f) {
+    info.rect.width = static_cast<int>(info.framebuffer->GetWidth());
+  } else if (rect_width_ < 1.0f) {
+    info.rect.width =
+        static_cast<int>(rect_width_ * info.framebuffer->GetWidth());
+  }
+
+  if (rect_height_ == 0.0f) {
+    info.rect.height = static_cast<int>(info.framebuffer->GetHeight());
+  } else if (rect_height_ < 1.0f) {
+    info.rect.height =
+        static_cast<int>(rect_height_ * info.framebuffer->GetHeight());
+  }
+
   cmd_info.cmd_buffer->BeginRenderPass(info);
 }
 
@@ -377,7 +405,9 @@ void CommandSetScissor::Init(const LayoutSetScissor& lset_scissor) {
   info_.first_scissor = lset_scissor.first_scissor;
 
   for (const auto& lscissor : lset_scissor.lscissors) {
-    info_.scissors.emplace_back(lscissor->rect);
+    std::array<float, 4> rect = {lscissor->x, lscissor->y, lscissor->width,
+                                 lscissor->height};
+    info_.scissors.emplace_back(std::move(rect));
   }
 }
 
@@ -551,28 +581,111 @@ void CommandBlitImage::Init(const LayoutBlitImage& lblit_image) {
                          .get();
   }
   info_.dst_image_layout = lblit_image.dst_image_layout;
-  info_.regions = lblit_image.regions;
+
+  for (const auto& region : lblit_image.regions) {
+    xg::ImageBlit blit = {};
+
+    blit.src_subresource = region.src_subresource;
+    blit.src_offsets[0].x = static_cast<int>(region.src_offsets[0][0]);
+    blit.src_offsets[0].y = static_cast<int>(region.src_offsets[0][1]);
+    blit.src_offsets[0].z = static_cast<int>(region.src_offsets[0][2]);
+    blit.src_offsets[1].x = static_cast<int>(region.src_offsets[1][0]);
+    blit.src_offsets[1].y = static_cast<int>(region.src_offsets[1][1]);
+    blit.src_offsets[1].z = static_cast<int>(region.src_offsets[1][2]);
+    blit.dst_subresource = region.dst_subresource;
+    blit.dst_offsets[0].x = static_cast<int>(region.dst_offsets[0][0]);
+    blit.dst_offsets[0].y = static_cast<int>(region.dst_offsets[0][1]);
+    blit.dst_offsets[0].z = static_cast<int>(region.dst_offsets[0][2]);
+    blit.dst_offsets[1].x = static_cast<int>(region.dst_offsets[1][0]);
+    blit.dst_offsets[1].y = static_cast<int>(region.dst_offsets[1][1]);
+    blit.dst_offsets[1].z = static_cast<int>(region.dst_offsets[1][2]);
+
+    info_.regions.emplace_back(std::move(blit));
+
+    CommandImageBlitOffsets offsets;
+
+    offsets.src_offsets[0][0] = region.src_offsets[0][0];
+    offsets.src_offsets[0][1] = region.src_offsets[0][1];
+    offsets.src_offsets[1][0] = region.src_offsets[1][0];
+    offsets.src_offsets[1][1] = region.src_offsets[1][1];
+    offsets.dst_offsets[0][0] = region.dst_offsets[0][0];
+    offsets.dst_offsets[0][1] = region.dst_offsets[0][1];
+    offsets.dst_offsets[1][0] = region.dst_offsets[1][0];
+    offsets.dst_offsets[1][1] = region.dst_offsets[1][1];
+
+    offsets_.emplace_back(std::move(offsets));
+  }
+
   info_.filter = lblit_image.filter;
 }
 
 void CommandBlitImage::Build(const CommandInfo& cmd_info) const {
-  if (src_swapchain_ || dst_swapchain_) {
-    auto info = info_;
+  auto info = info_;
 
-    if (src_swapchain_) {
-      assert(cmd_info.frame < src_swapchain_->GetFrameCount());
-      info.src_image = src_swapchain_->GetImage(cmd_info.frame).get();
-    }
-
-    if (dst_swapchain_) {
-      assert(cmd_info.frame < dst_swapchain_->GetFrameCount());
-      info.dst_image = dst_swapchain_->GetImage(cmd_info.frame).get();
-    }
-
-    cmd_info.cmd_buffer->BlitImage(info);
-  } else {
-    cmd_info.cmd_buffer->BlitImage(info_);
+  if (src_swapchain_) {
+    assert(cmd_info.frame < src_swapchain_->GetFrameCount());
+    info.src_image = src_swapchain_->GetImage(cmd_info.frame).get();
   }
+
+  if (dst_swapchain_) {
+    assert(cmd_info.frame < dst_swapchain_->GetFrameCount());
+    info.dst_image = dst_swapchain_->GetImage(cmd_info.frame).get();
+  }
+
+  for (int i = 0; i < offsets_.size(); ++i) {
+    const auto& offsets = offsets_[i];
+    auto& region = info.regions[i];
+
+    if (offsets.src_offsets[0][0] < 1.0f) {
+      region.src_offsets[0].x = static_cast<int>(offsets.src_offsets[0][0] *
+                                                 info.src_image->GetWidth());
+    }
+
+    if (offsets.src_offsets[0][1] < 1.0f) {
+      region.src_offsets[0].y = static_cast<int>(offsets.src_offsets[0][1] *
+                                                 info.src_image->GetHeight());
+    }
+
+    if (offsets.src_offsets[1][0] == 0.0f) {
+      region.src_offsets[1].x = static_cast<int>(info.src_image->GetWidth());
+    } else if (offsets.src_offsets[1][0] < 1.0f) {
+      region.src_offsets[1].x = static_cast<int>(offsets.src_offsets[1][0] *
+                                                 info.src_image->GetWidth());
+    }
+
+    if (offsets.src_offsets[1][1] == 0.0f) {
+      region.src_offsets[1].y = static_cast<int>(info.src_image->GetHeight());
+    } else if (offsets.src_offsets[1][1] < 1.0f) {
+      region.src_offsets[1].y = static_cast<int>(offsets.src_offsets[1][1] *
+                                                 info.src_image->GetHeight());
+    }
+
+    if (offsets.dst_offsets[0][0] < 1.0f) {
+      region.dst_offsets[0].x = static_cast<int>(offsets.dst_offsets[0][0] *
+                                                 info.dst_image->GetWidth());
+    }
+
+    if (offsets.dst_offsets[0][1] < 1.0f) {
+      region.dst_offsets[0].y = static_cast<int>(offsets.dst_offsets[0][1] *
+                                                 info.dst_image->GetHeight());
+    }
+
+    if (offsets.dst_offsets[1][0] == 0.0f) {
+      region.dst_offsets[1].x = static_cast<int>(info.dst_image->GetWidth());
+    } else if (offsets.dst_offsets[1][0] < 1.0f) {
+      region.dst_offsets[1].x = static_cast<int>(offsets.dst_offsets[1][0] *
+                                                 info.dst_image->GetWidth());
+    }
+
+    if (offsets.dst_offsets[1][1] == 0.0f) {
+      region.dst_offsets[1].y = static_cast<int>(info.dst_image->GetHeight());
+    } else if (offsets.dst_offsets[1][1] < 1.0f) {
+      region.dst_offsets[1].y = static_cast<int>(offsets.dst_offsets[1][1] *
+                                                 info.dst_image->GetHeight());
+    }
+  }
+
+  cmd_info.cmd_buffer->BlitImage(info);
 }
 
 void CommandPushConstants::Init(LayoutPushConstants* lpush_constants) {

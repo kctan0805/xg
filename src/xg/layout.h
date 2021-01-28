@@ -9,6 +9,7 @@
 #ifndef XG_LAYOUT_H_
 #define XG_LAYOUT_H_
 
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <limits>
@@ -29,6 +30,15 @@
 #include "glm/glm.hpp"
 #include "xg/logger.h"
 #include "xg/types.h"
+
+namespace std {
+
+template <class Archive>
+void serialize(Archive& archive, std::array<float, 3>& offset) {
+  archive(offset[0], offset[1], offset[2]);
+}
+
+}  // namespace std
 
 namespace glm {
 
@@ -437,7 +447,9 @@ struct LayoutImage : LayoutBase {
   ImageCreateFlags flags = ImageCreateFlags::kUndefined;
   ImageType image_type = ImageType::k2D;
   Format format = Format::kUndefined;
-  Extent3D extent = {0, 0, 1};
+  float width = 0.0f;
+  float height = 0.0f;
+  int depth = 1;
   int mip_levels = 1;
   int array_layers = 1;
   ImageTiling tiling = ImageTiling::kOptimal;
@@ -450,8 +462,8 @@ struct LayoutImage : LayoutBase {
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), flags, image_type, format,
-            extent, mip_levels, array_layers, tiling, usage, alloc_flags,
-            mem_usage, initial_layout);
+            width, height, depth, mip_levels, array_layers, tiling, usage,
+            alloc_flags, mem_usage, initial_layout, lswapchain);
   }
 
   const char* lswapchain_id = nullptr;
@@ -574,7 +586,7 @@ struct LayoutAttachment : LayoutBase {
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), format, samples, load_op,
             store_op, stencil_load_op, stencil_store_op, initial_layout,
-            final_layout);
+            final_layout, lswapchain);
   }
 
   const char* lswapchain_id = nullptr;
@@ -867,7 +879,8 @@ struct LayoutViewportState : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lviewports, lscissors);
+    archive(cereal::base_class<LayoutBase>(this), lviewports, lscissors,
+            lswapchain);
   }
 
   const char* lswapchain_id = nullptr;
@@ -887,11 +900,14 @@ struct LayoutViewport : LayoutBase {
 struct LayoutScissor : LayoutBase {
   LayoutScissor() : LayoutBase{LayoutType::kScissor} {}
 
-  Rect2D rect = {};
+  float x = 0.0f;
+  float y = 0.0f;
+  float width = 0.0f;
+  float height = 0.0f;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), rect);
+    archive(cereal::base_class<LayoutBase>(this), x, y, width, height);
   }
 };
 
@@ -1103,18 +1119,20 @@ struct LayoutFramebuffer : LayoutBase {
 
   std::shared_ptr<LayoutFrame> lframe;
   std::shared_ptr<LayoutRenderPass> lrender_pass;
-  int width = 0;
-  int height = 0;
+  std::shared_ptr<LayoutSwapchain> lswapchain;
+  float width = 0.0f;
+  float height = 0.0f;
   int layers = 1;
   std::vector<LayoutFramebufferAttachment> lattachments;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lframe, lrender_pass, width,
-            height, layers, lattachments);
+    archive(cereal::base_class<LayoutBase>(this), lframe, lrender_pass,
+            lswapchain, width, height, layers, lattachments);
   }
 
   const char* lrender_pass_id = nullptr;
+  const char* lswapchain_id = nullptr;
   int frame = 0;
 };
 
@@ -1205,7 +1223,7 @@ struct LayoutCamera : LayoutBase {
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), fov, width, height, z_near,
-            z_far, eye, center, up);
+            z_far, eye, center, up, lswapchain);
   }
 
   const char* lswapchain_id = nullptr;
@@ -1300,14 +1318,17 @@ struct LayoutBeginRenderPass : LayoutBase {
 
   std::shared_ptr<LayoutRenderPass> lrender_pass;
   std::shared_ptr<LayoutFramebuffer> lframebuffer;
-  Rect2D rect = {};
+  float rect_x = 0.0f;
+  float rect_y = 0.0f;
+  float rect_width = 0.0f;
+  float rect_height = 0.0f;
   std::vector<std::variant<ClearColorValue, ClearDepthStencilValue>>
       clear_values;
 
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), lrender_pass, lframebuffer,
-            rect, clear_values);
+            rect_x, rect_y, rect_width, rect_height, clear_values);
   }
 
   const char* lrender_pass_id = nullptr;
@@ -1543,6 +1564,19 @@ struct LayoutImageMemoryBarrier : LayoutBase {
   const char* ldst_queue_id = nullptr;
 };
 
+struct LayoutImageBlit {
+  ImageSubresourceLayers src_subresource;
+  std::array<float, 3> src_offsets[2];
+  ImageSubresourceLayers dst_subresource;
+  std::array<float, 3> dst_offsets[2];
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(src_subresource, src_offsets[0], src_offsets[1], dst_subresource,
+            dst_offsets[0], dst_offsets[1]);
+  }
+};
+
 struct LayoutBlitImage : LayoutBase {
   LayoutBlitImage() : LayoutBase{LayoutType::kBlitImage} {}
 
@@ -1552,7 +1586,7 @@ struct LayoutBlitImage : LayoutBase {
   std::shared_ptr<LayoutSwapchain> ldst_swapchain;
   ImageLayout src_image_layout = ImageLayout::kUndefined;
   ImageLayout dst_image_layout = ImageLayout::kUndefined;
-  std::vector<ImageBlit> regions;
+  std::vector<LayoutImageBlit> regions;
   Filter filter = Filter::kNearest;
 
   template <class Archive>

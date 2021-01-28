@@ -453,9 +453,20 @@ bool Engine::CreateImages(const Layout& layout) {
     if (limage->lswapchain) {
       const auto& swapchain =
           std::static_pointer_cast<Swapchain>(limage->lswapchain->instance);
-      limage->extent.width = swapchain->GetWidth();
-      limage->extent.height = swapchain->GetHeight();
-    } else if ((limage->extent.width == 0) || (limage->extent.height == 0)) {
+      if (limage->width == 0.0f)
+        limage->width = static_cast<float>(swapchain->GetWidth());
+      else
+        limage->width *= static_cast<float>(swapchain->GetWidth());
+
+      if (limage->height == 0.0f)
+        limage->height = static_cast<float>(swapchain->GetHeight());
+      else
+        limage->height *= static_cast<float>(swapchain->GetHeight());
+
+      if (limage->format == Format::kUndefined)
+        limage->format = swapchain->GetFormat();
+
+    } else if ((limage->width == 0.0f) || (limage->height == 0.0f)) {
       continue;
     }
 
@@ -912,6 +923,21 @@ bool Engine::CreateFramebuffers(const Layout& layout) {
 
       lframebuffer->instance = std::move(framebuffers);
     } else {
+      if (lframebuffer->lswapchain) {
+        const auto& swapchain = std::static_pointer_cast<Swapchain>(
+            lframebuffer->lswapchain->instance);
+
+        if (lframebuffer->width == 0.0f)
+          lframebuffer->width = static_cast<float>(swapchain->GetWidth());
+        else
+          lframebuffer->width *= static_cast<float>(swapchain->GetWidth());
+
+        if (lframebuffer->height == 0.0f)
+          lframebuffer->height = static_cast<float>(swapchain->GetHeight());
+        else
+          lframebuffer->height *= static_cast<float>(swapchain->GetHeight());
+      }
+
       auto framebuffer = device_->CreateFramebuffer(*lframebuffer);
       if (!framebuffer) return false;
 
@@ -985,8 +1011,15 @@ bool Engine::CreateCameras(const Layout& layout) {
     if (lcamera->lswapchain) {
       const auto& swapchain =
           std::static_pointer_cast<Swapchain>(lcamera->lswapchain->instance);
-      lcamera->width = static_cast<float>(swapchain->GetWidth());
-      lcamera->height = static_cast<float>(swapchain->GetHeight());
+      if (lcamera->width == 0.0f)
+        lcamera->width = static_cast<float>(swapchain->GetWidth());
+      else
+        lcamera->width *= static_cast<float>(swapchain->GetWidth());
+
+      if (lcamera->height == 0.0f)
+        lcamera->height = static_cast<float>(swapchain->GetHeight());
+      else
+        lcamera->height *= static_cast<float>(swapchain->GetHeight());
     }
 
     auto camera = renderer_->CreateCamera(*lcamera);

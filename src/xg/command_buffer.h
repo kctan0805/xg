@@ -9,6 +9,7 @@
 #ifndef XG_COMMAND_BUFFER_H_
 #define XG_COMMAND_BUFFER_H_
 
+#include <array>
 #include <cstdint>
 #include <variant>
 #include <vector>
@@ -125,7 +126,7 @@ struct SetViewportInfo {
 
 struct SetScissorInfo {
   int first_scissor;
-  std::vector<Rect2D> scissors;
+  std::vector<std::array<float, 4>> scissors;
 };
 
 struct BindDescriptorSetsInfo {

@@ -28,12 +28,13 @@ bool ParserSingleton<ParserFramebuffer>::ParseElement(
   }
 
   node->lrender_pass_id = element->Attribute("renderPass");
+  node->lswapchain_id = element->Attribute("swapchain");
 
   const char* value = element->Attribute("width");
-  if (value) node->width = static_cast<int>(Expression::Get().Evaluate(value));
+  if (value) node->width = Expression::Get().Evaluate(value);
 
   value = element->Attribute("height");
-  if (value) node->height = static_cast<int>(Expression::Get().Evaluate(value));
+  if (value) node->height = Expression::Get().Evaluate(value);
 
   element->QueryIntAttribute("layers", &node->layers);
 

@@ -51,8 +51,8 @@
     <PushConstantRange stageFlags="Vertex" size="4*16"/> <!-- model matrix -->
   </PipelineLayout>
 
-  <ShaderModule id="drawVertexShader" file="multiwin.vert.spv"/>
-  <ShaderModule id="drawFragmentShader" file="multiwin.frag.spv"/>
+  <ShaderModule id="drawVertexShader" file="shaders/multiwin.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="shaders/multiwin.frag.spv"/>
 
   <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
     <Stage stage="Vertex" module="drawVertexShader"/>

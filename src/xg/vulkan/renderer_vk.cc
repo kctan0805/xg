@@ -305,19 +305,30 @@ bool RendererVK::CreateGraphicsPipelines(
           lviewport_state->lswapchain->instance);
 
       for (const auto& lviewport : lviewport_state->lviewports) {
-        if ((lviewport->viewport.width == 0.0f) ||
-            (lviewport->viewport.height == 0.0f)) {
+        if (lviewport->viewport.width == 0.0f)
           lviewport->viewport.width = static_cast<float>(swapchain->GetWidth());
+        else
+          lviewport->viewport.width *=
+              static_cast<float>(swapchain->GetWidth());
+
+        if (lviewport->viewport.height == 0.0f)
           lviewport->viewport.height =
               static_cast<float>(swapchain->GetHeight());
-        }
+        else
+          lviewport->viewport.height *=
+              static_cast<float>(swapchain->GetHeight());
       }
 
       for (const auto& lscissor : lviewport_state->lscissors) {
-        if ((lscissor->rect.width == 0) || (lscissor->rect.height == 0)) {
-          lscissor->rect.width = swapchain->GetWidth();
-          lscissor->rect.height = swapchain->GetHeight();
-        }
+        if (lscissor->width == 0.0f) 
+          lscissor->width = static_cast<float>(swapchain->GetWidth());
+        else
+          lscissor->width *= static_cast<float>(swapchain->GetWidth());
+
+        if (lscissor->height == 0.0f)
+          lscissor->height = static_cast<float>(swapchain->GetHeight());
+        else
+          lscissor->height *= static_cast<float>(swapchain->GetHeight());
       }
     }
 

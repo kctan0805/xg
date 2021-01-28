@@ -43,8 +43,8 @@
     <SetLayout descriptorSetLayout="drawMaterialDescriptorSetLayout"/>
   </PipelineLayout>
 
-  <ShaderModule id="drawVertexShader" file="skybox.vert.spv"/>
-  <ShaderModule id="drawFragmentShader" file="skybox.frag.spv"/>
+  <ShaderModule id="drawVertexShader" file="shaders/skybox.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="shaders/skybox.frag.spv"/>
 
   <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
     <Stage stage="Vertex" module="drawVertexShader"/>
