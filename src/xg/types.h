@@ -9,6 +9,8 @@
 #ifndef XG_TYPES_H_
 #define XG_TYPES_H_
 
+#include <type_traits>
+
 #include "glm/glm.hpp"
 
 namespace xg {
