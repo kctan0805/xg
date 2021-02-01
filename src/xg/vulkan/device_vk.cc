@@ -239,19 +239,29 @@ bool DeviceVK::CreateDevice(const LayoutDevice& ldevice) {
   }
 
   physical_device_.getFeatures(&physical_device_features_);
-#ifdef _WIN32
-  auto features2 = physical_device_.getFeatures2<
-      vk::PhysicalDeviceFeatures2, vk::PhysicalDeviceIndexTypeUint8FeaturesEXT,
-      vk::PhysicalDeviceShaderAtomicFloatFeaturesEXT>();
-#else
-  auto features2 =
+
+  auto features2_index_type_uint8 =
       physical_device_
           .getFeatures2<vk::PhysicalDeviceFeatures2,
                         vk::PhysicalDeviceIndexTypeUint8FeaturesEXT>();
-#endif  // _WIN32
 
   auto index_type_uint8_features =
-      features2.get<vk::PhysicalDeviceIndexTypeUint8FeaturesEXT>();
+      features2_index_type_uint8
+          .get<vk::PhysicalDeviceIndexTypeUint8FeaturesEXT>();
+
+#ifdef VK_EXT_shader_atomic_float
+  auto features2_atomic_float =
+      physical_device_
+          .getFeatures2<vk::PhysicalDeviceFeatures2,
+                        vk::PhysicalDeviceShaderAtomicFloatFeaturesEXT>();
+
+  auto atomic_float_features =
+      features2_atomic_float
+          .get<vk::PhysicalDeviceShaderAtomicFloatFeaturesEXT>();
+
+  index_type_uint8_features.setPNext(&atomic_float_features);
+
+#endif  // VK_EXT_shader_atomic_float
 
   const auto& create_info =
       vk::DeviceCreateInfo()

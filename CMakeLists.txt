@@ -21,6 +21,7 @@ if(WIN32)
     add_definitions(
         -D_SCL_SECURE_NO_WARNINGS
     )
+    add_compile_options(/bigobj /utf-8)
 endif()
 
 project(xg)
