@@ -599,8 +599,19 @@ bool Engine::CreateDescriptorPools(Layout* layout) {
                                      return pool_size.first == ldesc->desc_type;
                                    });
       if (it != ldesc_pool->pool_sizes.end()) {
-        it->second += count;
+        if (ldesc->ldesc_image_infos.size() > 0) {
+          it->second += count * ldesc->ldesc_image_infos.size();
+        } else if (ldesc->ldesc_buffer_infos.size() > 0) {
+          it->second += count * ldesc->ldesc_buffer_infos.size();
+        } else {
+          it->second += count;
+        }
       } else {
+        if (ldesc->ldesc_image_infos.size() > 0) {
+          count *= static_cast<int>(ldesc->ldesc_image_infos.size());
+        } else if (ldesc->ldesc_buffer_infos.size() > 0) {
+          count *= static_cast<int>(ldesc->ldesc_buffer_infos.size());
+        }
         ldesc_pool->pool_sizes.emplace_back(
             std::make_pair(ldesc->desc_type, count));
       }
