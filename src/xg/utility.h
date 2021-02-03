@@ -21,6 +21,7 @@ namespace xg {
 const char* ResultString(Result result);
 int FormatToSize(Format format);
 bool LoadFile(const std::string& filepath, std::vector<uint8_t>* data);
+bool SaveFile(const std::string& filepath, const std::vector<uint8_t>& data);
 
 }  // namespace xg
 

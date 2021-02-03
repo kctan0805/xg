@@ -9,9 +9,10 @@
 #include "xg/layout.h"
 
 #include <cstdint>
-#include <fstream>
+#include <istream>
 #include <memory>
-#include <sstream>
+#include <ostream>
+#include <streambuf>
 #include <string>
 #include <vector>
 
@@ -108,29 +109,63 @@ CEREAL_REGISTER_TYPE(xg::LayoutUpdater);
 
 namespace xg {
 
-bool Layout::Serialize(const std::string& filepath) {
-  std::ofstream file(filepath, std::ios::binary);
+class CounterBuffer : public std::streambuf {
+ public:
+  size_t GetSize(void) const { return size_; }
 
-  if (!file.is_open()) {
-    XG_ERROR("failed to open file: {}", filepath);
-    return false;
+ private:
+  int_type overflow(int_type c) { return static_cast<int_type>(size_++); }
+  size_t size_ = 0;
+};
+
+template <typename char_type>
+struct OutStreamBuffer
+    : public std::basic_streambuf<char_type, std::char_traits<char_type>> {
+  OutStreamBuffer(char_type* buf, std::streamsize len) {
+    std::basic_streambuf<char_type, std::char_traits<char_type>>::setp(
+        buf, buf + len);
   }
+};
 
-  cereal::BinaryOutputArchive archive(file);
+bool Layout::Serialize(const std::string& filepath) {
+  CounterBuffer counter_buffer;
+  std::basic_ostream<char> counter_stream(&counter_buffer);
+  cereal::BinaryOutputArchive counter_archive(counter_stream);
+  counter_archive(shared_from_this());
+
+  size_t size = counter_buffer.GetSize();
+
+  std::vector<uint8_t> data;
+  data.resize(size);
+
+  OutStreamBuffer<char> stream_buffer(reinterpret_cast<char*>(data.data()), size);
+  std::ostream stream(&stream_buffer);
+
+  cereal::BinaryOutputArchive archive(stream);
   archive(shared_from_this());
 
-  file.close();
+  if (!SaveFile(filepath, data)) return false;
 
   return true;
 }
+
+struct InStreamBuffer : std::streambuf {
+  InStreamBuffer(char const* base, size_t size) {
+    char* p(const_cast<char*>(base));
+    this->setg(p, p, p + size);
+  }
+};
+
+struct InStream : virtual InStreamBuffer, std::istream {
+  InStream(char const* base, size_t size)
+      : InStreamBuffer(base, size), std::istream(static_cast<std::streambuf*>(this)) {}
+};
 
 std::shared_ptr<Layout> Layout::Deserialize(const std::string& filepath) {
   std::vector<uint8_t> data;
   if (!LoadFile(filepath, &data)) return nullptr;
 
-  std::stringstream stream = std::stringstream(
-      std::string(reinterpret_cast<char*>(data.data()), data.size()),
-      std::stringstream::in);
+  InStream stream(reinterpret_cast<char*>(data.data()), data.size());
 
   cereal::BinaryInputArchive archive(stream);
   std::shared_ptr<xg::Layout> layout;

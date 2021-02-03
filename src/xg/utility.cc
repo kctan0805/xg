@@ -241,9 +241,34 @@ bool LoadFile(const std::string& filepath, std::vector<uint8_t>* data) {
 
   auto size_read = SDL_RWread(rw, data->data(), 1, size);
   if (size_read != size) {
-    XG_ERROR("read file size incorrect: {} != {}", size, size_read);
+    XG_ERROR("read file size incorrect: {} != {}", size_read, size);
+    SDL_RWclose(rw);
     return false;
   }
+
+  SDL_RWclose(rw);
+
+  return true;
+}
+
+bool SaveFile(const std::string& filepath, const std::vector<uint8_t>& data) {
+  assert(!filepath.empty());
+  XG_DEBUG("load file: {}", filepath);
+
+  auto* rw = SDL_RWFromFile(filepath.c_str(), "wb");
+  if (!rw) {
+    XG_ERROR("failed to open file: {}, error: {}", filepath, SDL_GetError());
+    return false;
+  }
+
+  auto size_write = SDL_RWwrite(rw, data.data(), 1, data.size());
+  if (size_write != data.size()) {
+    XG_ERROR("write file size incorrect: {} != {}", size_write);
+    SDL_RWclose(rw);
+    return false;
+  }
+
+  SDL_RWclose(rw);
 
   return true;
 }
