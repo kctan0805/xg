@@ -44,7 +44,7 @@ class Window {
   Window& operator=(Window&&) = delete;
   virtual ~Window() = default;
 
-  virtual const void* GetHandle() const = 0;
+  virtual void* GetHandle() const = 0;
   virtual void GetDrawableSize(int* width, int* height) const = 0;
   virtual WindowFlags GetWindowFlags() const = 0;
   virtual bool ShouldClose() const = 0;

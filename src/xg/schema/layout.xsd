@@ -1314,6 +1314,12 @@
               <xs:attribute name="contents" type="SubpassContentsType" default="Inline" />
             </xs:complexType>
           </xs:element>          
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="DrawOverlay">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" />
+              <xs:attribute name="overlay" type="xs:IDREF" />
+            </xs:complexType>
+          </xs:element>                    
         </xs:choice>
       </xs:sequence>
       <xs:attribute name="id" type="xs:ID" />
@@ -1327,6 +1333,7 @@
       <xs:attribute name="realize" type="xs:boolean" default="true" />
       <xs:attribute name="commandGroup" type="xs:IDREF" use="required" />
       <xs:attribute name="commandBuffer" type="xs:IDREF" use="required" />
+      <xs:attribute name="dynamic" type="xs:boolean" default="false" />
     </xs:complexType>
   </xs:element>
 
@@ -1796,6 +1803,25 @@
               <xs:attribute name="swapchain" type="xs:IDREF" />
             </xs:complexType>
           </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Overlay">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Font">
+                  <xs:complexType>
+                    <xs:attribute name="file" type="xs:string" use="required" />
+                    <xs:attribute name="size" type="xs:string" use="required" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
+              <xs:attribute name="window" type="xs:IDREF" />
+              <xs:attribute name="queue" type="xs:IDREF" />
+              <xs:attribute name="descriptorPool" type="xs:IDREF" />
+              <xs:attribute name="swapchain" type="xs:IDREF" />
+              <xs:attribute name="renderPass" type="xs:IDREF" />
+            </xs:complexType>
+          </xs:element>          
           <xs:element minOccurs="0" maxOccurs="unbounded" name="BufferLoader">
             <xs:complexType>
               <xs:attribute name="id" type="xs:ID" />
@@ -1876,6 +1902,7 @@
               <xs:attribute name="window" type="xs:IDREF" use="required" />
               <xs:attribute name="frame" type="xs:IDREF" use="required" />
               <xs:attribute name="camera" type="xs:IDREF" use="required" />
+              <xs:attribute name="overlay" type="xs:IDREF" />
             </xs:complexType>
           </xs:element>
         </xs:choice>

@@ -19,6 +19,8 @@ class RenderPassVK : public RenderPass {
  public:
   virtual ~RenderPassVK();
 
+  const vk::RenderPass& GetVkRenderPass() const { return render_pass_; }
+
   Result Init(const LayoutRenderPass& lrender_pass) override;
   virtual void Exit() override;
 

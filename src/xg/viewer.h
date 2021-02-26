@@ -18,6 +18,7 @@
 #include "xg/command.h"
 #include "xg/device.h"
 #include "xg/layout.h"
+#include "xg/overlay.h"
 #include "xg/swapchain.h"
 #include "xg/types.h"
 #include "xg/window.h"
@@ -86,6 +87,12 @@ class Viewer {
     resize_handler_ = handler;
   }
 
+  using DrawOverlayHandlerType = void();
+
+  void SetDrawOverlayHandler(std::function<DrawOverlayHandlerType> handler) {
+    draw_overlay_handler_ = handler;
+  }
+
  protected:
   bool Init(const LayoutViewer& lviewer);
   void InitAcquireNextImage(const LayoutViewer& lviewer);
@@ -103,6 +110,7 @@ class Viewer {
   std::shared_ptr<Window> win_;
   std::shared_ptr<LayoutFrame> lframe_;
   std::shared_ptr<Camera> camera_;
+  std::shared_ptr<Overlay> overlay_;
   int curr_frame_ = 0;
   int curr_image_ = 0;
   bool first_round_ = true;
@@ -116,6 +124,7 @@ class Viewer {
     return false;
   };
   std::function<ResizeHandlerType> resize_handler_ = [](int, int) {};
+  std::function<DrawOverlayHandlerType> draw_overlay_handler_ = []() {};
   std::vector<std::shared_ptr<CommandContext>> cmd_contexts_;
   std::vector<Fence*> wait_fences_;
   std::vector<AcquireNextImageInfo> acquire_next_image_infos_;

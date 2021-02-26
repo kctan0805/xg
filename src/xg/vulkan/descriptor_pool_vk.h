@@ -22,6 +22,8 @@ class DescriptorPoolVK : public DescriptorPool {
  public:
   virtual ~DescriptorPoolVK();
 
+  const vk::DescriptorPool& GetVkDescriptorPool() const { return desc_pool_; }
+
   virtual bool AllocateDescriptorSets(
       const std::vector<std::shared_ptr<LayoutDescriptorSet>>& ldesc_sets,
       std::vector<std::shared_ptr<DescriptorSet>>* desc_sets) override;

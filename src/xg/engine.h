@@ -25,11 +25,13 @@
 #include "xg/descriptor_set_layout.h"
 #include "xg/device.h"
 #include "xg/fence.h"
+#include "xg/font_loader.h"
 #include "xg/framebuffer.h"
 #include "xg/image.h"
 #include "xg/image_loader.h"
 #include "xg/image_view.h"
 #include "xg/layout.h"
+#include "xg/overlay.h"
 #include "xg/pipeline.h"
 #include "xg/pipeline_layout.h"
 #include "xg/queue.h"
@@ -105,6 +107,7 @@ class Engine {
   bool CreateCommandContexts(const Layout& layout);
   bool CreateQueueSubmits(const Layout& layout);
   bool CreateQueuePresents(const Layout& layout);
+  bool CreateOverlays(const Layout& layout);
   bool CreateViewers(const Layout& layout);
   void CreateDebugMarkers(const Layout& layout);
   void FinishResourceLoaders();
@@ -126,6 +129,8 @@ class Engine {
   std::vector<std::shared_ptr<Semaphore>> semaphores_;
   std::vector<std::shared_ptr<QueueSubmit>> queue_submits_;
   std::vector<std::shared_ptr<QueuePresent>> queue_presents_;
+  std::vector<std::shared_ptr<Overlay>> overlays_;
+  std::vector<std::shared_ptr<FontLoader>> font_loaders_;
   std::vector<std::shared_ptr<Viewer>> viewers_;
 
   struct {

@@ -23,6 +23,7 @@
 #include "xg/device.h"
 #include "xg/factory.h"
 #include "xg/fence.h"
+#include "xg/font_loader.h"
 #include "xg/framebuffer.h"
 #include "xg/image.h"
 #include "xg/image_loader.h"
@@ -83,6 +84,7 @@ bool Engine::PostInit(const std::shared_ptr<Layout>& layout) {
   if (!CreateDescriptorSetLayouts(*layout)) return false;
   if (!CreateDescriptorPools(layout.get())) return false;
   if (!CreateRenderPasses(*layout)) return false;
+  if (!CreateOverlays(*layout)) return false;
   if (!CreateShaderModules(*layout)) return false;
   if (!CreatePipelineLayouts(*layout)) return false;
   if (!CreateComputePipelines(*layout)) return false;
@@ -1143,6 +1145,32 @@ bool Engine::CreateQueuePresents(const Layout& layout) {
   return true;
 }
 
+bool Engine::CreateOverlays(const Layout& layout) {
+  for (const auto& loverlay : layout.loverlays) {
+    if (!loverlay->realize) continue;
+
+    auto overlay = renderer_->CreateOverlay(*loverlay);
+    if (!overlay) return false;
+
+    if (!loverlay->id.empty())
+      instance_id_map_.insert(std::make_pair(loverlay->id, overlay));
+
+    loverlay->instance = overlay;
+
+    overlays_.emplace_back(std::move(overlay));
+
+    FontLoaderInfo info = {};
+    info.loverlay = loverlay.get();
+    info.dst_queue = static_cast<Queue*>(loverlay->lqueue->instance.get());
+
+    auto loader = FontLoader::Load(info);
+    if (!loader) return false;
+
+    font_loaders_.emplace_back(std::move(loader));
+  }
+  return true;
+}
+
 bool Engine::CreateViewers(const Layout& layout) {
   for (const auto& lviewer : layout.lviewers) {
     if (!lviewer->realize) continue;
@@ -1189,6 +1217,11 @@ void Engine::FinishResourceLoaders() {
       instance_id_map_.insert_or_assign(limage->id, limage->instance);
   }
   image_loaders_.clear();
+
+  for (auto& loader : font_loaders_) {
+    loader->Finish();
+  }
+  font_loaders_.clear();
 }
 
 Result Engine::QueueSubmits() {

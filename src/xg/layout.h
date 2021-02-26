@@ -222,6 +222,8 @@ enum class LayoutType {
   kSetEvent,
   kResetEvent,
   kNextSubpass,
+  kDrawOverlay,
+  kOverlay,
   kViewer,
   kAcquireNextImage,
   kQueueSubmit,
@@ -1259,10 +1261,12 @@ struct LayoutCommandContext : LayoutBase {
 
   std::shared_ptr<LayoutCommandGroup> lcmd_group;
   std::shared_ptr<LayoutCommandBuffer> lcmd_buffer;
+  bool dynamic = false;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lcmd_group, lcmd_buffer);
+    archive(cereal::base_class<LayoutBase>(this), lcmd_group, lcmd_buffer,
+            dynamic);
   }
 
   const char* lcmd_group_id = nullptr;
@@ -1677,6 +1681,44 @@ struct LayoutNextSubpass : LayoutBase {
   }
 };
 
+struct LayoutOverlay;
+
+struct LayoutDrawOverlay : LayoutBase {
+  LayoutDrawOverlay() : LayoutBase{LayoutType::kDrawOverlay} {}
+
+  std::shared_ptr<LayoutOverlay> loverlay;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), loverlay);
+  }
+
+  const char* loverlay_id = nullptr;
+};
+
+struct LayoutOverlay : LayoutBase {
+  LayoutOverlay() : LayoutBase{LayoutType::kOverlay} {}
+
+  std::shared_ptr<LayoutWindow> lwin;
+  std::shared_ptr<LayoutQueue> lqueue;
+  std::shared_ptr<LayoutDescriptorPool> ldesc_pool;
+  std::shared_ptr<LayoutSwapchain> lswapchain;
+  std::shared_ptr<LayoutRenderPass> lrender_pass;
+  std::vector<std::pair<std::string, float>> fonts;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), lwin, lqueue, ldesc_pool,
+            lswapchain, lrender_pass, fonts);
+  }
+
+  const char* lwin_id = nullptr;
+  const char* lqueue_id = nullptr;
+  const char* ldesc_pool_id = nullptr;
+  const char* lswapchain_id = nullptr;
+  const char* lrender_pass_id = nullptr;
+};
+
 struct LayoutAcquireNextImage;
 struct LayoutQueueSubmit;
 struct LayoutQueuePresent;
@@ -1689,6 +1731,7 @@ struct LayoutViewer : LayoutBase {
   std::shared_ptr<LayoutWindow> lwin;
   std::shared_ptr<LayoutFrame> lframe;
   std::shared_ptr<LayoutCamera> lcamera;
+  std::shared_ptr<LayoutOverlay> loverlay;
   std::vector<std::shared_ptr<LayoutCommandContext>> lcmd_contexts;
   std::shared_ptr<LayoutAcquireNextImage> lacquire_next_image;
   std::vector<std::shared_ptr<LayoutQueueSubmit>> lqueue_submits;
@@ -1699,13 +1742,14 @@ struct LayoutViewer : LayoutBase {
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), lwin, lframe, lcamera,
-            lcmd_contexts, lacquire_next_image, lqueue_submits, lqueue_present,
-            lresizer, lupdater);
+            loverlay, lcmd_contexts, lacquire_next_image, lqueue_submits,
+            lqueue_present, lresizer, lupdater);
   }
 
   const char* lwin_id = nullptr;
   const char* lframe_id = nullptr;
   const char* lcamera_id = nullptr;
+  const char* loverlay_id = nullptr;
   std::vector<const char*> lcmd_context_ids;
   std::vector<const char*> lqueue_submit_ids;
 };
@@ -1878,6 +1922,8 @@ struct Layout : std::enable_shared_from_this<Layout> {
   std::vector<std::shared_ptr<LayoutResetQueryPool>> lreset_query_pools;
   std::vector<std::shared_ptr<LayoutSetEvent>> lset_events;
   std::vector<std::shared_ptr<LayoutResetEvent>> lreset_events;
+  std::vector<std::shared_ptr<LayoutDrawOverlay>> ldraw_overlays;
+  std::vector<std::shared_ptr<LayoutOverlay>> loverlays;
   std::vector<std::shared_ptr<LayoutViewer>> lviewers;
   std::vector<std::shared_ptr<LayoutQueueSubmit>> lqueue_submits;
   std::vector<std::shared_ptr<LayoutQueuePresent>> lqueue_presents;
@@ -1946,6 +1992,8 @@ struct Layout : std::enable_shared_from_this<Layout> {
     archive(lreset_query_pools);
     archive(lset_events);
     archive(lreset_events);
+    archive(ldraw_overlays);
+    archive(loverlays);
     archive(lviewers);
     archive(lqueue_submits);
     archive(lqueue_presents);

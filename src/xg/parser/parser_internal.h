@@ -168,6 +168,8 @@ class ParserResetQueryPool : public ParserSingleton<ParserResetQueryPool> {};
 class ParserSetEvent : public ParserSingleton<ParserSetEvent> {};
 class ParserResetEvent : public ParserSingleton<ParserResetEvent> {};
 class ParserNextSubpass : public ParserSingleton<ParserNextSubpass> {};
+class ParserDrawOverlay : public ParserSingleton<ParserDrawOverlay> {};
+class ParserOverlay : public ParserSingleton<ParserOverlay> {};
 class ParserViewer : public ParserSingleton<ParserViewer> {};
 class ParserAcquireNextImage : public ParserSingleton<ParserAcquireNextImage> {
 };

@@ -3,6 +3,27 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(GLM_TEST_ENABLE OFF CACHE BOOL "" FORCE)
 add_subdirectory(glm)
 
+# imgui
+find_package(Vulkan REQUIRED)
+include_directories(${Vulkan_INCLUDE_DIR})
+add_library(imgui
+    imgui/imconfig.h
+    imgui/imgui.cpp
+    imgui/imgui.h
+    imgui/imgui_demo.cpp
+    imgui/imgui_draw.cpp
+    imgui/imgui_internal.h
+    imgui/imgui_tables.cpp
+    imgui/imgui_widgets.cpp
+    imgui/imstb_rectpack.h
+    imgui/imstb_textedit.h
+    imgui/imstb_truetype.h
+    imgui/backends/imgui_impl_sdl.cpp
+    imgui/backends/imgui_impl_sdl.h
+    imgui/backends/imgui_impl_vulkan.cpp
+    imgui/backends/imgui_impl_vulkan.h
+)
+
 # ktx
 add_library(ktx
     KTX-Software/include/ktx.h

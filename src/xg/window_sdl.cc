@@ -74,6 +74,12 @@ void WindowSDL::PollEvents() {
               resize_handler_(e.window.data1, e.window.data2);
               break;
 
+            case SDL_WINDOWEVENT_RESTORED: {
+              int w, h;
+              GetDrawableSize(&w, &h);
+              resize_handler_(w, h);
+            } break;
+
             case SDL_WINDOWEVENT_CLOSE:
               closing_ = true;
               break;

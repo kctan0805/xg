@@ -200,6 +200,10 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
     return ParserResetEvent::Get().ParseElement(element, status);
   } else if (strcmp(name, "NextSubpass") == 0) {
     return ParserNextSubpass::Get().ParseElement(element, status);
+  } else if (strcmp(name, "DrawOverlay") == 0) {
+    return ParserDrawOverlay::Get().ParseElement(element, status);
+  } else if (strcmp(name, "Overlay") == 0) {
+    return ParserOverlay::Get().ParseElement(element, status);
   } else if (strcmp(name, "Viewer") == 0) {
     return ParserViewer::Get().ParseElement(element, status);
   } else if (strcmp(name, "AcquireNextImage") == 0) {
@@ -566,6 +570,16 @@ void Parser::AddLayoutNode(std::shared_ptr<Layout> layout,
     case LayoutType::kResetEvent:
       layout->lreset_events.emplace_back(
           std::static_pointer_cast<LayoutResetEvent>(node));
+      break;
+
+    case LayoutType::kDrawOverlay:
+      layout->ldraw_overlays.emplace_back(
+          std::static_pointer_cast<LayoutDrawOverlay>(node));
+      break;
+
+    case LayoutType::kOverlay:
+      layout->loverlays.emplace_back(
+          std::static_pointer_cast<LayoutOverlay>(node));
       break;
 
     case LayoutType::kViewer:
@@ -1332,6 +1346,56 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     }
   }
 
+  for (auto ldraw_overlay : layout->ldraw_overlays) {
+    if (ldraw_overlay->loverlay_id) {
+      const auto it = node_id_map.find(ldraw_overlay->loverlay_id);
+      assert(it != node_id_map.end());
+      ldraw_overlay->loverlay =
+          std::static_pointer_cast<LayoutOverlay>(it->second);
+      assert(ldraw_overlay->loverlay);
+    }
+  }
+
+  for (auto loverlay : layout->loverlays) {
+    if (loverlay->lwin_id) {
+      const auto it = node_id_map.find(loverlay->lwin_id);
+      assert(it != node_id_map.end());
+      loverlay->lwin = std::static_pointer_cast<LayoutWindow>(it->second);
+      assert(loverlay->lwin);
+    }
+
+    if (loverlay->lqueue_id) {
+      const auto it = node_id_map.find(loverlay->lqueue_id);
+      assert(it != node_id_map.end());
+      loverlay->lqueue = std::static_pointer_cast<LayoutQueue>(it->second);
+      assert(loverlay->lqueue);
+    }
+
+    if (loverlay->ldesc_pool_id) {
+      const auto it = node_id_map.find(loverlay->ldesc_pool_id);
+      assert(it != node_id_map.end());
+      loverlay->ldesc_pool =
+          std::static_pointer_cast<LayoutDescriptorPool>(it->second);
+      assert(loverlay->ldesc_pool);
+    }
+
+    if (loverlay->lswapchain_id) {
+      const auto it = node_id_map.find(loverlay->lswapchain_id);
+      assert(it != node_id_map.end());
+      loverlay->lswapchain =
+          std::static_pointer_cast<LayoutSwapchain>(it->second);
+      assert(loverlay->lswapchain);
+    }
+
+    if (loverlay->lrender_pass_id) {
+      const auto it = node_id_map.find(loverlay->lrender_pass_id);
+      assert(it != node_id_map.end());
+      loverlay->lrender_pass =
+          std::static_pointer_cast<LayoutRenderPass>(it->second);
+      assert(loverlay->lrender_pass);
+    }
+  }
+
   for (auto lviewer : layout->lviewers) {
     if (lviewer->lwin_id) {
       const auto it = node_id_map.find(lviewer->lwin_id);
@@ -1352,6 +1416,13 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
       assert(it != node_id_map.end());
       lviewer->lcamera = std::static_pointer_cast<LayoutCamera>(it->second);
       assert(lviewer->lcamera);
+    }
+
+    if (lviewer->loverlay_id) {
+      const auto it = node_id_map.find(lviewer->loverlay_id);
+      assert(it != node_id_map.end());
+      lviewer->loverlay = std::static_pointer_cast<LayoutOverlay>(it->second);
+      assert(lviewer->loverlay);
     }
 
     for (auto& lcmd_context_id : lviewer->lcmd_context_ids) {

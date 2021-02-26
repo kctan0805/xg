@@ -21,6 +21,7 @@
 #include "xg/fence.h"
 #include "xg/framebuffer.h"
 #include "xg/layout.h"
+#include "xg/overlay.h"
 #include "xg/pipeline.h"
 #include "xg/query_pool.h"
 #include "xg/queue.h"
@@ -90,6 +91,7 @@ class Renderer {
       const LayoutCommandContext& lcmd_context);
   std::shared_ptr<QueueSubmit> CreateQueueSubmit(
       const LayoutQueueSubmit& lqueue_submit);
+  virtual std::shared_ptr<Overlay> CreateOverlay(const LayoutOverlay& loverlay) = 0;
   std::shared_ptr<Viewer> CreateViewer(const LayoutViewer& lviewer);
   std::shared_ptr<QueuePresent> CreateQueuePresent(
       const LayoutQueuePresent& lqueue_present);

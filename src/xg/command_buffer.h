@@ -199,6 +199,12 @@ struct NextSubpassInfo {
   SubpassContents contents;
 };
 
+class Overlay;
+
+struct DrawOverlayInfo {
+  Overlay* overlay;
+};
+
 class CommandBuffer {
  public:
   CommandBuffer(const CommandBuffer&) = delete;

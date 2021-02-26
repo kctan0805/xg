@@ -36,6 +36,7 @@ bool ParserSingleton<ParserCommandContext>::ParseElement(
 
   node->lcmd_group_id = element->Attribute("commandGroup");
   node->lcmd_buffer_id = element->Attribute("commandBuffer");
+  element->QueryBoolAttribute("dynamic", &node->dynamic);
 
   status->node = node;
 

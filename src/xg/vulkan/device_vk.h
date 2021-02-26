@@ -47,8 +47,14 @@ class DeviceVK : public Device {
  public:
   virtual ~DeviceVK();
 
+  const vk::PhysicalDevice& GetVkPhysicalDevice() const {
+    return physical_device_;
+  }
   const vk::Device& GetVkDevice() const { return device_; }
   const VmaAllocator& GetVmaAllocator() const { return vma_allocator_; }
+  const vk::PipelineCache& GetVkPipelineCache() const {
+    return pipeline_cache_;
+  }
 
  protected:
   bool Init(const LayoutDevice& ldevice);

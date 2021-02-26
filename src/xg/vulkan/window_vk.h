@@ -14,6 +14,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_vulkan.h"
 #include "vulkan/vulkan.hpp"
+#include "xg/layout.h"
 #include "xg/types.h"
 #include "xg/window.h"
 #include "xg/window_sdl.h"

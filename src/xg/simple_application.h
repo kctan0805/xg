@@ -43,6 +43,7 @@ class SimpleApplication {
   virtual bool ShouldExit(std::shared_ptr<Viewer> viewer) {
     return viewer->ShouldClose();
   }
+  virtual void OnDrawOverlay(std::shared_ptr<Viewer> viewer) {}
 
   struct ViewerData {
     int viewer_index = 0;

@@ -417,6 +417,19 @@ class CommandNextSubpass : public CommandBase {
   friend class Renderer;
 };
 
+class CommandDrawOverlay : public CommandBase {
+ public:
+  virtual ~CommandDrawOverlay() = default;
+
+  void Init(const LayoutDrawOverlay& ldraw_overlay);
+  void Build(const CommandInfo& cmd_info) const override;
+
+ protected:
+  DrawOverlayInfo info_ = {};
+
+  friend class Renderer;
+};
+
 }  // namespace xg
 
 #endif  // XG_COMMAND_H_

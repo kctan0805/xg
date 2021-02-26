@@ -23,6 +23,8 @@ class QueueVK : public Queue {
  public:
   virtual ~QueueVK() = default;
 
+  const vk::Queue& GetVkQueue() const { return queue_; }
+
   std::shared_ptr<CommandPool> CreateCommandPool(
       const LayoutCommandPool& lcmd_pool) override;
 

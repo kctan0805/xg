@@ -25,6 +25,7 @@ add_library(xg
 
 target_link_libraries(xg
     glm
+    imgui
     ktx
     SDL2-static
     spdlog

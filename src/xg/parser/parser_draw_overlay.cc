@@ -1,4 +1,4 @@
-// xg - XML Graphics Engine
+// xg - XML Graphics Device
 // Copyright (c) Jim Tan
 //
 // Free use of the XML Graphics Engine is
@@ -8,7 +8,7 @@
 
 #include "xg/parser/parser_internal.h"
 
-#include <cstring>
+#include <cassert>
 #include <memory>
 
 #include "tinyxml2.h"
@@ -19,18 +19,18 @@ namespace xg {
 namespace parser {
 
 template <>
-bool ParserSingleton<ParserViewer>::ParseElement(
+bool ParserSingleton<ParserDrawOverlay>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
-  auto node = std::make_shared<LayoutViewer>();
+  auto node = std::make_shared<LayoutDrawOverlay>();
   if (!node) return false;
 
-  node->lwin_id = element->Attribute("window");
-  node->lframe_id = element->Attribute("frame");
-  node->lcamera_id = element->Attribute("camera");
+  assert(status->parent->layout_type == LayoutType::kCommandList);
+  auto lcmd_list = std::static_pointer_cast<LayoutCommandList>(status->parent);
+  lcmd_list->lcmds.emplace_back(node);
+
   node->loverlay_id = element->Attribute("overlay");
 
   status->node = node;
-  status->child_element = element->FirstChildElement();
 
   return ParserBase::Get().ParseElement(element, status);
 }

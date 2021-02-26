@@ -26,8 +26,6 @@ bool SimpleApplication::Init(xg::Engine* engine) {
 
   int i = 0;
   for (const auto& viewer : viewers) {
-    if (viewer->BuildCommandBuffers() != Result::kSuccess) return false;
-
     const auto& win = viewer->GetWindow();
 
     win->SetMouseDownHandler(
@@ -50,6 +48,9 @@ bool SimpleApplication::Init(xg::Engine* engine) {
     viewer->SetShouldExitHandler(
         [this, &viewer]() -> bool { return this->ShouldExit(viewer); });
 
+    viewer->SetDrawOverlayHandler(
+        [this, &viewer]() { this->OnDrawOverlay(viewer); });
+
     ViewerData viewer_data = {};
     viewer_data.viewer_index = i;
 
@@ -58,6 +59,9 @@ bool SimpleApplication::Init(xg::Engine* engine) {
     viewer_data.trackball.Init(trackball_info);
 
     viewer_data_map_.insert(std::make_pair(viewer, viewer_data));
+
+    if (viewer->BuildCommandBuffers() != Result::kSuccess) return false;
+
     ++i;
   }
   return true;

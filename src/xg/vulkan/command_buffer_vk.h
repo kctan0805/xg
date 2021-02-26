@@ -19,6 +19,8 @@ class CommandBufferVK : public CommandBuffer {
  public:
   virtual ~CommandBufferVK();
 
+  const vk::CommandBuffer& GetVkCommandBuffer() const { return cmd_buffer_; }
+
   Result Begin(const CommandBufferBeginInfo& info) const override;
   void End() const override;
   void Reset() const override;

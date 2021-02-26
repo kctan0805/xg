@@ -23,6 +23,7 @@
 #include "xg/image.h"
 #include "xg/layout.h"
 #include "xg/logger.h"
+#include "xg/overlay.h"
 #include "xg/query_pool.h"
 #include "xg/queue.h"
 #include "xg/render_pass.h"
@@ -54,24 +55,29 @@ bool CommandContext::Init(const LayoutCommandContext& lcmd_context) {
         std::static_pointer_cast<std::vector<std::shared_ptr<CommandBuffer>>>(
             lcmd_buffer_->instance);
 
-    need_rebuilds_ = std::vector<bool>(cmd_buffers->size(), false);
+    if (!lcmd_context.dynamic)
+      need_rebuilds_ = std::vector<bool>(cmd_buffers->size(), false);
   } else {
-    need_rebuilds_ = std::vector<bool>(1, false);
+    if (!lcmd_context.dynamic) need_rebuilds_ = std::vector<bool>(1, false);
   }
 
   return true;
 }
 
 void CommandContext::Rebuild() {
-  for (auto need_rebuild : need_rebuilds_) need_rebuild = true;
+  for (auto& need_rebuild : need_rebuilds_) need_rebuild = true;
 }
 
 Result CommandContext::Update(int frame) {
   CommandBuffer* cmd_buffer;
 
   if (lcmd_buffer_->lframe) {
-    assert(frame < need_rebuilds_.size());
-    if (!need_rebuilds_[frame]) return Result::kSuccess;
+    if (need_rebuilds_.size() > 0) {
+      assert(frame < need_rebuilds_.size());
+      if (!need_rebuilds_[frame]) return Result::kSuccess;
+
+      need_rebuilds_[frame] = false;
+    }
 
     auto cmd_buffers =
         std::static_pointer_cast<std::vector<std::shared_ptr<CommandBuffer>>>(
@@ -80,7 +86,11 @@ Result CommandContext::Update(int frame) {
     cmd_buffer = (*cmd_buffers)[frame].get();
 
   } else {
-    if (!need_rebuilds_[0]) return Result::kSuccess;
+    if (need_rebuilds_.size() > 0) {
+      if (!need_rebuilds_[0]) return Result::kSuccess;
+
+      need_rebuilds_[0] = false;
+    }
 
     cmd_buffer = static_cast<CommandBuffer*>(lcmd_buffer_->instance.get());
 
@@ -89,10 +99,14 @@ Result CommandContext::Update(int frame) {
   assert(cmd_group_);
   assert(lcmd_buffer_);
 
-  cmd_buffer->Reset();
-
   CommandBufferBeginInfo begin_info = {};
-  begin_info.usage = CommandBufferUsage::kSimultaneousUse;
+
+  if (need_rebuilds_.size() > 0) {
+    cmd_buffer->Reset();
+    begin_info.usage = CommandBufferUsage::kSimultaneousUse;
+  } else {
+    begin_info.usage = CommandBufferUsage::kOneTimeSubmit;
+  }
 
   Result result = cmd_buffer->Begin(begin_info);
   if (result != Result::kSuccess) return result;
@@ -104,8 +118,6 @@ Result CommandContext::Update(int frame) {
   cmd_group_->Build(info);
   cmd_buffer->End();
 
-  need_rebuilds_[frame] = false;
-
   return Result::kSuccess;
 }
 
@@ -113,8 +125,11 @@ Result CommandContext::Build() {
   assert(cmd_group_);
   assert(lcmd_buffer_);
 
+  if (need_rebuilds_.size() == 0) return Result::kSuccess;
+
   CommandBufferBeginInfo begin_info = {};
   begin_info.usage = CommandBufferUsage::kSimultaneousUse;
+
   CommandInfo info = {};
 
   if (lcmd_buffer_->lframe) {
@@ -783,6 +798,14 @@ void CommandNextSubpass::Init(const LayoutNextSubpass& lnext_subpass) {
 
 void CommandNextSubpass::Build(const CommandInfo& cmd_info) const {
   cmd_info.cmd_buffer->NextSubpass(info_);
+}
+
+void CommandDrawOverlay::Init(const LayoutDrawOverlay& ldraw_overlay) {
+  info_.overlay = static_cast<Overlay*>(ldraw_overlay.loverlay->instance.get());
+}
+
+void CommandDrawOverlay::Build(const CommandInfo& cmd_info) const {
+  info_.overlay->Draw(cmd_info.cmd_buffer);
 }
 
 }  // namespace xg

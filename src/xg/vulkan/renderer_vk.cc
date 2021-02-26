@@ -20,6 +20,7 @@
 
 #include "vulkan/vulkan.hpp"
 #include "xg/logger.h"
+#include "xg/overlay_imgui.h"
 #include "xg/types.h"
 #include "xg/utility.h"
 #include "xg/vulkan/buffer_vk.h"
@@ -33,6 +34,7 @@
 #include "xg/vulkan/framebuffer_vk.h"
 #include "xg/vulkan/image_view_vk.h"
 #include "xg/vulkan/image_vk.h"
+#include "xg/vulkan/overlay_vk.h"
 #include "xg/vulkan/pipeline_layout_vk.h"
 #include "xg/vulkan/pipeline_vk.h"
 #include "xg/vulkan/query_pool_vk.h"
@@ -48,6 +50,7 @@
 namespace xg {
 
 RendererVK::~RendererVK() {
+  OverlayVK::Terminate();
   device_.reset();
   if (instance_) {
     if (debug_msg_) {
@@ -68,6 +71,7 @@ RendererVK::~RendererVK() {
 
 bool RendererVK::Init(const LayoutRenderer& lrenderer) {
   if (!WindowVK::Initialize()) return false;
+  if (!OverlayImGui::Initialize()) return false;
   if (!CreateInstance(lrenderer)) return false;
   CreateDispatchLoader(nullptr);
   if (lrenderer.validation && !CreateDebugMessenger()) return false;
@@ -385,6 +389,18 @@ bool RendererVK::CreateComputePipelines(
     return false;
   }
   return true;
+}
+
+std::shared_ptr<Overlay> RendererVK::CreateOverlay(
+    const LayoutOverlay& loverlay) {
+  auto overlay = std::make_shared<OverlayVK>();
+  if (!overlay) {
+    XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+    return nullptr;
+  }
+  if (!overlay->Init(loverlay)) return nullptr;
+
+  return overlay;
 }
 
 void RendererVK::DebugMarkerSetObjectName(const LayoutBase& lbase) const {

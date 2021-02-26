@@ -64,6 +64,17 @@ bool Viewer::Init(const LayoutViewer& lviewer) {
     }
   }
 
+  if (lviewer.loverlay) {
+    overlay_ = std::static_pointer_cast<Overlay>(lviewer.loverlay->instance);
+    if (!overlay_) {
+      XG_ERROR("overlay not found");
+      return false;
+    }
+
+    overlay_->SetDrawHandler(
+        [this]() -> void { this->draw_overlay_handler_(); });
+  }
+
   for (const auto& lcmd_context : lviewer.lcmd_contexts) {
     cmd_contexts_.emplace_back(
         std::static_pointer_cast<CommandContext>(lcmd_context->instance));
@@ -248,7 +259,11 @@ Result Viewer::Resize() {
     }
   }
 
-  return BuildCommandBuffers();
+  if (overlay_) overlay_->Resize();
+
+  RebuildCommandBuffers();
+
+  return Result::kSuccess;
 }
 
 void Viewer::RebuildCommandBuffers() {
@@ -388,7 +403,7 @@ Result Viewer::Draw() {
     result = update_handler_();
     if (result != Result::kSuccess) return result;
 
-    for (auto& cmd_context : cmd_contexts_) cmd_context->Update(curr_frame_);
+    for (auto& cmd_context : cmd_contexts_) cmd_context->Update(curr_image_);
 
     UpdateQueueSubmits();
     UpdateQueuePresent();

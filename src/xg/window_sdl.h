@@ -22,7 +22,7 @@ class WindowSDL : public Window {
   WindowSDL() = default;
   ~WindowSDL() { SDL_DestroyWindow(window_); }
 
-  const void* GetHandle() const override { return window_; }
+  void* GetHandle() const override { return window_; }
 
   WindowFlags GetWindowFlags() const override {
     return static_cast<WindowFlags>(SDL_GetWindowFlags(window_));

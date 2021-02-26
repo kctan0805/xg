@@ -43,6 +43,7 @@ class RendererVK : public Renderer {
       const std::vector<std::shared_ptr<LayoutGraphicsPipeline>>&
           lgraphics_pipelines,
       std::vector<std::shared_ptr<Pipeline>>* pipelines) override;
+  std::shared_ptr<Overlay> CreateOverlay(const LayoutOverlay& loverlay) override;
 
  protected:
   bool Init(const LayoutRenderer& lrenderer);

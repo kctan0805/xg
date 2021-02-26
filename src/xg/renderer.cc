@@ -621,6 +621,20 @@ std::shared_ptr<CommandList> Renderer::CreateCommandList(
         break;
       }
 
+      case LayoutType::kDrawOverlay: {
+        auto cmd = std::make_shared<CommandDrawOverlay>();
+        if (!cmd) {
+          XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+          return nullptr;
+        }
+        auto ldraw_overlay = std::static_pointer_cast<LayoutDrawOverlay>(lcmd);
+        cmd->Init(*ldraw_overlay);
+
+        cmd_list->commands_.emplace_back(cmd);
+        lcmd->instance = std::move(cmd);
+        break;
+      }
+
       default:
         XG_ERROR("unknown command layout: {}",
                  static_cast<int>(lcmd->layout_type));

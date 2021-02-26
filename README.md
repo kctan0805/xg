@@ -25,12 +25,14 @@ and has following features:
 - [serialize layout](app/serialize_layout/) serialize layout example.
 - [skybox](app/skybox/) skybox example.
 - [render_to_skybox](app/render_to_skybox/) render to skybox example.
+- [overlay](app/overlay/) overlay UI example.
 
 
 ## Dependencies
 
 - [cereal - A C++11 library for serialization](https://github.com/USCiLab/cereal)
 - [C++ Mathematical Expression Toolkit Library Documentation](https://github.com/ArashPartow/exprtk)
+- [Dear ImGui](https://github.com/ocornut/imgui)
 - [SDL](https://github.com/SDL-mirror/SDL)
 - [KTX](https://github.com/KhronosGroup/KTX-Software)
 - [OpenGL Mathematics](https://github.com/g-truc/glm)
