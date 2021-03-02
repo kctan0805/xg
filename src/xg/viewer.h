@@ -127,6 +127,7 @@ class Viewer {
   std::function<DrawOverlayHandlerType> draw_overlay_handler_ = []() {};
   std::vector<std::shared_ptr<CommandContext>> cmd_contexts_;
   std::vector<Fence*> wait_fences_;
+  std::vector<Fence*> wait_image_fences_;
   std::vector<AcquireNextImageInfo> acquire_next_image_infos_;
   std::vector<std::shared_ptr<LayoutQueueSubmit>> lqueue_submits_;
   std::shared_ptr<LayoutQueuePresent> lqueue_present_;

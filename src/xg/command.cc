@@ -8,6 +8,7 @@
 
 #include "xg/command.h"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <memory>
@@ -65,7 +66,7 @@ bool CommandContext::Init(const LayoutCommandContext& lcmd_context) {
 }
 
 void CommandContext::Rebuild() {
-  for (auto& need_rebuild : need_rebuilds_) need_rebuild = true;
+  std::fill(need_rebuilds_.begin(), need_rebuilds_.end(), true);
 }
 
 Result CommandContext::Update(int frame) {

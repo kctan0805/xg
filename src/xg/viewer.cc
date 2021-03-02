@@ -283,7 +283,6 @@ Result Viewer::AcquireNextImage() {
   assert(fence);
 
   fence->Wait();
-  fence->Reset();
 
   auto& info = acquire_next_image_infos_[curr_frame_];
   auto swapchain = GetSwapchain();
@@ -292,6 +291,12 @@ Result Viewer::AcquireNextImage() {
   if (result == Result::kSuboptimal || result == Result::kErrorOutOfDate) {
     result = Resize();
   }
+
+  if (wait_image_fences_[curr_image_]) wait_image_fences_[curr_image_]->Wait();
+
+  wait_image_fences_[curr_image_] = wait_fences_[curr_frame_];
+
+  fence->Reset();
 
   return result;
 }
@@ -439,6 +444,7 @@ void Viewer::InitAcquireNextImage(const LayoutViewer& lviewer) {
     const auto& lacquire_next_image = lviewer.lacquire_next_image;
     int frame_count = swapchain->GetFrameCount();
     wait_fences_.reserve(frame_count);
+    wait_image_fences_.reserve(frame_count);
     acquire_next_image_infos_.reserve(frame_count);
 
     for (int i = 0; i < frame_count; ++i) {
@@ -455,6 +461,7 @@ void Viewer::InitAcquireNextImage(const LayoutViewer& lviewer) {
         }
         assert(fence);
         wait_fences_.emplace_back(fence);
+        wait_image_fences_.emplace_back(nullptr);
       }
 
       AcquireNextImageInfo info;
