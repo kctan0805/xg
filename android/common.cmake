@@ -13,6 +13,7 @@ include_directories(
     ${CMAKE_BINARY_DIR}/third_party/SDL/include
     ${root_dir}/third_party
     ${root_dir}/third_party/cereal/include
+    ${root_dir}/third_party/imgui
     ${root_dir}/third_party/KTX-Software/include
     ${root_dir}/third_party/KTX-Software/other_include
     ${root_dir}/third_party/SDL/include
