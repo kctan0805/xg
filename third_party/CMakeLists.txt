@@ -25,6 +25,10 @@ add_library(imgui
 )
 
 # ktx
+include_directories(
+    KTX-Software/utils
+    zstd/lib
+)
 add_library(ktx
     KTX-Software/include/ktx.h
     KTX-Software/lib/basis_sgd.h
