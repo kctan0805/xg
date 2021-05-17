@@ -1607,16 +1607,22 @@ Result DeviceVK::UpdateDescriptorSets(
             const auto& buffer = std::static_pointer_cast<BufferVK>(
                 ldesc_buffer_info->lbuffer->instance);
 
+            vk::DeviceSize range;
+            if (ldesc_buffer_info->range == -1)
+              range = buffer->GetSize();
+            else
+              range = ldesc_buffer_info->range;
+
             auto vk_desc_buffer_info = vk::DescriptorBufferInfo()
                                            .setBuffer(buffer->buffer_)
                                            .setOffset(ldesc_buffer_info->offset)
-                                           .setRange(ldesc_buffer_info->range);
+                                           .setRange(range);
 
             vk_desc_buffer_infos->emplace_back(std::move(vk_desc_buffer_info));
 
             XG_TRACE("    BufferInfo: {} {} {}",
                      (void*)(VkBuffer)buffer->buffer_,
-                     ldesc_buffer_info->offset, ldesc_buffer_info->range);
+                     ldesc_buffer_info->offset, range);
           }
           write.setPBufferInfo(vk_desc_buffer_infos->data());
           desc_buffer_infos.emplace_back(std::move(vk_desc_buffer_infos));
