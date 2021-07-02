@@ -47,7 +47,64 @@ enum class Result {
   kErrorFragmentation = -1000161000,
   kErrorNotPermitted = -1000174001,
   kErrorInvalidDeviceAddress = -1000244000,
-  kErrorFullScreenExclusiveModeLost = -1000255000
+  kErrorFullScreenExclusiveModeLost = -1000255000,
+
+#ifdef XG_ENABLE_REALITY
+  kTimeoutExpired = 1,
+  kSessionLossPending = 3,
+  kEventUnavailable = 4,
+  kSpaceBoundsUnavailable = 7,
+  kSessionNotFocused = 8,
+  kFrameDiscarded = 9,
+  kErrorValidationFailure = -1,
+  kErrorRuntimeFailure = -2,
+  kErrorOutOfMemory = -3,
+  kErrorAPIVersionUnsupported = -4,
+  kErrorInitializationFailed2 = -6,
+  kErrorFunctionUnsupported = -7,
+  kErrorFeatureUnsupported = -8,
+  kErrorExtensionNotPresent2 = -9,
+  kErrorLimitReached = -10,
+  kErrorSizeInsufficient = -11,
+  kErrorHandleInvalid = -12,
+  kErrorInstanceLost = -13,
+  kErrorSessionRunning = -14,
+  kErrorSessionNotRunning = -16,
+  kErrorSessionLost = -17,
+  kErrorSystemInvalid = -18,
+  kErrorPathInvalid = -19,
+  kErrorPathCountExceeded = -20,
+  kErrorPathFormatInvalid = -21,
+  kErrorPathUnsupported = -22,
+  kErrorLayerInvalid = -23,
+  kErrorLayerLimitExceeded = -24,
+  kErrorSwapchainRectInvalid = -25,
+  kErrorSwapchainFormatUnsupported = -26,
+  kErrorActionTypeMismatch = -27,
+  kErrorSessionNotReady = -28,
+  kErrorSessionNotStopping = -29,
+  kErrorTimeInvalid = -30,
+  kErrorReferenceSpaceUnsupported = -31,
+  kErrorFileAccessError = -32,
+  kErrorFileContentsInvalid = -33,
+  kErrorFormFactorUnsupported = -34,
+  kErrorFormFactorUnavailable = -35,
+  kErrorAPILayerNotPresent = -36,
+  kErrorCallOrderInvalid = -37,
+  kErrorGraphicsDeviceInvalid = -38,
+  kErrorPoseInvalid = -39,
+  kErrorIndexOutOfRange = -40,
+  kErrorViewConfigurationTypeUnsupported = -41,
+  kErrorEnvironmentBlendModeUnsupported = -42,
+  kErrorNameDuplicated = -44,
+  kErrorNameInvalid = -45,
+  kErrorActionsetNotAttached = -46,
+  kErrorActionsetsAlreadyAttached = -47,
+  kErrorLocalizedNameDuplicated = -48,
+  kErrorLocalizedNameInvalid = -49,
+  kErrorGraphicsRequirementsCallMissing = -50,
+  kErrorRuntimeUnavailable = -51
+#endif  // XG_ENABLE_REALITY
 };
 
 enum class Format {
@@ -881,6 +938,14 @@ inline DependencyFlags operator&(DependencyFlags lhs, DependencyFlags rhs) {
       static_cast<std::underlying_type_t<DependencyFlags>>(lhs) &
       static_cast<std::underlying_type_t<DependencyFlags>>(rhs));
 }
+
+#ifdef XG_ENABLE_REALITY
+
+enum class FormFactor { kHeadMountedDisplay = 1, kHandheldDisplay = 2 };
+
+enum class ReferenceSpaceType { kView = 1, kLocal = 2, kStage = 3 };
+
+#endif
 
 }  // namespace xg
 

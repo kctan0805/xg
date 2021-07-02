@@ -273,4 +273,73 @@ bool SaveFile(const std::string& filepath, const std::vector<uint8_t>& data) {
   return true;
 }
 
+#ifdef XG_ENABLE_REALITY
+const char* RealityResultString(Result result) {
+  switch (result) {
+#define STR(r)       \
+  case Result::k##r: \
+    return #r
+    STR(Success);
+    STR(TimeoutExpired);
+    STR(SessionLossPending);
+    STR(EventUnavailable);
+    STR(SpaceBoundsUnavailable);
+    STR(SessionNotFocused);
+    STR(FrameDiscarded);
+    STR(ErrorValidationFailure);
+    STR(ErrorRuntimeFailure);
+    STR(ErrorOutOfMemory);
+    STR(ErrorAPIVersionUnsupported);
+    STR(ErrorInitializationFailed2);
+    STR(ErrorFunctionUnsupported);
+    STR(ErrorFeatureUnsupported);
+    STR(ErrorExtensionNotPresent2);
+    STR(ErrorLimitReached);
+    STR(ErrorSizeInsufficient);
+    STR(ErrorHandleInvalid);
+    STR(ErrorInstanceLost);
+    STR(ErrorSessionRunning);
+    STR(ErrorSessionNotRunning);
+    STR(ErrorSessionLost);
+    STR(ErrorSystemInvalid);
+    STR(ErrorPathInvalid);
+    STR(ErrorPathCountExceeded);
+    STR(ErrorPathFormatInvalid);
+    STR(ErrorPathUnsupported);
+    STR(ErrorLayerInvalid);
+    STR(ErrorLayerLimitExceeded);
+    STR(ErrorSwapchainRectInvalid);
+    STR(ErrorSwapchainFormatUnsupported);
+    STR(ErrorActionTypeMismatch);
+    STR(ErrorSessionNotReady);
+    STR(ErrorSessionNotStopping);
+    STR(ErrorTimeInvalid);
+    STR(ErrorReferenceSpaceUnsupported);
+    STR(ErrorFileAccessError);
+    STR(ErrorFileContentsInvalid);
+    STR(ErrorFormFactorUnsupported);
+    STR(ErrorFormFactorUnavailable);
+    STR(ErrorAPILayerNotPresent);
+    STR(ErrorCallOrderInvalid);
+    STR(ErrorGraphicsDeviceInvalid);
+    STR(ErrorPoseInvalid);
+    STR(ErrorIndexOutOfRange);
+    STR(ErrorViewConfigurationTypeUnsupported);
+    STR(ErrorEnvironmentBlendModeUnsupported);
+    STR(ErrorNameDuplicated);
+    STR(ErrorNameInvalid);
+    STR(ErrorActionsetNotAttached);
+    STR(ErrorActionsetsAlreadyAttached);
+    STR(ErrorLocalizedNameDuplicated);
+    STR(ErrorLocalizedNameInvalid);
+    STR(ErrorGraphicsRequirementsCallMissing);
+    STR(ErrorRuntimeUnavailable);
+
+#undef STR
+    default:
+      return "ErrorUnknown";
+  }
+}
+#endif // XG_ENABLE_REALITY
+
 }  // namespace xg

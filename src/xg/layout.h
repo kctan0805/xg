@@ -28,6 +28,7 @@
 #include "cereal/types/variant.hpp"
 #include "cereal/types/vector.hpp"
 #include "glm/glm.hpp"
+#include "glm/gtc/quaternion.hpp"
 #include "xg/logger.h"
 #include "xg/types.h"
 
@@ -55,6 +56,11 @@ void serialize(Archive& archive, glm::vec4& v) {
 template <class Archive>
 void serialize(Archive& archive, glm::mat4& m) {
   archive(m[0], m[1], m[2], m[3]);
+}
+
+template <class Archive>
+void serialize(Archive& archive, glm::quat& q) {
+  archive(q.x, q.y, q.z, q.w);
 }
 
 }  // namespace glm
@@ -230,7 +236,14 @@ enum class LayoutType {
   kQueuePresent,
   kSubmit,
   kResizer,
-  kUpdater
+  kUpdater,
+#ifdef XG_ENABLE_REALITY
+  kReality,
+  kSystem,
+  kSession,
+  kReferenceSpace,
+  kCompositionLayerProjection
+#endif  // XG_ENABLE_REALITY
 };
 
 struct LayoutBase {
@@ -1865,6 +1878,76 @@ struct LayoutUpdater : LayoutBase {
   std::vector<const char*> lbuffer_ids;
 };
 
+#ifdef XG_ENABLE_REALITY
+
+struct LayoutReality : LayoutBase {
+  LayoutReality() : LayoutBase{LayoutType::kReality} {}
+
+  std::shared_ptr<LayoutRenderer> lrenderer;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), lrenderer);
+  }
+};
+
+struct LayoutSystem : LayoutBase {
+  LayoutSystem() : LayoutBase{LayoutType::kSystem} {}
+
+  FormFactor form_factor = FormFactor::kHeadMountedDisplay;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), form_factor);
+  }
+};
+
+struct LayoutSession : LayoutBase {
+  LayoutSession() : LayoutBase{LayoutType::kSession} {}
+
+  std::shared_ptr<LayoutQueue> lqueue;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), lqueue);
+  }
+
+  const char* lqueue_id = nullptr;
+};
+
+struct LayoutReferenceSpace : LayoutBase {
+  LayoutReferenceSpace() : LayoutBase{LayoutType::kReferenceSpace} {}
+
+  std::shared_ptr<LayoutSession> lsession;
+  ReferenceSpaceType reference_space_type_ = ReferenceSpaceType::kLocal;
+  glm::quat orientation_ = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+  glm::vec3 position_ = glm::vec3(0.0f, 0.0f, 0.0f);
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), lsession,
+            reference_space_type_, orientation_, position_);
+  }
+
+  const char* lsession_id = nullptr;
+};
+
+struct LayoutCompositionLayerProjection : LayoutBase {
+  LayoutCompositionLayerProjection()
+      : LayoutBase{LayoutType::kCompositionLayerProjection} {}
+
+  std::shared_ptr<LayoutReferenceSpace> lreference_space;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), lreference_space);
+  }
+
+  const char* lreference_space_id = nullptr;
+};
+
+#endif  // XG_ENABLE_REALITY
+
 struct Layout : std::enable_shared_from_this<Layout> {
   std::shared_ptr<LayoutResourceLoader> lres_loader;
   std::shared_ptr<LayoutRenderer> lrenderer;
@@ -1927,6 +2010,16 @@ struct Layout : std::enable_shared_from_this<Layout> {
   std::vector<std::shared_ptr<LayoutViewer>> lviewers;
   std::vector<std::shared_ptr<LayoutQueueSubmit>> lqueue_submits;
   std::vector<std::shared_ptr<LayoutQueuePresent>> lqueue_presents;
+
+#ifdef XG_ENABLE_REALITY
+  std::shared_ptr<LayoutReality> lreality;
+  std::shared_ptr<LayoutSystem> lsystem;
+  std::vector<std::shared_ptr<LayoutSession>> lsessions;
+  std::vector<std::shared_ptr<LayoutReferenceSpace>> lreference_spaces;
+  std::vector<std::shared_ptr<LayoutCompositionLayerProjection>>
+      lcomposition_layer_projections;
+#endif  // XG_ENABLE_REALITY
+
   std::vector<std::shared_ptr<LayoutBase>> lnodes;
   std::unordered_map<std::string, std::shared_ptr<LayoutBase>> node_id_map;
 
@@ -1997,6 +2090,15 @@ struct Layout : std::enable_shared_from_this<Layout> {
     archive(lviewers);
     archive(lqueue_submits);
     archive(lqueue_presents);
+
+#ifdef XG_ENABLE_REALITY
+    archive(lreality);
+    archive(lsystem);
+    archive(lsessions);
+    archive(lreference_spaces);
+    archive(lcomposition_layer_projections);
+#endif  // XG_ENABLE_REALITY
+
     archive(lnodes);
     archive(node_id_map);
   }

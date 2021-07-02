@@ -44,6 +44,13 @@
 #include "xg/viewer.h"
 #include "xg/window.h"
 
+#ifdef XG_ENABLE_REALITY
+#include "xg/reality.h"
+#include "xg/reference_space.h"
+#include "xg/session.h"
+#include "xg/system.h"
+#endif  // XG_ENABLE_REALITY
+
 namespace xg {
 
 class Engine {
@@ -62,7 +69,9 @@ class Engine {
   void Set(const LayoutBase& lbase);
   std::shared_ptr<Device> GetDevice() const { return device_; }
   std::shared_ptr<Renderer> GetRenderer() const { return renderer_; }
-  const std::vector<std::shared_ptr<Viewer>>& GetViewers() const { return viewers_; }
+  const std::vector<std::shared_ptr<Viewer>>& GetViewers() const {
+    return viewers_;
+  }
 
  private:
   Engine() = default;
@@ -114,6 +123,18 @@ class Engine {
   Result QueueSubmits();
   Result QueuePresents();
 
+#ifdef XG_ENABLE_REALITY
+  bool CreateReality(const Layout& layout);
+  bool CreateSystem(const Layout& layout);
+  bool CreateSession(const Layout& layout);
+  bool CreateReferenceSpace(const Layout& layout);
+
+  std::shared_ptr<Reality> reality_;
+  std::shared_ptr<System> system_;
+  std::vector<std::shared_ptr<Session>> sessions_;
+  std::vector<std::shared_ptr<ReferenceSpace>> reference_spaces_;
+#endif  // XG_ENABLE_REALITY
+
   std::shared_ptr<Renderer> renderer_;
   std::unordered_map<std::string, std::shared_ptr<void>> instance_id_map_;
 
@@ -135,7 +156,7 @@ class Engine {
 
   struct {
     std::vector<std::shared_ptr<LayoutQueue>> lqueues;
-  } system_;
+  } internal_;
 };
 
 }  // namespace xg

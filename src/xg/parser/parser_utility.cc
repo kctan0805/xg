@@ -1172,5 +1172,52 @@ void StringToFloats(const char* value, std::vector<float>* results) {
   }
 }
 
+#ifdef XG_ENABLE_REALITY
+
+FormFactor StringToFormFactor(const char* value) {
+  static std::unordered_map<std::string, FormFactor> mapping{
+#define ENTRY(s) {#s, FormFactor::k##s}
+      ENTRY(HeadMountedDisplay), ENTRY(HandheldDisplay)
+#undef ENTRY
+  };
+  const auto x = mapping.find(value);
+  if (x != std::end(mapping)) {
+    return x->second;
+  }
+  XG_ERROR("unknown form factor: {}", value);
+  return FormFactor::kHeadMountedDisplay;
+}
+
+ReferenceSpaceType StringToReferenceSpaceType(const char* value) {
+  static std::unordered_map<std::string, ReferenceSpaceType> mapping{
+#define ENTRY(s) {#s, ReferenceSpaceType::k##s}
+      ENTRY(View), ENTRY(Local), ENTRY(Stage)
+#undef ENTRY
+  };
+  const auto x = mapping.find(value);
+  if (x != std::end(mapping)) {
+    return x->second;
+  }
+  XG_ERROR("unknown reference space type: {}", value);
+  return ReferenceSpaceType::kLocal;
+}
+
+glm::quat StringToQuaternion(const char* value) {
+  std::stringstream ss(value);
+  std::string token;
+  glm::quat result(1.0f, 0.0f, 0.0f, 0.0f);
+
+  for (int i = 0; i < 4; ++i) {
+    if (ss >> token) {
+      result[i] = std::stof(token);
+    } else {
+      break;
+    }
+  }
+  return result;
+}
+
+#endif // XG_ENABLE_REALITY
+
 }  // namespace parser
 }  // namespace xg

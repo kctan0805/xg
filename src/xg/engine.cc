@@ -43,6 +43,13 @@
 #include "xg/utility.h"
 #include "xg/viewer.h"
 
+#ifdef XG_ENABLE_REALITY
+#include "xg/reality.h"
+#include "xg/reference_space.h"
+#include "xg/session.h"
+#include "xg/system.h"
+#endif  // XG_ENABLE_REALITY
+
 namespace xg {
 
 Engine::~Engine() {
@@ -108,6 +115,15 @@ bool Engine::PostInit(const std::shared_ptr<Layout>& layout) {
 
   CreateDebugMarkers(*layout);
 
+#ifdef XG_ENABLE_REALITY
+  if (layout->lreality) {
+    if (!CreateReality(*layout)) return false;
+    if (!CreateSystem(*layout)) return false;
+    if (!CreateSession(*layout)) return false;
+    if (!CreateReferenceSpace(*layout)) return false;
+  }
+#endif  // XG_ENABLE_REALITY
+
   return true;
 }
 
@@ -124,7 +140,7 @@ void Engine::AddSystemLayouts(Layout* layout) {
       lqueue->queue_priority = lres_loader->queue_priority;
       layout->ldevice->lqueues.emplace_back(lqueue);
       layout->lqueues.emplace_back(lqueue);
-      system_.lqueues.emplace_back(std::move(lqueue));
+      internal_.lqueues.emplace_back(std::move(lqueue));
     }
 
   } else {
@@ -135,7 +151,7 @@ void Engine::AddSystemLayouts(Layout* layout) {
       lqueue->queue_family = QueueFamily::kGraphics;
       layout->ldevice->lqueues.emplace_back(lqueue);
       layout->lqueues.emplace_back(lqueue);
-      system_.lqueues.emplace_back(std::move(lqueue));
+      internal_.lqueues.emplace_back(std::move(lqueue));
     }
   }
 }
@@ -327,7 +343,7 @@ bool Engine::InitSystem(const Layout& layout) {
   info.device = device_;
 
   int i = 0;
-  for (const auto& lqueue : system_.lqueues) {
+  for (const auto& lqueue : internal_.lqueues) {
     auto queue = std::static_pointer_cast<Queue>(lqueue->instance);
 
     lcmd_pool->lqueue = lqueue;
@@ -1192,7 +1208,7 @@ void Engine::CreateDebugMarkers(const Layout& layout) {
   if (!layout.lrenderer->debug) return;
 
   int i = 0;
-  for (auto& lqueue : system_.lqueues) {
+  for (auto& lqueue : internal_.lqueues) {
     lqueue->id = "ResourceLoaderQueue" + std::to_string(i);
     renderer_->DebugMarkerSetObjectName(*lqueue);
     ++i;
@@ -1349,5 +1365,73 @@ void Engine::Set(const LayoutBase& lbase) {
   instance_id_map_.insert_or_assign(lbase.id, lbase.instance);
   renderer_->DebugMarkerSetObjectName(lbase);
 }
+
+#ifdef XG_ENABLE_REALITY
+
+bool Engine::CreateReality(const Layout& layout) {
+  auto lreality = layout.lreality;
+  lreality->lrenderer = layout.lrenderer;
+  reality_ = Factory::Get().CreateReality(*lreality);
+  if (reality_ == nullptr) return false;
+
+  lreality->instance = reality_;
+
+  return true;
+}
+
+bool Engine::CreateSystem(const Layout& layout) {
+  const auto& lsystem = layout.lsystem;
+  if (!reality_->InitSystem(*lsystem)) return false;
+
+  auto system = reality_->GetSystem();
+
+  lsystem->instance = system;
+
+  if (!lsystem->id.empty())
+    instance_id_map_.insert(std::make_pair(lsystem->id, system));
+
+  system_ = std::move(system);
+  return true;
+}
+
+bool Engine::CreateSession(const Layout& layout) {
+  for (const auto& lsession : layout.lsessions) {
+    if (!lsession->realize) continue;
+
+    auto session = reality_->CreateSession(*lsession);
+    if (!session) return false;
+
+    lsession->instance = session;
+
+    if (!lsession->id.empty())
+      instance_id_map_.insert(std::make_pair(lsession->id, session));
+
+    sessions_.emplace_back(std::move(session));
+  }
+  return true;
+}
+
+bool Engine::CreateReferenceSpace(const Layout& layout) {
+  for (const auto& lreference_space : layout.lreference_spaces) {
+    if (!lreference_space->realize) continue;
+    if (!lreference_space->lsession) continue;
+
+    auto* session = static_cast<Session*>(lreference_space->lsession->instance.get());
+
+    auto reference_space = session->CreateReferenceSpace(*lreference_space);
+    if (!reference_space) return false;
+
+    lreference_space->instance = reference_space;
+
+    if (!lreference_space->id.empty())
+      instance_id_map_.insert(
+          std::make_pair(lreference_space->id, reference_space));
+
+    reference_spaces_.emplace_back(std::move(reference_space));
+  }
+  return true;
+}
+
+#endif  // XG_ENABLE_REALITY
 
 }  // namespace xg

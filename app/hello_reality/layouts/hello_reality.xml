@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Engine>
+  <Renderer appName="hello_reality" debug="true" validation="true">
+    <Window id="mainWindow" width="640" height="480" title="Hello XR!" resizable="true"/>
+    <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
+
+    <Device>
+      <Queue id="mainQueue" queueFamily="Graphics Transfer" presentable="true"/>
+    </Device>
+  </Renderer>
+
+  <CommandPool id="mainCommandPool" queue="mainQueue"/>
+  <DescriptorPool id="mainDescriptorPool"/>
+
+  <Image id="mainDepthBufferImage" format="D32Sfloat" usage="DepthStencilAttachment" swapchain="mainSwapchain"/>
+  <ImageView id="mainDepthBufferImageView" image="mainDepthBufferImage" format="D32Sfloat" aspectMask="Depth"/>
+
+  <RenderPass id="mainRenderPass">
+    <Attachment id="mainColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc" swapchain="mainSwapchain"/>
+    <Attachment id="mainDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
+    <Subpass id="mainSubpass">
+      <ColorAttachment attachment="mainColorAttachment" layout="ColorAttachmentOptimal"/>
+      <DepthStencilAttachment attachment="mainDepthAttachment" layout="DepthStencilAttachmentOptimal"/>
+    </Subpass>
+    <Dependency>
+      <Source stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+      <Destination subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="mainSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+    </Dependency>
+  </RenderPass>
+
+  <DescriptorSetLayout id="drawCommonDescriptorSetLayout">
+    <DescriptorSetLayoutBinding binding="0" descriptorType="UniformBuffer" stageFlags="Vertex"/>
+  </DescriptorSetLayout>
+  <DescriptorSetLayout id="drawMaterialDescriptorSetLayout">
+    <DescriptorSetLayoutBinding binding="0" descriptorType="CombinedImageSampler" stageFlags="Fragment"/>
+  </DescriptorSetLayout>
+
+  <PipelineLayout id="drawPipelineLayout">
+    <SetLayout descriptorSetLayout="drawCommonDescriptorSetLayout"/>
+    <SetLayout descriptorSetLayout="drawMaterialDescriptorSetLayout"/>
+    <PushConstantRange stageFlags="Vertex" size="4*16"/> <!-- model matrix -->
+  </PipelineLayout>
+
+  <ShaderModule id="drawVertexShader" file="shaders/hello_reality.vert.spv"/>
+  <ShaderModule id="drawFragmentShader" file="shaders/hello_reality.frag.spv"/>
+
+  <GraphicsPipeline id="drawPipeline" layout="drawPipelineLayout" renderPass="mainRenderPass" subpass="mainSubpass">
+    <Stage stage="Vertex" module="drawVertexShader"/>
+    <Stage stage="Fragment" module="drawFragmentShader"/>
+    <VertexInputState>
+      <VertexBindingDescription binding="0" stride="(3+3+2)*4" inputRate="Vertex"/>
+      <VertexAttributeDescription location="0" binding="0" format="R32G32B32Sfloat" offset="0"/>
+      <VertexAttributeDescription location="1" binding="0" format="R32G32B32Sfloat" offset="3*4"/>
+      <VertexAttributeDescription location="2" binding="0" format="R32G32Sfloat" offset="(3+3)*4"/>
+    </VertexInputState>
+    <InputAssemblyState topology="TriangleList"/>
+    <ViewportState swapchain="mainSwapchain">
+      <Viewport maxDepth="1.0"/>
+      <Scissor/>
+    </ViewportState>
+    <RasterizationState polygonMode="Fill" cullMode="None" frontFace="Clockwise" lineWidth="1.0"/>
+    <MultisampleState/>
+    <DepthStencilState depthTestEnable="true" depthWriteEnable="true"/>
+    <ColorBlendState>
+      <Attachment/>
+    </ColorBlendState>
+  </GraphicsPipeline>
+
+  <Frame id="mainFrame" swapchain="mainSwapchain">
+    <Framebuffer id="mainFramebuffer" renderPass="mainRenderPass">
+      <Attachment swapchain="mainSwapchain"/>
+      <Attachment imageView="mainDepthBufferImageView"/>
+    </Framebuffer>
+    <Fence id="renderCompleteFence" signaled="true"/>
+    <Semaphore id="imageAvailableSemaphore"/>
+    <Semaphore id="renderCompleteSemaphore"/>
+    <CommandBuffer id="mainCommandBuffer" commandPool="mainCommandPool"/>
+
+    <Buffer id="drawCommonUniformBuffer" size="4*16" usage="UniformBuffer" allocFlags="Undefined" memUsage="CpuToGpu"/> <!-- perspective * view matrix of camera -->
+
+    <DescriptorSet id="drawCommonDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawCommonDescriptorSetLayout">
+      <Descriptor binding="0" descriptorType="UniformBuffer"><BufferInfo buffer="drawCommonUniformBuffer"/></Descriptor>
+    </DescriptorSet>
+  </Frame>
+
+  <!-- Model -->
+  <!-- Material -->
+  <Image id="drawTextureImage" format="Bc3UnormBlock" usage="TransferDst Sampled"/>
+  <ImageLoader image="drawTextureImage" file="texture.ktx" queue="mainQueue"/>
+  <ImageView id="drawTextureImageView" image="drawTextureImage" format="Bc3UnormBlock"/>
+  <Sampler id="drawTextureSampler" magFilter="Linear" minFilter="Linear" mipmapMode="Linear" anisotropyEnable="true"/>
+
+  <DescriptorSet id="drawMaterialDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawMaterialDescriptorSetLayout">
+    <Descriptor binding="0" descriptorType="CombinedImageSampler"><ImageInfo sampler="drawTextureSampler" imageView="drawTextureImageView" imageLayout="ShaderReadOnlyOptimal"/></Descriptor>
+  </DescriptorSet>
+
+  <!-- Geometry -->
+  <Data id="drawVertexData">
+    <FloatValues>-0.5 -0.5 0.0 1.0 0.0 0.0 0.0 0.0</FloatValues>
+    <FloatValues>0.5 -0.5 0.0 0.0 1.0 0.0 1.0 0.0</FloatValues>
+    <FloatValues>0.5 0.5 0.0 0.0 0.0 1.0 1.0 1.0</FloatValues>
+    <FloatValues>-0.5 0.5 0.0 1.0 1.0 1.0 0.0 1.0</FloatValues>
+    <FloatValues>-0.5 -0.5 -0.5 1.0 0.0 0.0 1.0 0.0</FloatValues>
+    <FloatValues>0.5 -0.5 -0.5 0.0 1.0 0.0 0.0 0.0</FloatValues>
+    <FloatValues>0.5 0.5 -0.5 0.0 0.0 1.0 0.0 1.0</FloatValues>
+    <FloatValues>-0.5 0.5 -0.5 1.0 1.0 1.0 1.0 1.0</FloatValues>
+  </Data>
+
+  <Buffer id="drawVertexBuffer" usage="TransferDst VertexBuffer"/>
+  <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
+
+  <Data id="drawIndexData">
+    <UInt32Values>0 1 2 2 3 0 4 5 6 6 7 4</UInt32Values>
+  </Data>
+
+  <Buffer id="drawIndexBuffer" usage="TransferDst IndexBuffer"/>
+  <BufferLoader buffer="drawIndexBuffer" accessMask="IndexRead" queue="mainQueue" stageMask="VertexInput" data="drawIndexData"/>
+
+  <!-- Scene -->
+  <Data id="mainModelMatrix">
+    <FloatValues>1.0 0.0 0.0 0.0</FloatValues>
+    <FloatValues>0.0 1.0 0.0 0.0</FloatValues>
+    <FloatValues>0.0 0.0 1.0 0.0</FloatValues>
+    <FloatValues>0.0 0.0 0.0 1.0</FloatValues>
+  </Data>
+
+  <CommandGroup id="mainModelCommandGroup">
+    <CommandList>
+      <PushConstants layout="drawPipelineLayout" stageFlags="Vertex" data="mainModelMatrix"/>
+
+      <!-- material -->
+      <BindDescriptorSets layout="drawPipelineLayout" firstSet="1">
+        <DescriptorSet descriptorSet="drawMaterialDescriptorSet"/>
+      </BindDescriptorSets>
+
+      <!-- geometry -->
+      <BindVertexBuffers firstBinding="0">
+        <Buffer buffer="drawVertexBuffer" offset="0"/>
+      </BindVertexBuffers>
+      <BindIndexBuffer buffer="drawIndexBuffer" indexType="Uint32"/>
+      <DrawIndexed indexCount="12" instanceCount="1"/>
+    </CommandList>
+  </CommandGroup>
+
+  <CommandGroup id="mainCommandGroup">
+    <CommandList>
+      <BeginRenderPass renderPass="mainRenderPass" framebuffer="mainFramebuffer">
+        <ClearValues>
+          <ClearColorValue value="0.0 0.0 0.0 1.0"/>
+          <ClearDepthStencilValue depth="1.0" stencil="0"/>
+        </ClearValues>
+      </BeginRenderPass>
+
+      <BindDescriptorSets layout="drawPipelineLayout" firstSet="0">
+        <DescriptorSet descriptorSet="drawCommonDescriptorSet"/>
+      </BindDescriptorSets>
+
+      <BindPipeline pipeline="drawPipeline"/>
+    </CommandList>
+
+    <CommandGroup commandGroup="mainModelCommandGroup"/>
+
+    <CommandList>
+      <EndRenderPass/>
+    </CommandList>
+  </CommandGroup>
+
+  <Camera id="mainCamera" swapchain="mainSwapchain">
+    <Perspective fov="60" zNear="0.1" zFar="10.0"/>
+    <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
+  </Camera>
+
+  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
+    <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
+    <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
+    <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
+      <Submit>
+        <Wait semaphore="imageAvailableSemaphore" dstStageMask="ColorAttachmentOutput"/>
+        <CommandBuffer commandBuffer="mainCommandBuffer"/>
+        <SignalSemaphore semaphore="renderCompleteSemaphore"/>
+      </Submit>
+    </QueueSubmit>
+    <QueuePresent queue="mainQueue">
+      <WaitSemaphore semaphore="renderCompleteSemaphore"/>
+    </QueuePresent>
+    <Resizer>
+      <Image image="mainDepthBufferImage"/>
+      <ImageView imageView="mainDepthBufferImageView"/>
+      <GraphicsPipeline graphicsPipeline="drawPipeline"/>
+      <Framebuffer framebuffer="mainFramebuffer"/>
+    </Resizer>
+    <Updater>
+      <Buffer buffer="drawCommonUniformBuffer"/>
+    </Updater>
+  </Viewer>
+  
+  <Reality>
+    <System formFactor="HeadMountedDisplay"/>
+    <Session id="mainSession" queue="mainQueue"/>
+    <ReferenceSpace id="mainSpace" session="mainSession" referenceSpaceType="Local">
+      <PoseInReferenceSpace orientation="0 0 0 1" position="0 0 0"/>
+    </ReferenceSpace>
+    <CompositionLayerProjection id="mainProjection" space="mainSpace">
+      <ViewConfiguration/>
+      <Swapchain/>
+    </CompositionLayerProjection>
+  </Reality>  
+  
+</Engine>

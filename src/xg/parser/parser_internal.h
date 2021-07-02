@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "glm/glm.hpp"
+#include "glm/gtc/quaternion.hpp"
 #include "tinyxml2.h"
 #include "xg/layout.h"
 
@@ -179,6 +180,15 @@ class ParserQueuePresent : public ParserSingleton<ParserQueuePresent> {};
 class ParserResizer : public ParserSingleton<ParserResizer> {};
 class ParserUpdater : public ParserSingleton<ParserUpdater> {};
 
+#ifdef XG_ENABLE_REALITY
+class ParserReality : public ParserSingleton<ParserReality> {};
+class ParserSystem : public ParserSingleton<ParserSystem> {};
+class ParserSession : public ParserSingleton<ParserSession> {};
+class ParserReferenceSpace : public ParserSingleton<ParserReferenceSpace> {};
+class ParserCompositionLayerProjection
+    : public ParserSingleton<ParserCompositionLayerProjection> {};
+#endif  // XG_ENABLE_REALITY
+
 // Utilities
 const char* Tinyxml2ErrorString(tinyxml2::XMLError error);
 Format StringToFormat(const char* value);
@@ -241,6 +251,14 @@ static void StringToIntegers(const char* value, std::vector<T>* results) {
         static_cast<T>(Expression::Get().Evaluate(token.c_str())));
   }
 }
+
+#ifdef XG_ENABLE_REALITY
+
+FormFactor StringToFormFactor(const char* value);
+ReferenceSpaceType StringToReferenceSpaceType(const char* value);
+glm::quat StringToQuaternion(const char* value);
+
+#endif  // XG_ENABLE_REALITY
 
 }  // namespace parser
 }  // namespace xg

@@ -23,6 +23,10 @@ int FormatToSize(Format format);
 bool LoadFile(const std::string& filepath, std::vector<uint8_t>* data);
 bool SaveFile(const std::string& filepath, const std::vector<uint8_t>& data);
 
+#ifdef XG_ENABLE_REALITY
+const char* RealityResultString(Result result);
+#endif
+
 }  // namespace xg
 
 #endif  // XG_UTILITY_H_

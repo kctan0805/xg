@@ -336,6 +336,7 @@ bool DeviceVK::CreateQueues(const LayoutDevice& ldevice,
       }
       queue_vk->device_ = device_;
       queue_vk->family_index_ = static_cast<int>(queue_family_index);
+      queue_vk->queue_index_ = static_cast<int>(queue_index);
       queue_vk->use_count_ = 1;
 
       XG_TRACE("getQueue: {} {} {}", (void*)(VkQueue)queue_vk->queue_,

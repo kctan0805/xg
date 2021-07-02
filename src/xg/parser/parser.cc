@@ -219,6 +219,20 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
   } else if (strcmp(name, "Updater") == 0) {
     return ParserUpdater::Get().ParseElement(element, status);
   }
+#ifdef XG_ENABLE_REALITY
+  else if (strcmp(name, "Reality") == 0) {
+    return ParserReality::Get().ParseElement(element, status);
+  } else if (strcmp(name, "System") == 0) {
+    return ParserSystem::Get().ParseElement(element, status);
+  } else if (strcmp(name, "Session") == 0) {
+    return ParserSession::Get().ParseElement(element, status);
+  } else if (strcmp(name, "ReferenceSpace") == 0) {
+    return ParserReferenceSpace::Get().ParseElement(element, status);
+  } else if (strcmp(name, "CompositionLayerProjection") == 0) {
+    return ParserCompositionLayerProjection::Get().ParseElement(element,
+                                                                status);
+  }
+#endif  // XG_ENABLE_REALITY
 
   XG_ERROR("unknown element: {}", name);
   return false;
@@ -596,6 +610,34 @@ void Parser::AddLayoutNode(std::shared_ptr<Layout> layout,
       layout->lqueue_presents.emplace_back(
           std::static_pointer_cast<LayoutQueuePresent>(node));
       break;
+
+#ifdef XG_ENABLE_REALITY
+    case LayoutType::kReality:
+      assert(layout->lreality == nullptr);
+      layout->lreality = std::static_pointer_cast<LayoutReality>(node);
+      break;
+
+    case LayoutType::kSystem:
+      assert(layout->lsystem == nullptr);
+      layout->lsystem = std::static_pointer_cast<LayoutSystem>(node);
+      break;
+
+    case LayoutType::kSession:
+      layout->lsessions.emplace_back(
+          std::static_pointer_cast<LayoutSession>(node));
+      break;
+
+    case LayoutType::kReferenceSpace:
+      layout->lreference_spaces.emplace_back(
+          std::static_pointer_cast<LayoutReferenceSpace>(node));
+      break;
+
+    case LayoutType::kCompositionLayerProjection:
+      layout->lcomposition_layer_projections.emplace_back(
+          std::static_pointer_cast<LayoutCompositionLayerProjection>(node));
+      break;
+
+#endif  // XG_ENABLE_REALITY
 
     default:
       layout->lnodes.emplace_back(node);
@@ -1599,6 +1641,39 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     }
     lqueue_present->lswapchain_ids.clear();
   }
+
+#ifdef XG_ENABLE_REALITY
+  for (auto lsession : layout->lsessions) {
+    if (lsession->lqueue_id) {
+      const auto it = node_id_map.find(lsession->lqueue_id);
+      assert(it != node_id_map.end());
+      lsession->lqueue = std::static_pointer_cast<LayoutQueue>(it->second);
+      assert(lsession->lqueue);
+    }
+  }
+
+  for (auto lreference_space : layout->lreference_spaces) {
+    if (lreference_space->lsession_id) {
+      const auto it = node_id_map.find(lreference_space->lsession_id);
+      assert(it != node_id_map.end());
+      lreference_space->lsession =
+          std::static_pointer_cast<LayoutSession>(it->second);
+      assert(lreference_space->lsession);
+    }
+  }
+
+  for (auto lcomposition_layer_projection :
+       layout->lcomposition_layer_projections) {
+    if (lcomposition_layer_projection->lreference_space_id) {
+      const auto it =
+          node_id_map.find(lcomposition_layer_projection->lreference_space_id);
+      assert(it != node_id_map.end());
+      lcomposition_layer_projection->lreference_space =
+          std::static_pointer_cast<LayoutReferenceSpace>(it->second);
+      assert(lcomposition_layer_projection->lreference_space);
+    }
+  }
+#endif  // XG_ENABLE_REALITY
 }
 
 }  // namespace xg

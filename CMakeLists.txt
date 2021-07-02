@@ -5,6 +5,7 @@ if(POLICY CMP0074)
 endif()
 
 option(XG_BUILD_APPS "Build the XG example applications" ON)
+option(XG_ENABLE_REALITY "Enable reality feature" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -17,7 +18,13 @@ add_definitions(
     -DVULKAN_HPP_TYPESAFE_CONVERSION
 )
 
-if(WIN32)
+if (XG_ENABLE_REALITY)
+add_definitions(
+    -DXG_ENABLE_REALITY
+)
+endif()
+
+if (WIN32)
     add_definitions(
         -D_SCL_SECURE_NO_WARNINGS
     )

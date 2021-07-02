@@ -24,6 +24,7 @@ class QueueVK : public Queue {
   virtual ~QueueVK() = default;
 
   const vk::Queue& GetVkQueue() const { return queue_; }
+  int GetQueueIndex() const { return queue_index_; }
 
   std::shared_ptr<CommandPool> CreateCommandPool(
       const LayoutCommandPool& lcmd_pool) override;
@@ -35,6 +36,7 @@ class QueueVK : public Queue {
  protected:
   vk::Device device_;
   vk::Queue queue_;
+  int queue_index_ = 0;
   int use_count_ = 0;
   std::mutex mutex_;
 

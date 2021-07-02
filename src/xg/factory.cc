@@ -15,6 +15,9 @@
 #include "xg/types.h"
 #include "xg/utility.h"
 #include "xg/vulkan/renderer_vk.h"
+#ifdef XG_ENABLE_REALITY
+#include "xg/openxr/reality_xr.h"
+#endif  // XG_ENABLE_REALITY
 
 namespace xg {
 
@@ -30,5 +33,21 @@ std::shared_ptr<Renderer> Factory::CreateRenderer(
 
   return renderer;
 }
+
+#ifdef XG_ENABLE_REALITY
+
+std::shared_ptr<Reality> xg::Factory::CreateReality(
+    const LayoutReality& lreality) {
+  auto reality = std::make_shared<RealityXR>();
+  if (!reality) {
+    XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+    return nullptr;
+  }
+
+  if (!reality->Init(lreality)) return nullptr;
+
+  return reality;
+}
+#endif  // XG_ENABLE_REALITY
 
 }  // namespace xg

@@ -4,7 +4,6 @@ file(GLOB parser_src
     parser/*.cc
     parser/*.h
 )
-source_group(parser FILES ${parser_src})
 
 file(GLOB vulkan_src
     vulkan/*.cc
@@ -17,7 +16,24 @@ file(GLOB src
     *.h
 )
 
+if (XG_ENABLE_XR)
+    file(GLOB parser_reality_src
+        parser/reality/*.cc
+        parser/reality/*.h
+    )
+
+    file(GLOB openxr_src
+        openxr/*.cc
+        openxr/*.h
+    )
+    source_group(openxr FILES ${openxr_src})
+endif()
+
+source_group(parser FILES ${parser_src} ${parser_reality_src})
+
 add_library(xg
+    ${openxr_src}
+    ${parser_reality_src}
     ${parser_src}
     ${vulkan_src}
     ${src}
@@ -33,3 +49,8 @@ target_link_libraries(xg
 )
 
 include(vulkan/CMakeLists.txt)
+
+if (XG_ENABLE_XR)
+    include(openxr/CMakeLists.txt)
+endif()
+
