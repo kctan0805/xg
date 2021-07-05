@@ -5,7 +5,7 @@ if(POLICY CMP0074)
 endif()
 
 option(XG_BUILD_APPS "Build the XG example applications" ON)
-option(XG_ENABLE_REALITY "Enable reality feature" ON)
+option(XG_ENABLE_REALITY "Enable reality feature" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 

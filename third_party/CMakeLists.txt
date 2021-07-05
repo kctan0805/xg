@@ -33,6 +33,8 @@ add_library(ktx
     KTX-Software/include/ktx.h
     KTX-Software/lib/basis_sgd.h
     KTX-Software/lib/basis_transcode.cpp
+    KTX-Software/lib/basisu/transcoder/basisu_containers.h
+    KTX-Software/lib/basisu/transcoder/basisu_containers_impl.h
     KTX-Software/lib/basisu/transcoder/basisu_file_headers.h
     KTX-Software/lib/basisu/transcoder/basisu_global_selector_cb.h
     KTX-Software/lib/basisu/transcoder/basisu_global_selector_palette.h
@@ -41,6 +43,7 @@ add_library(ktx
     KTX-Software/lib/basisu/transcoder/basisu_transcoder.cpp
     KTX-Software/lib/basisu/transcoder/basisu_transcoder.h
     KTX-Software/lib/basisu/transcoder/basisu.h
+    KTX-Software/lib/basisu/zstd/zstd.c
     KTX-Software/lib/checkheader.c
     KTX-Software/lib/dfdutils/createdfd.c
     KTX-Software/lib/dfdutils/colourspaces.c
@@ -58,15 +61,11 @@ add_library(ktx
     KTX-Software/lib/filestream.h
     KTX-Software/lib/formatsize.h
     KTX-Software/lib/gl_format.h
-    KTX-Software/lib/gl_funcs.c
-    KTX-Software/lib/gl_funcs.h
-    KTX-Software/lib/glloader.c
     KTX-Software/lib/hashlist.c
     KTX-Software/lib/info.c
     KTX-Software/lib/ktxint.h
     KTX-Software/lib/memstream.c
     KTX-Software/lib/memstream.h
-    KTX-Software/lib/stream.h
     KTX-Software/lib/strings.c
     KTX-Software/lib/swap.c
     KTX-Software/lib/texture.c
@@ -79,7 +78,7 @@ add_library(ktx
     KTX-Software/lib/vkformat_enum.h
     KTX-Software/lib/vkformat_str.c
     KTX-Software/lib/texture1.c
-    KTX-Software/lib/texture1.h    
+    KTX-Software/lib/texture1.h
 )
 set_target_properties(ktx PROPERTIES COMPILE_DEFINITIONS "LIBKTX=1;BASISD_SUPPORT_FXT1=0")
 target_link_libraries(ktx libzstd_static)
