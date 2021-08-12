@@ -6,12 +6,11 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/parser/parser_internal.h"
-
 #include <memory>
 
 #include "tinyxml2.h"
 #include "xg/layout.h"
+#include "xg/parser/parser_internal.h"
 #include "xg/types.h"
 
 namespace xg {
@@ -58,6 +57,16 @@ bool ParserSingleton<ParserSwapchain>::ParseElement(
   if (value) node->present_mode = StringToPresentMode(value);
 
   element->QueryBoolAttribute("clipped", &node->clipped);
+
+#ifdef XG_ENABLE_REALITY
+  value = element->Attribute("usage");
+  if (value) node->usage = StringToSwapchainUsage(value);
+
+  element->QueryIntAttribute("sampleCount", &node->sample_count);
+  element->QueryIntAttribute("faceCount", &node->face_count);
+  element->QueryIntAttribute("arraySize", &node->array_size);
+  element->QueryIntAttribute("mipCount", &node->mip_count);
+#endif  // XG_ENABLE_REALITY
 
   status->node = node;
 

@@ -10,10 +10,12 @@
 #define XG_REALITY_H_
 
 #include <memory>
+#include <vector>
 
+#include "xg/composition_layer_projection.h"
 #include "xg/layout.h"
 #include "xg/session.h"
-#include "xg/system.h"
+#include "xg/swapchain.h"
 
 namespace xg {
 
@@ -26,13 +28,18 @@ class Reality {
   Reality& operator=(Reality&&) = delete;
   virtual ~Reality() = default;
 
-  std::shared_ptr<System> GetSystem() const { return system_; }
+  const std::vector<std::shared_ptr<Swapchain>>& GetSwapchains() const {
+    return swapchains_;
+  }
+  std::shared_ptr<Session> GetSession() const { return session_; }
 
-  virtual bool InitSystem(const LayoutSystem& lsystem) = 0;
-  virtual std::shared_ptr<Session> CreateSession(const LayoutSession& lsession) = 0;
+  virtual std::shared_ptr<CompositionLayerProjection>
+  CreateCompositionLayerProjection(
+      const LayoutCompositionLayerProjection& lprojection) = 0;
 
  protected:
-  std::shared_ptr<System> system_;
+  std::vector<std::shared_ptr<Swapchain>> swapchains_;
+  std::shared_ptr<Session> session_;
 };
 
 }  // namespace xg

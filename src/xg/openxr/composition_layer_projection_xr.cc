@@ -6,14 +6,16 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/openxr/system_xr.h"
+#include "xg/openxr/composition_layer_projection_xr.h"
+
+#include <memory>
 
 #include "openxr/openxr.hpp"
-//#include "xg/logger.h"
+#include "xg/logger.h"
+#include "xg/utility.h"
 
 namespace xg {
 
-SystemXR::~SystemXR() {
-}
+CompositionLayerProjectionXR::~CompositionLayerProjectionXR() {}
 
 }  // namespace xg

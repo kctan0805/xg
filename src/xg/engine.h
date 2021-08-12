@@ -45,10 +45,9 @@
 #include "xg/window.h"
 
 #ifdef XG_ENABLE_REALITY
+#include "xg/composition_layer_projection.h"
 #include "xg/reality.h"
 #include "xg/reference_space.h"
-#include "xg/session.h"
-#include "xg/system.h"
 #endif  // XG_ENABLE_REALITY
 
 namespace xg {
@@ -125,14 +124,13 @@ class Engine {
 
 #ifdef XG_ENABLE_REALITY
   bool CreateReality(const Layout& layout);
-  bool CreateSystem(const Layout& layout);
-  bool CreateSession(const Layout& layout);
   bool CreateReferenceSpace(const Layout& layout);
+  bool CreateCompositionLayerProjection(const Layout& layout);
 
   std::shared_ptr<Reality> reality_;
-  std::shared_ptr<System> system_;
-  std::vector<std::shared_ptr<Session>> sessions_;
   std::vector<std::shared_ptr<ReferenceSpace>> reference_spaces_;
+  std::vector<std::shared_ptr<CompositionLayerProjection>>
+      composition_layer_projections_;
 #endif  // XG_ENABLE_REALITY
 
   std::shared_ptr<Renderer> renderer_;

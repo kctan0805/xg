@@ -9,11 +9,15 @@
 #include "xg/openxr/reference_space_xr.h"
 
 #include "openxr/openxr.hpp"
-//#include "xg/logger.h"
+#include "xg/logger.h"
 
 namespace xg {
 
 ReferenceSpaceXR::~ReferenceSpaceXR() {
+  if (space_) {
+    XG_TRACE("destroy: {}", (void*)(XrSpace)space_);
+    space_.destroy();
+  }
 }
 
 }  // namespace xg

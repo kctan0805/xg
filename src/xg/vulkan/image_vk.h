@@ -33,6 +33,7 @@ class ImageVK : public Image {
   friend class ImageViewVK;
   friend class SwapchainVK;
   friend class CommandBufferVK;
+  friend class RealityXR;
 };
 
 }  // namespace xg

@@ -182,7 +182,6 @@ class ParserUpdater : public ParserSingleton<ParserUpdater> {};
 
 #ifdef XG_ENABLE_REALITY
 class ParserReality : public ParserSingleton<ParserReality> {};
-class ParserSystem : public ParserSingleton<ParserSystem> {};
 class ParserSession : public ParserSingleton<ParserSession> {};
 class ParserReferenceSpace : public ParserSingleton<ParserReferenceSpace> {};
 class ParserCompositionLayerProjection
@@ -257,6 +256,8 @@ static void StringToIntegers(const char* value, std::vector<T>* results) {
 FormFactor StringToFormFactor(const char* value);
 ReferenceSpaceType StringToReferenceSpaceType(const char* value);
 glm::quat StringToQuaternion(const char* value);
+ViewConfigurationType StringToViewConfigurationType(const char* value);
+SwapchainUsage StringToSwapchainUsage(const char* value);
 
 #endif  // XG_ENABLE_REALITY
 

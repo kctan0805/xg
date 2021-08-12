@@ -30,6 +30,7 @@ class ImageViewVK : public ImageView {
   friend class DeviceVK;
   friend class SwapchainVK;
   friend class FramebufferVK;
+  friend class RealityXR;
 };
 
 }  // namespace xg

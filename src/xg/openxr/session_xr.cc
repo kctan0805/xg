@@ -17,7 +17,12 @@
 
 namespace xg {
 
-SessionXR::~SessionXR() {}
+SessionXR::~SessionXR() {
+  if (session_) {
+    XG_TRACE("destroy: {}", (void*)(XrSession)session_);
+    session_.destroy();
+  }
+}
 
 std::shared_ptr<ReferenceSpace> SessionXR::CreateReferenceSpace(
     const LayoutReferenceSpace& lreference_space) {

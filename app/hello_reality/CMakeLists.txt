@@ -28,6 +28,12 @@ add_executable(hello_reality
 
 set_target_properties(hello_reality PROPERTIES WIN32_EXECUTABLE TRUE)
 
+if (MINGW)
+    target_link_libraries(hello_reality
+        mingw32
+    )
+endif()
+
 target_link_libraries(hello_reality
     SDL2main
     xg

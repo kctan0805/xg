@@ -6,12 +6,11 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/parser/parser_internal.h"
-
 #include <memory>
 
 #include "tinyxml2.h"
 #include "xg/layout.h"
+#include "xg/parser/parser_internal.h"
 #include "xg/types.h"
 
 namespace xg {
@@ -22,8 +21,6 @@ bool ParserSingleton<ParserReferenceSpace>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
   auto node = std::make_shared<LayoutReferenceSpace>();
   if (!node) return false;
-
-  node->lsession_id = element->Attribute("session");
 
   const char* value = element->Attribute("referenceSpaceType");
   if (value) node->reference_space_type_ = StringToReferenceSpaceType(value);

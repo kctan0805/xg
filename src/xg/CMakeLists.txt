@@ -16,7 +16,7 @@ file(GLOB src
     *.h
 )
 
-if (XG_ENABLE_XR)
+if (XG_ENABLE_REALITY)
     file(GLOB parser_reality_src
         parser/reality/*.cc
         parser/reality/*.h
@@ -50,7 +50,7 @@ target_link_libraries(xg
 
 include(vulkan/CMakeLists.txt)
 
-if (XG_ENABLE_XR)
+if (XG_ENABLE_REALITY)
     include(openxr/CMakeLists.txt)
 endif()
 

@@ -198,16 +198,72 @@
     </Updater>
   </Viewer>
   
-  <Reality>
-    <System formFactor="HeadMountedDisplay"/>
-    <Session id="mainSession" queue="mainQueue"/>
-    <ReferenceSpace id="mainSpace" session="mainSession" referenceSpaceType="Local">
-      <PoseInReferenceSpace orientation="0 0 0 1" position="0 0 0"/>
-    </ReferenceSpace>
-    <CompositionLayerProjection id="mainProjection" space="mainSpace">
-      <ViewConfiguration/>
-      <Swapchain/>
-    </CompositionLayerProjection>
+  <Reality formFactor="HeadMountedDisplay" viewConfigurationType="PrimaryStereo">
+    <Session queue="mainQueue"/>
+    
+    <Swapchain id="leftSwapchain"/>
+    <Swapchain id="rightSwapchain"/>
   </Reality>  
+
+  <ReferenceSpace id="mainSpace" referenceSpaceType="Local">
+    <PoseInReferenceSpace orientation="0 0 0 1" position="0 0 0"/>
+  </ReferenceSpace>
+  
+  <CompositionLayerProjection id="mainProjection" space="mainSpace">
+    <View swapchain="leftSwapchain"/>
+    <View swapchain="rightSwapchain"/>    
+  </CompositionLayerProjection>
+      
+  <Image id="leftDepthBufferImage" format="D32Sfloat" usage="DepthStencilAttachment" swapchain="leftSwapchain"/>
+  <ImageView id="leftDepthBufferImageView" image="leftDepthBufferImage" format="D32Sfloat" aspectMask="Depth"/>
+
+  <RenderPass id="leftRenderPass">
+    <Attachment id="leftColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc" swapchain="leftSwapchain"/>
+    <Attachment id="leftDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
+    <Subpass id="leftSubpass">
+      <ColorAttachment attachment="leftColorAttachment" layout="ColorAttachmentOptimal"/>
+      <DepthStencilAttachment attachment="leftDepthAttachment" layout="DepthStencilAttachmentOptimal"/>
+    </Subpass>
+    <Dependency>
+      <Source stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+      <Destination subpass="leftSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="leftSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+    </Dependency>
+  </RenderPass>
+
+  <Image id="rightDepthBufferImage" format="D32Sfloat" usage="DepthStencilAttachment" swapchain="leftSwapchain"/>
+  <ImageView id="rightDepthBufferImageView" image="rightDepthBufferImage" format="D32Sfloat" aspectMask="Depth"/>
+
+  <RenderPass id="rightRenderPass">
+    <Attachment id="rightColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc" swapchain="rightSwapchain"/>
+    <Attachment id="rightDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
+    <Subpass id="rightSubpass">
+      <ColorAttachment attachment="rightColorAttachment" layout="ColorAttachmentOptimal"/>
+      <DepthStencilAttachment attachment="rightDepthAttachment" layout="DepthStencilAttachmentOptimal"/>
+    </Subpass>
+    <Dependency>
+      <Source stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+      <Destination subpass="rightSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+    </Dependency>
+    <Dependency>
+      <Source subpass="rightSubpass" stageMask="ColorAttachmentOutput" accessMask="ColorAttachmentWrite"/>
+      <Destination stageMask="BottomOfPipe" accessMask="MemoryRead"/>
+    </Dependency>
+  </RenderPass>
+
+  <Frame id="realityFrame" swapchain="leftSwapchain">
+    <Framebuffer id="leftFramebuffer" renderPass="leftRenderPass">
+      <Attachment swapchain="leftSwapchain"/>
+      <Attachment imageView="leftDepthBufferImageView"/>
+    </Framebuffer>
+
+    <Framebuffer id="rightFramebuffer" renderPass="rightRenderPass">
+      <Attachment swapchain="rightSwapchain"/>
+      <Attachment imageView="rightDepthBufferImageView"/>
+    </Framebuffer>
+  </Frame>
   
 </Engine>

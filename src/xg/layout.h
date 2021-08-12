@@ -239,7 +239,6 @@ enum class LayoutType {
   kUpdater,
 #ifdef XG_ENABLE_REALITY
   kReality,
-  kSystem,
   kSession,
   kReferenceSpace,
   kCompositionLayerProjection
@@ -529,7 +528,7 @@ struct LayoutSwapchain : LayoutBase {
 
   std::shared_ptr<LayoutWindow> lwin;
   int min_image_count = 3;
-  Format image_format = Format::kR8G8B8A8Unorm;
+  Format image_format = Format::kUndefined;
   ColorSpace image_color_space = ColorSpace::kSrgbNonlinear;
   int width = 0;
   int height = 0;
@@ -540,11 +539,23 @@ struct LayoutSwapchain : LayoutBase {
   PresentMode present_mode = PresentMode::kImmediate;
   bool clipped = true;
 
+#ifdef XG_ENABLE_REALITY
+  SwapchainUsage usage =
+      SwapchainUsage::kColorAttachment | SwapchainUsage::kSampled;
+  int sample_count = 0;
+  int face_count = 1;
+  int array_size = 1;
+  int mip_count = 1;
+#endif  // XG_ENABLE_REALITY
+
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), lwin, min_image_count,
             image_format, image_color_space, width, height, image_array_layers,
             image_usage, pre_transform, composite_alpha, present_mode, clipped);
+#ifdef XG_ENABLE_REALITY
+    archive(usage, sample_count, face_count, array_size, mip_count);
+#endif
   }
 
   const char* lwin_id = nullptr;
@@ -1880,31 +1891,29 @@ struct LayoutUpdater : LayoutBase {
 
 #ifdef XG_ENABLE_REALITY
 
+struct LayoutSession;
+
 struct LayoutReality : LayoutBase {
   LayoutReality() : LayoutBase{LayoutType::kReality} {}
 
   std::shared_ptr<LayoutRenderer> lrenderer;
 
-  template <class Archive>
-  void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lrenderer);
-  }
-};
-
-struct LayoutSystem : LayoutBase {
-  LayoutSystem() : LayoutBase{LayoutType::kSystem} {}
-
   FormFactor form_factor = FormFactor::kHeadMountedDisplay;
+  ViewConfigurationType view_config_type =
+      ViewConfigurationType::kPrimaryStereo;
+
+  std::vector<std::shared_ptr<LayoutSwapchain>> lswapchains;
+  std::shared_ptr<LayoutSession> lsession;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), form_factor);
+    archive(cereal::base_class<LayoutBase>(this), lrenderer, form_factor,
+            view_config_type, lswapchains, lsession);
   }
 };
 
 struct LayoutSession : LayoutBase {
   LayoutSession() : LayoutBase{LayoutType::kSession} {}
-
   std::shared_ptr<LayoutQueue> lqueue;
 
   template <class Archive>
@@ -1918,32 +1927,41 @@ struct LayoutSession : LayoutBase {
 struct LayoutReferenceSpace : LayoutBase {
   LayoutReferenceSpace() : LayoutBase{LayoutType::kReferenceSpace} {}
 
-  std::shared_ptr<LayoutSession> lsession;
   ReferenceSpaceType reference_space_type_ = ReferenceSpaceType::kLocal;
   glm::quat orientation_ = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
   glm::vec3 position_ = glm::vec3(0.0f, 0.0f, 0.0f);
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lsession,
-            reference_space_type_, orientation_, position_);
+    archive(cereal::base_class<LayoutBase>(this), reference_space_type_,
+            orientation_, position_);
+  }
+};
+
+struct LayoutCompositionLayerProjectionView {
+  std::shared_ptr<LayoutSwapchain> lswapchain;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(lswapchain);
   }
 
-  const char* lsession_id = nullptr;
+  const char* lswapchain_id = nullptr;
 };
 
 struct LayoutCompositionLayerProjection : LayoutBase {
   LayoutCompositionLayerProjection()
       : LayoutBase{LayoutType::kCompositionLayerProjection} {}
 
-  std::shared_ptr<LayoutReferenceSpace> lreference_space;
+  std::shared_ptr<LayoutBase> lspace;
+  std::vector<LayoutCompositionLayerProjectionView> lviews;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lreference_space);
+    archive(cereal::base_class<LayoutBase>(this), lspace, lviews);
   }
 
-  const char* lreference_space_id = nullptr;
+  const char* lspace_id = nullptr;
 };
 
 #endif  // XG_ENABLE_REALITY
@@ -2013,8 +2031,7 @@ struct Layout : std::enable_shared_from_this<Layout> {
 
 #ifdef XG_ENABLE_REALITY
   std::shared_ptr<LayoutReality> lreality;
-  std::shared_ptr<LayoutSystem> lsystem;
-  std::vector<std::shared_ptr<LayoutSession>> lsessions;
+  std::shared_ptr<LayoutSession> lsession;
   std::vector<std::shared_ptr<LayoutReferenceSpace>> lreference_spaces;
   std::vector<std::shared_ptr<LayoutCompositionLayerProjection>>
       lcomposition_layer_projections;
@@ -2093,8 +2110,7 @@ struct Layout : std::enable_shared_from_this<Layout> {
 
 #ifdef XG_ENABLE_REALITY
     archive(lreality);
-    archive(lsystem);
-    archive(lsessions);
+    archive(lsession);
     archive(lreference_spaces);
     archive(lcomposition_layer_projections);
 #endif  // XG_ENABLE_REALITY

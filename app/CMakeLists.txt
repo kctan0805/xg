@@ -8,6 +8,6 @@ add_subdirectory(skybox)
 add_subdirectory(render_to_skybox)
 add_subdirectory(overlay)
 
-if (XG_ENABLE_XR)
+if (XG_ENABLE_REALITY)
     add_subdirectory(hello_reality)
 endif()

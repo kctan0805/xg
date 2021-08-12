@@ -16,10 +16,10 @@
 #include "openxr/openxr_platform.h"
 #include "openxr/openxr.hpp"
 // clang-format on
+#include "xg/composition_layer_projection.h"
 #include "xg/layout.h"
 #include "xg/reality.h"
 #include "xg/session.h"
-#include "xg/system.h"
 
 namespace xg {
 
@@ -30,9 +30,8 @@ class RealityXR : public Reality {
 
   const xr::Instance& GetXrInstance() const { return instance_; }
 
-  bool InitSystem(const LayoutSystem& lsystem) override;
-  std::shared_ptr<Session> CreateSession(
-      const LayoutSession& lsession) override;
+  std::shared_ptr<CompositionLayerProjection> CreateCompositionLayerProjection(
+      const LayoutCompositionLayerProjection& lprojection) override;
 
  protected:
   bool Init(const LayoutReality& lreality);
@@ -40,10 +39,14 @@ class RealityXR : public Reality {
   bool CreateInstance(const LayoutReality& lreality);
   void CreateDispatchLoader();
   bool CreateDebugMessenger();
+  bool InitSystem(const LayoutReality& lreality);
+  bool CreateSession(const LayoutSession& lsession);
+  bool CreateSwapchains(const LayoutReality& lreality);
 
   xr::DispatchLoaderDynamic dispatch_loader_dynamic_;
   xr::Instance instance_;
   xr::DebugUtilsMessengerEXT debug_msg_;
+  xr::SystemId system_id_;
   vk::Instance vk_instance_;
   VkPhysicalDevice vk_physical_device_;
   vk::Device vk_device_;

@@ -942,10 +942,35 @@ inline DependencyFlags operator&(DependencyFlags lhs, DependencyFlags rhs) {
 #ifdef XG_ENABLE_REALITY
 
 enum class FormFactor { kHeadMountedDisplay = 1, kHandheldDisplay = 2 };
-
 enum class ReferenceSpaceType { kView = 1, kLocal = 2, kStage = 3 };
+enum class ViewConfigurationType {
+  kPrimaryMono = 1,
+  kPrimaryStereo = 2
+};
 
-#endif
+enum class SwapchainUsage : unsigned int {
+  kUndefined = 0x0,
+  kColorAttachment = 0x1,
+  kDepthStencilAttachment = 0x2,
+  kUnorderedAccess = 0x4,
+  kTransferSrc = 0x8,
+  kTransferDst = 0x10,
+  kSampled = 0x20,
+  kMutableFormat = 0x40,
+  kInputAttachmentBit = 0x80
+};
+inline SwapchainUsage operator|(SwapchainUsage lhs, SwapchainUsage rhs) {
+  return static_cast<SwapchainUsage>(
+      static_cast<std::underlying_type_t<SwapchainUsage>>(lhs) |
+      static_cast<std::underlying_type_t<SwapchainUsage>>(rhs));
+}
+inline SwapchainUsage operator&(SwapchainUsage lhs, SwapchainUsage rhs) {
+  return static_cast<SwapchainUsage>(
+      static_cast<std::underlying_type_t<SwapchainUsage>>(lhs) &
+      static_cast<std::underlying_type_t<SwapchainUsage>>(rhs));
+}
+
+#endif // XG_ENABLE_REALITY
 
 }  // namespace xg
 

@@ -1217,6 +1217,47 @@ glm::quat StringToQuaternion(const char* value) {
   return result;
 }
 
+ViewConfigurationType StringToViewConfigurationType(
+    const char* value) {
+  static std::unordered_map<std::string, ViewConfigurationType> mapping{
+#define ENTRY(s) {#s, ViewConfigurationType::k##s}
+      ENTRY(PrimaryMono), ENTRY(PrimaryStereo)
+#undef ENTRY
+  };
+  const auto x = mapping.find(value);
+  if (x != std::end(mapping)) {
+    return x->second;
+  }
+  XG_ERROR("unknown view configuration type: {}", value);
+  return ViewConfigurationType::kPrimaryStereo;
+}
+
+SwapchainUsage StringToSwapchainUsage(const char* value) {
+  static std::unordered_map<std::string, SwapchainUsage> mapping{
+#define ENTRY(s) {#s, SwapchainUsage::k##s}
+      ENTRY(ColorAttachment),
+      ENTRY(DepthStencilAttachment),
+      ENTRY(UnorderedAccess),
+      ENTRY(TransferSrc),
+      ENTRY(TransferDst),
+      ENTRY(Sampled),
+      ENTRY(MutableFormat),
+      ENTRY(InputAttachmentBit)
+#undef ENTRY
+  };
+  std::stringstream ss(value);
+  std::string token;
+  auto result = SwapchainUsage::kUndefined;
+
+  while (ss >> token) {
+    const auto x = mapping.find(token.c_str());
+    if (x != std::end(mapping)) {
+      result = result | x->second;
+    }
+  }
+  return result;
+}
+
 #endif // XG_ENABLE_REALITY
 
 }  // namespace parser

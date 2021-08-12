@@ -44,10 +44,9 @@
 #include "xg/viewer.h"
 
 #ifdef XG_ENABLE_REALITY
+#include "xg/composition_layer_projection.h"
 #include "xg/reality.h"
 #include "xg/reference_space.h"
-#include "xg/session.h"
-#include "xg/system.h"
 #endif  // XG_ENABLE_REALITY
 
 namespace xg {
@@ -118,9 +117,8 @@ bool Engine::PostInit(const std::shared_ptr<Layout>& layout) {
 #ifdef XG_ENABLE_REALITY
   if (layout->lreality) {
     if (!CreateReality(*layout)) return false;
-    if (!CreateSystem(*layout)) return false;
-    if (!CreateSession(*layout)) return false;
     if (!CreateReferenceSpace(*layout)) return false;
+    if (!CreateCompositionLayerProjection(*layout)) return false;
   }
 #endif  // XG_ENABLE_REALITY
 
@@ -201,6 +199,7 @@ bool Engine::CreateDevice(Layout* layout) {
 bool Engine::CreateSwapchains(const Layout& layout) {
   for (const auto& lswapchain : layout.lswapchains) {
     if (!lswapchain->realize) continue;
+    if (!lswapchain->lwin) continue;
 
     auto swapchain = device_->CreateSwapchain(lswapchain.get());
     if (!swapchain) return false;
@@ -1376,47 +1375,35 @@ bool Engine::CreateReality(const Layout& layout) {
 
   lreality->instance = reality_;
 
-  return true;
-}
+  const auto& session = reality_->GetSession();
+  const auto& lsession = lreality->lsession;
+  lsession->instance = session;
 
-bool Engine::CreateSystem(const Layout& layout) {
-  const auto& lsystem = layout.lsystem;
-  if (!reality_->InitSystem(*lsystem)) return false;
+  if (!lsession->id.empty())
+    instance_id_map_.insert(std::make_pair(lsession->id, session));
 
-  auto system = reality_->GetSystem();
+  const auto& swapchains = reality_->GetSwapchains();
+  const auto& lswapchains = lreality->lswapchains;
+  assert(swapchains.size() == lswapchains.size());
+  int count = std::min(swapchains.size(), lswapchains.size());
+  for (int i = 0; i < count; ++i) {
+    const auto& swapchain = swapchains[i];
+    const auto& lswapchain = lswapchains[i];
 
-  lsystem->instance = system;
+    lswapchain->instance = swapchain;
 
-  if (!lsystem->id.empty())
-    instance_id_map_.insert(std::make_pair(lsystem->id, system));
-
-  system_ = std::move(system);
-  return true;
-}
-
-bool Engine::CreateSession(const Layout& layout) {
-  for (const auto& lsession : layout.lsessions) {
-    if (!lsession->realize) continue;
-
-    auto session = reality_->CreateSession(*lsession);
-    if (!session) return false;
-
-    lsession->instance = session;
-
-    if (!lsession->id.empty())
-      instance_id_map_.insert(std::make_pair(lsession->id, session));
-
-    sessions_.emplace_back(std::move(session));
+    if (!lswapchain->id.empty())
+      instance_id_map_.insert(std::make_pair(lswapchain->id, swapchain));
   }
+
   return true;
 }
 
 bool Engine::CreateReferenceSpace(const Layout& layout) {
+  const auto& session = reality_->GetSession();
+
   for (const auto& lreference_space : layout.lreference_spaces) {
     if (!lreference_space->realize) continue;
-    if (!lreference_space->lsession) continue;
-
-    auto* session = static_cast<Session*>(lreference_space->lsession->instance.get());
 
     auto reference_space = session->CreateReferenceSpace(*lreference_space);
     if (!reference_space) return false;
@@ -1428,6 +1415,23 @@ bool Engine::CreateReferenceSpace(const Layout& layout) {
           std::make_pair(lreference_space->id, reference_space));
 
     reference_spaces_.emplace_back(std::move(reference_space));
+  }
+  return true;
+}
+
+bool Engine::CreateCompositionLayerProjection(const Layout& layout) {
+  for (const auto& lprojection : layout.lcomposition_layer_projections) {
+    if (!lprojection->realize) continue;
+
+    auto projection = reality_->CreateCompositionLayerProjection(*lprojection);
+    if (!projection) return false;
+
+    lprojection->instance = projection;
+
+    if (!lprojection->id.empty())
+      instance_id_map_.insert(std::make_pair(lprojection->id, projection));
+
+    composition_layer_projections_.emplace_back(std::move(projection));
   }
   return true;
 }

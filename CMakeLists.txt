@@ -4,6 +4,8 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
+project(xg)
+
 option(XG_BUILD_APPS "Build the XG example applications" ON)
 option(XG_ENABLE_REALITY "Enable reality feature" OFF)
 
@@ -19,19 +21,23 @@ add_definitions(
 )
 
 if (XG_ENABLE_REALITY)
-add_definitions(
-    -DXG_ENABLE_REALITY
-)
+    add_definitions(
+        -DXG_ENABLE_REALITY
+    )
 endif()
 
-if (WIN32)
+if (MSVC)
     add_definitions(
         -D_SCL_SECURE_NO_WARNINGS
     )
     add_compile_options(/bigobj /utf-8)
+elseif (MINGW)
+    add_definitions(
+        -DS_IFSOCK=0xC000
+    )
+    add_compile_options(-Wa,-mbig-obj)
 endif()
 
-project(xg)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include_directories(

@@ -35,7 +35,7 @@ bool Application::Init(xg::Engine* engine) {
 }
 
 xg::Result Application::OnUpdate(std::shared_ptr<xg::Viewer> viewer) {
-  auto& camera = viewer->GetCamera();
+  const auto& camera = viewer->GetCamera();
 
   // update common uniform buffer
   auto draw_update_data = view_update_data_[viewer.get()];

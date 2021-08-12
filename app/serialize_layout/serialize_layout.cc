@@ -27,7 +27,7 @@ bool Application::Init(xg::Engine* engine) {
   if (!SimpleApplication::Init(engine)) return false;
 
   auto& viewer = engine->GetViewers()[0];
-  auto& camera = viewer->GetCamera();
+  const auto& camera = viewer->GetCamera();
 
   // update common uniform buffer
   auto& draw_common_update_data = viewer->GetUpdateData(0);
@@ -42,7 +42,7 @@ bool Application::Init(xg::Engine* engine) {
 }
 
 xg::Result Application::OnUpdate(std::shared_ptr<xg::Viewer> viewer) {
-  auto& camera = viewer->GetCamera();
+  const auto& camera = viewer->GetCamera();
 
   // update instance uniform buffer
   auto uniform_data = static_cast<glm::mat4*>(draw_update_data_->Map());

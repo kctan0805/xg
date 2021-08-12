@@ -6,12 +6,11 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/parser/parser_internal.h"
-
 #include <memory>
 
 #include "tinyxml2.h"
 #include "xg/layout.h"
+#include "xg/parser/parser_internal.h"
 #include "xg/types.h"
 
 namespace xg {
@@ -23,7 +22,20 @@ bool ParserSingleton<ParserCompositionLayerProjection>::ParseElement(
   auto node = std::make_shared<LayoutCompositionLayerProjection>();
   if (!node) return false;
 
-  node->lreference_space_id = element->Attribute("space");
+  node->lspace_id = element->Attribute("space");
+
+  for (auto child = element->FirstChildElement(); child;
+       child = child->NextSiblingElement()) {
+    const char* name = child->Name();
+
+    if (strcmp(name, "View") == 0) {
+      LayoutCompositionLayerProjectionView lview;
+
+      lview.lswapchain_id = child->Attribute("swapchain");
+
+      node->lviews.emplace_back(lview);
+    }
+  }
 
   status->node = node;
 

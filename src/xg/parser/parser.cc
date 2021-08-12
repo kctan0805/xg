@@ -222,8 +222,6 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
 #ifdef XG_ENABLE_REALITY
   else if (strcmp(name, "Reality") == 0) {
     return ParserReality::Get().ParseElement(element, status);
-  } else if (strcmp(name, "System") == 0) {
-    return ParserSystem::Get().ParseElement(element, status);
   } else if (strcmp(name, "Session") == 0) {
     return ParserSession::Get().ParseElement(element, status);
   } else if (strcmp(name, "ReferenceSpace") == 0) {
@@ -617,14 +615,9 @@ void Parser::AddLayoutNode(std::shared_ptr<Layout> layout,
       layout->lreality = std::static_pointer_cast<LayoutReality>(node);
       break;
 
-    case LayoutType::kSystem:
-      assert(layout->lsystem == nullptr);
-      layout->lsystem = std::static_pointer_cast<LayoutSystem>(node);
-      break;
-
     case LayoutType::kSession:
-      layout->lsessions.emplace_back(
-          std::static_pointer_cast<LayoutSession>(node));
+      assert(layout->lsession == nullptr);
+      layout->lsession = std::static_pointer_cast<LayoutSession>(node);
       break;
 
     case LayoutType::kReferenceSpace:
@@ -1643,34 +1636,44 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
   }
 
 #ifdef XG_ENABLE_REALITY
-  for (auto lsession : layout->lsessions) {
-    if (lsession->lqueue_id) {
-      const auto it = node_id_map.find(lsession->lqueue_id);
-      assert(it != node_id_map.end());
-      lsession->lqueue = std::static_pointer_cast<LayoutQueue>(it->second);
-      assert(lsession->lqueue);
+  if (layout->lreality) {
+    auto& lreality = layout->lreality;
+    lreality->lsession = layout->lsession;
+
+    for (auto lswapchain : layout->lswapchains) {
+      if (!lswapchain->lwin) {
+        lreality->lswapchains.emplace_back(lswapchain);
+      }
     }
   }
 
-  for (auto lreference_space : layout->lreference_spaces) {
-    if (lreference_space->lsession_id) {
-      const auto it = node_id_map.find(lreference_space->lsession_id);
-      assert(it != node_id_map.end());
-      lreference_space->lsession =
-          std::static_pointer_cast<LayoutSession>(it->second);
-      assert(lreference_space->lsession);
-    }
+  if (layout->lsession) {
+    auto& lsession = layout->lsession;
+    const auto it = node_id_map.find(lsession->lqueue_id);
+    assert(it != node_id_map.end());
+    lsession->lqueue = std::static_pointer_cast<LayoutQueue>(it->second);
+    assert(lsession.lqueue);
   }
 
   for (auto lcomposition_layer_projection :
        layout->lcomposition_layer_projections) {
-    if (lcomposition_layer_projection->lreference_space_id) {
+    if (lcomposition_layer_projection->lspace_id) {
       const auto it =
-          node_id_map.find(lcomposition_layer_projection->lreference_space_id);
+          node_id_map.find(lcomposition_layer_projection->lspace_id);
       assert(it != node_id_map.end());
-      lcomposition_layer_projection->lreference_space =
-          std::static_pointer_cast<LayoutReferenceSpace>(it->second);
-      assert(lcomposition_layer_projection->lreference_space);
+      lcomposition_layer_projection->lspace =
+          std::static_pointer_cast<LayoutBase>(it->second);
+      assert(lcomposition_layer_projection->lspace);
+    }
+
+    for (auto& lview : lcomposition_layer_projection->lviews) {
+      if (lview.lswapchain_id) {
+        const auto it = node_id_map.find(lview.lswapchain_id);
+        assert(it != node_id_map.end());
+        lview.lswapchain =
+            std::static_pointer_cast<LayoutSwapchain>(it->second);
+        assert(lview.lswapchain);
+      }
     }
   }
 #endif  // XG_ENABLE_REALITY
