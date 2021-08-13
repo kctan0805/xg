@@ -76,6 +76,13 @@ bool Engine::Init(std::shared_ptr<Layout> layout) {
   if (!CreateCommandPools(*layout)) return false;
   if (!CreateCommandBuffers(*layout)) return false;
   if (!CreateFences(*layout)) return false;
+
+#ifdef XG_ENABLE_REALITY
+  if (layout->lreality) {
+    if (!CreateReality(*layout)) return false;
+  }
+#endif  // XG_ENABLE_REALITY
+
   if (!PostInit(layout)) return false;
 
   return true;
@@ -116,7 +123,6 @@ bool Engine::PostInit(const std::shared_ptr<Layout>& layout) {
 
 #ifdef XG_ENABLE_REALITY
   if (layout->lreality) {
-    if (!CreateReality(*layout)) return false;
     if (!CreateReferenceSpace(*layout)) return false;
     if (!CreateCompositionLayerProjection(*layout)) return false;
   }

@@ -258,6 +258,7 @@ ReferenceSpaceType StringToReferenceSpaceType(const char* value);
 glm::quat StringToQuaternion(const char* value);
 ViewConfigurationType StringToViewConfigurationType(const char* value);
 SwapchainUsage StringToSwapchainUsage(const char* value);
+CompositionLayerFlags StringToCompositionLayerFlags(const char* value);
 
 #endif  // XG_ENABLE_REALITY
 

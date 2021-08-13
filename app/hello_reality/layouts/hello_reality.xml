@@ -174,30 +174,6 @@
     <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
 
-  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
-    <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
-    <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
-    <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
-      <Submit>
-        <Wait semaphore="imageAvailableSemaphore" dstStageMask="ColorAttachmentOutput"/>
-        <CommandBuffer commandBuffer="mainCommandBuffer"/>
-        <SignalSemaphore semaphore="renderCompleteSemaphore"/>
-      </Submit>
-    </QueueSubmit>
-    <QueuePresent queue="mainQueue">
-      <WaitSemaphore semaphore="renderCompleteSemaphore"/>
-    </QueuePresent>
-    <Resizer>
-      <Image image="mainDepthBufferImage"/>
-      <ImageView imageView="mainDepthBufferImageView"/>
-      <GraphicsPipeline graphicsPipeline="drawPipeline"/>
-      <Framebuffer framebuffer="mainFramebuffer"/>
-    </Resizer>
-    <Updater>
-      <Buffer buffer="drawCommonUniformBuffer"/>
-    </Updater>
-  </Viewer>
-  
   <Reality formFactor="HeadMountedDisplay" viewConfigurationType="PrimaryStereo">
     <Session queue="mainQueue"/>
     
@@ -265,5 +241,29 @@
       <Attachment imageView="rightDepthBufferImageView"/>
     </Framebuffer>
   </Frame>
+
+  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
+    <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
+    <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
+    <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
+      <Submit>
+        <Wait semaphore="imageAvailableSemaphore" dstStageMask="ColorAttachmentOutput"/>
+        <CommandBuffer commandBuffer="mainCommandBuffer"/>
+        <SignalSemaphore semaphore="renderCompleteSemaphore"/>
+      </Submit>
+    </QueueSubmit>
+    <QueuePresent queue="mainQueue">
+      <WaitSemaphore semaphore="renderCompleteSemaphore"/>
+    </QueuePresent>
+    <Resizer>
+      <Image image="mainDepthBufferImage"/>
+      <ImageView imageView="mainDepthBufferImageView"/>
+      <GraphicsPipeline graphicsPipeline="drawPipeline"/>
+      <Framebuffer framebuffer="mainFramebuffer"/>
+    </Resizer>
+    <Updater>
+      <Buffer buffer="drawCommonUniformBuffer"/>
+    </Updater>
+  </Viewer>
   
 </Engine>

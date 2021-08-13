@@ -40,7 +40,7 @@ class RealityXR : public Reality {
   void CreateDispatchLoader();
   bool CreateDebugMessenger();
   bool InitSystem(const LayoutReality& lreality);
-  bool CreateSession(const LayoutSession& lsession);
+  bool CreateSession(const LayoutReality& lreality);
   bool CreateSwapchains(const LayoutReality& lreality);
 
   xr::DispatchLoaderDynamic dispatch_loader_dynamic_;

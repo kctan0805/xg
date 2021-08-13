@@ -22,6 +22,7 @@
 #include "xg/layout.h"
 #include "xg/logger.h"
 #include "xg/openxr/composition_layer_projection_xr.h"
+#include "xg/openxr/reference_space_xr.h"
 #include "xg/openxr/session_xr.h"
 #include "xg/openxr/swapchain_xr.h"
 #include "xg/session.h"
@@ -48,7 +49,7 @@ bool RealityXR::Init(const LayoutReality& lreality) {
   CreateDispatchLoader();
   if (lrenderer.validation && !CreateDebugMessenger()) return false;
   if (!InitSystem(lreality)) return false;
-  if (!CreateSession(*lreality.lsession)) return false;
+  if (!CreateSession(lreality)) return false;
   if (!CreateSwapchains(lreality)) return false;
 
   return true;
@@ -197,17 +198,28 @@ bool RealityXR::InitSystem(const LayoutReality& lreality) {
     return false;
   }
 
+  const auto view_configs =
+      instance_.enumerateViewConfigurationsToVector(system_id_);
+  const auto it = std::find(
+      view_configs.begin(), view_configs.end(),
+      static_cast<xr::ViewConfigurationType>(lreality.view_config_type));
+  if (it == view_configs.end()) {
+    XG_ERROR("unsupport view configuration type:{}", lreality.view_config_type);
+    return false;
+  }
+
   return true;
 }
 
-bool RealityXR::CreateSession(const LayoutSession& lsession) {
+bool RealityXR::CreateSession(const LayoutReality& lreality) {
   auto session = std::make_shared<SessionXR>();
   if (!session) {
     XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
     return false;
   }
 
-  const auto queue_vk = static_cast<QueueVK*>(lsession.lqueue->instance.get());
+  const auto queue_vk =
+      static_cast<QueueVK*>(lreality.lsession->lqueue->instance.get());
   xr::GraphicsBindingVulkanKHR binding;
   binding.instance = (VkInstance)vk_instance_;
   binding.physicalDevice = vk_physical_device_;
@@ -225,6 +237,9 @@ bool RealityXR::CreateSession(const LayoutSession& lsession) {
     return false;
   }
 
+  session->view_config_type_ =
+      static_cast<xr::ViewConfigurationType>(lreality.view_config_type);
+
   session_ = session;
 
   return true;
@@ -235,6 +250,7 @@ bool RealityXR::CreateSwapchains(const LayoutReality& lreality) {
   const auto& views = instance_.enumerateViewConfigurationViewsToVector(
       system_id_,
       static_cast<xr::ViewConfigurationType>(lreality.view_config_type));
+  if (views.size() == 0) return false;
 
   const auto& swapchain_formats =
       xr_session.enumerateSwapchainFormatsToVector();
@@ -363,6 +379,13 @@ RealityXR::CreateCompositionLayerProjection(
     return nullptr;
   }
 
+  projection->composition_layer_projection_.layerFlags =
+      static_cast<xr::CompositionLayerFlagBits>(lprojection.layer_flags);
+
+  const auto space_xr =
+      static_cast<ReferenceSpaceXR*>(lprojection.lspace->instance.get());
+  projection->composition_layer_projection_.space = space_xr->space_;
+
   for (const auto& lview : lprojection.lviews) {
     xr::CompositionLayerProjectionView view;
     const auto swapchain =
@@ -374,6 +397,12 @@ RealityXR::CreateCompositionLayerProjection(
 
     projection->composition_layer_projection_views_.emplace_back(view);
   }
+
+  projection->composition_layer_projection_.viewCount = static_cast<uint32_t>(
+      projection->composition_layer_projection_views_.size());
+
+  projection->composition_layer_projection_.views =
+      projection->composition_layer_projection_views_.data();
 
   return projection;
 }

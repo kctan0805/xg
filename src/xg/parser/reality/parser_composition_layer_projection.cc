@@ -22,6 +22,9 @@ bool ParserSingleton<ParserCompositionLayerProjection>::ParseElement(
   auto node = std::make_shared<LayoutCompositionLayerProjection>();
   if (!node) return false;
 
+  const char* value = element->Attribute("layerFlags");
+  if (value) node->layer_flags = StringToCompositionLayerFlags(value);
+
   node->lspace_id = element->Attribute("space");
 
   for (auto child = element->FirstChildElement(); child;

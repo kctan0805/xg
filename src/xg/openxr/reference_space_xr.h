@@ -22,6 +22,7 @@ class ReferenceSpaceXR : public ReferenceSpace {
  protected:
   xr::Space space_;
 
+  friend class RealityXR;
   friend class SessionXR;
 };
 

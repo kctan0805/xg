@@ -1953,6 +1953,7 @@ struct LayoutCompositionLayerProjection : LayoutBase {
   LayoutCompositionLayerProjection()
       : LayoutBase{LayoutType::kCompositionLayerProjection} {}
 
+  CompositionLayerFlags layer_flags = CompositionLayerFlags::kUndefined;
   std::shared_ptr<LayoutBase> lspace;
   std::vector<LayoutCompositionLayerProjectionView> lviews;
 

@@ -6,8 +6,6 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/parser/parser_internal.h"
-
 #include <cassert>
 #include <memory>
 #include <sstream>
@@ -18,13 +16,14 @@
 #include "glm/glm.hpp"
 #include "tinyxml2.h"
 #include "xg/logger.h"
+#include "xg/parser/parser_internal.h"
 
 namespace xg {
 namespace parser {
 
 const char* Tinyxml2ErrorString(tinyxml2::XMLError error) {
   switch (error) {
-#define STR(r)        \
+#define STR(r)      \
   case tinyxml2::r: \
     return #r
     STR(XML_NO_ATTRIBUTE);
@@ -312,8 +311,7 @@ ColorSpace StringToColorSpace(const char* value) {
   return ColorSpace::kSrgbNonlinear;
 }
 
-SurfaceTransformFlags StringToSurfaceTransformFlags(
-    const char* value) {
+SurfaceTransformFlags StringToSurfaceTransformFlags(const char* value) {
   static std::unordered_map<std::string, SurfaceTransformFlags> mapping{
 #define ENTRY(s) {#s, SurfaceTransformFlags::k##s}
       ENTRY(Identity),
@@ -1217,8 +1215,7 @@ glm::quat StringToQuaternion(const char* value) {
   return result;
 }
 
-ViewConfigurationType StringToViewConfigurationType(
-    const char* value) {
+ViewConfigurationType StringToViewConfigurationType(const char* value) {
   static std::unordered_map<std::string, ViewConfigurationType> mapping{
 #define ENTRY(s) {#s, ViewConfigurationType::k##s}
       ENTRY(PrimaryMono), ENTRY(PrimaryStereo)
@@ -1258,7 +1255,27 @@ SwapchainUsage StringToSwapchainUsage(const char* value) {
   return result;
 }
 
-#endif // XG_ENABLE_REALITY
+CompositionLayerFlags StringToCompositionLayerFlags(const char* value) {
+  static std::unordered_map<std::string, CompositionLayerFlags> mapping{
+#define ENTRY(s) {#s, CompositionLayerFlags::k##s}
+      ENTRY(CorrectChromaticAberration), ENTRY(BlendTextureSourceAlpha),
+      ENTRY(UnpremultipliedAlpha)
+#undef ENTRY
+  };
+  std::stringstream ss(value);
+  std::string token;
+  auto result = CompositionLayerFlags::kUndefined;
+
+  while (ss >> token) {
+    const auto x = mapping.find(token.c_str());
+    if (x != std::end(mapping)) {
+      result = result | x->second;
+    }
+  }
+  return result;
+}
+
+#endif  // XG_ENABLE_REALITY
 
 }  // namespace parser
 }  // namespace xg

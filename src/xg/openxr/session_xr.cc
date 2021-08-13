@@ -53,4 +53,13 @@ std::shared_ptr<ReferenceSpace> SessionXR::CreateReferenceSpace(
   return reference_space;
 }
 
+void SessionXR::Begin() {
+  xr::SessionBeginInfo info;
+  info.primaryViewConfigurationType = view_config_type_;
+
+  session_.beginSession(info);
+}
+
+void SessionXR::End() { session_.endSession(); }
+
 }  // namespace xg

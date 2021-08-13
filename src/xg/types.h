@@ -943,10 +943,7 @@ inline DependencyFlags operator&(DependencyFlags lhs, DependencyFlags rhs) {
 
 enum class FormFactor { kHeadMountedDisplay = 1, kHandheldDisplay = 2 };
 enum class ReferenceSpaceType { kView = 1, kLocal = 2, kStage = 3 };
-enum class ViewConfigurationType {
-  kPrimaryMono = 1,
-  kPrimaryStereo = 2
-};
+enum class ViewConfigurationType { kPrimaryMono = 1, kPrimaryStereo = 2 };
 
 enum class SwapchainUsage : unsigned int {
   kUndefined = 0x0,
@@ -970,7 +967,26 @@ inline SwapchainUsage operator&(SwapchainUsage lhs, SwapchainUsage rhs) {
       static_cast<std::underlying_type_t<SwapchainUsage>>(rhs));
 }
 
-#endif // XG_ENABLE_REALITY
+enum class CompositionLayerFlags : unsigned int {
+  kUndefined = 0x0,
+  kCorrectChromaticAberration = 0x1,
+  kBlendTextureSourceAlpha = 0x2,
+  kUnpremultipliedAlpha = 0x4
+};
+inline CompositionLayerFlags operator|(CompositionLayerFlags lhs,
+                                       CompositionLayerFlags rhs) {
+  return static_cast<CompositionLayerFlags>(
+      static_cast<std::underlying_type_t<CompositionLayerFlags>>(lhs) |
+      static_cast<std::underlying_type_t<CompositionLayerFlags>>(rhs));
+}
+inline CompositionLayerFlags operator&(CompositionLayerFlags lhs,
+                                       CompositionLayerFlags rhs) {
+  return static_cast<CompositionLayerFlags>(
+      static_cast<std::underlying_type_t<CompositionLayerFlags>>(lhs) &
+      static_cast<std::underlying_type_t<CompositionLayerFlags>>(rhs));
+}
+
+#endif  // XG_ENABLE_REALITY
 
 }  // namespace xg
 
