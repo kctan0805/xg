@@ -204,8 +204,8 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
     return ParserDrawOverlay::Get().ParseElement(element, status);
   } else if (strcmp(name, "Overlay") == 0) {
     return ParserOverlay::Get().ParseElement(element, status);
-  } else if (strcmp(name, "Viewer") == 0) {
-    return ParserViewer::Get().ParseElement(element, status);
+  } else if (strcmp(name, "WindowViewer") == 0) {
+    return ParserWindowViewer::Get().ParseElement(element, status);
   } else if (strcmp(name, "AcquireNextImage") == 0) {
     return ParserAcquireNextImage::Get().ParseElement(element, status);
   } else if (strcmp(name, "QueueSubmit") == 0) {
@@ -229,6 +229,12 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
   } else if (strcmp(name, "CompositionLayerProjection") == 0) {
     return ParserCompositionLayerProjection::Get().ParseElement(element,
                                                                 status);
+  } else if (strcmp(name, "RealityViewer") == 0) {
+    return ParserRealityViewer::Get().ParseElement(element, status);
+  } else if (strcmp(name, "LocateViews") == 0) {
+    return ParserLocateViews::Get().ParseElement(element, status);
+  } else if (strcmp(name, "EndFrame") == 0) {
+    return ParserEndFrame::Get().ParseElement(element, status);
   }
 #endif  // XG_ENABLE_REALITY
 
@@ -594,9 +600,9 @@ void Parser::AddLayoutNode(std::shared_ptr<Layout> layout,
           std::static_pointer_cast<LayoutOverlay>(node));
       break;
 
-    case LayoutType::kViewer:
-      layout->lviewers.emplace_back(
-          std::static_pointer_cast<LayoutViewer>(node));
+    case LayoutType::kWindowViewer:
+      layout->lwindow_viewers.emplace_back(
+          std::static_pointer_cast<LayoutWindowViewer>(node));
       break;
 
     case LayoutType::kQueueSubmit:
@@ -630,6 +636,10 @@ void Parser::AddLayoutNode(std::shared_ptr<Layout> layout,
           std::static_pointer_cast<LayoutCompositionLayerProjection>(node));
       break;
 
+    case LayoutType::kRealityViewer:
+      layout->lreality_viewers.emplace_back(
+          std::static_pointer_cast<LayoutRealityViewer>(node));
+      break;
 #endif  // XG_ENABLE_REALITY
 
     default:
@@ -642,6 +652,7 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
   const auto& node_id_map = layout->node_id_map;
 
   for (auto lwin : layout->lwindows) {
+    lwin->lrenderer = layout->lrenderer;
     layout->ldevice->lwindows.emplace_back(lwin);
   }
 
@@ -1431,47 +1442,51 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     }
   }
 
-  for (auto lviewer : layout->lviewers) {
-    if (lviewer->lwin_id) {
-      const auto it = node_id_map.find(lviewer->lwin_id);
+  for (auto lreality_viewer : layout->lwindow_viewers) {
+    if (lreality_viewer->lwin_id) {
+      const auto it = node_id_map.find(lreality_viewer->lwin_id);
       assert(it != node_id_map.end());
-      lviewer->lwin = std::static_pointer_cast<LayoutWindow>(it->second);
-      assert(lviewer->lwin);
+      lreality_viewer->lwin =
+          std::static_pointer_cast<LayoutWindow>(it->second);
+      assert(lreality_viewer->lwin);
     }
 
-    if (lviewer->lframe_id) {
-      const auto it = node_id_map.find(lviewer->lframe_id);
+    if (lreality_viewer->lframe_id) {
+      const auto it = node_id_map.find(lreality_viewer->lframe_id);
       assert(it != node_id_map.end());
-      lviewer->lframe = std::static_pointer_cast<LayoutFrame>(it->second);
-      assert(lviewer->lframe);
+      lreality_viewer->lframe =
+          std::static_pointer_cast<LayoutFrame>(it->second);
+      assert(lreality_viewer->lframe);
     }
 
-    if (lviewer->lcamera_id) {
-      const auto it = node_id_map.find(lviewer->lcamera_id);
+    if (lreality_viewer->lcamera_id) {
+      const auto it = node_id_map.find(lreality_viewer->lcamera_id);
       assert(it != node_id_map.end());
-      lviewer->lcamera = std::static_pointer_cast<LayoutCamera>(it->second);
-      assert(lviewer->lcamera);
+      lreality_viewer->lcamera =
+          std::static_pointer_cast<LayoutCamera>(it->second);
+      assert(lreality_viewer->lcamera);
     }
 
-    if (lviewer->loverlay_id) {
-      const auto it = node_id_map.find(lviewer->loverlay_id);
+    if (lreality_viewer->loverlay_id) {
+      const auto it = node_id_map.find(lreality_viewer->loverlay_id);
       assert(it != node_id_map.end());
-      lviewer->loverlay = std::static_pointer_cast<LayoutOverlay>(it->second);
-      assert(lviewer->loverlay);
+      lreality_viewer->loverlay =
+          std::static_pointer_cast<LayoutOverlay>(it->second);
+      assert(lreality_viewer->loverlay);
     }
 
-    for (auto& lcmd_context_id : lviewer->lcmd_context_ids) {
+    for (auto& lcmd_context_id : lreality_viewer->lcmd_context_ids) {
       const auto it = node_id_map.find(lcmd_context_id);
       assert(it != node_id_map.end());
       auto lcmd_context =
           std::static_pointer_cast<LayoutCommandContext>(it->second);
       assert(lcmd_context);
-      lviewer->lcmd_contexts.emplace_back(lcmd_context);
+      lreality_viewer->lcmd_contexts.emplace_back(lcmd_context);
     }
-    lviewer->lcmd_context_ids.clear();
+    lreality_viewer->lcmd_context_ids.clear();
 
-    if (lviewer->lacquire_next_image) {
-      auto& lacquire_next_image = lviewer->lacquire_next_image;
+    if (lreality_viewer->lacquire_next_image) {
+      auto& lacquire_next_image = lreality_viewer->lacquire_next_image;
       if (lacquire_next_image->lwait_fence_id) {
         const auto it = node_id_map.find(lacquire_next_image->lwait_fence_id);
         assert(it != node_id_map.end());
@@ -1497,18 +1512,18 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
       }
     }
 
-    for (auto& lqueue_submit_id : lviewer->lqueue_submit_ids) {
+    for (auto& lqueue_submit_id : lreality_viewer->lqueue_submit_ids) {
       const auto it = node_id_map.find(lqueue_submit_id);
       assert(it != node_id_map.end());
       auto lqueue_submit =
           std::static_pointer_cast<LayoutQueueSubmit>(it->second);
       assert(lqueue_submit);
-      lviewer->lqueue_submits.emplace_back(lqueue_submit);
+      lreality_viewer->lqueue_submits.emplace_back(lqueue_submit);
     }
-    lviewer->lqueue_submit_ids.clear();
+    lreality_viewer->lqueue_submit_ids.clear();
 
-    if (lviewer->lresizer) {
-      auto lresizer = lviewer->lresizer;
+    if (lreality_viewer->lresizer) {
+      auto lresizer = lreality_viewer->lresizer;
 
       for (auto& limage_id : lresizer->limage_ids) {
         const auto it = node_id_map.find(limage_id);
@@ -1550,8 +1565,8 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
       lresizer->lframebuffer_ids.clear();
     }
 
-    if (lviewer->lupdater) {
-      auto lupdater = lviewer->lupdater;
+    if (lreality_viewer->lupdater) {
+      auto lupdater = lreality_viewer->lupdater;
       for (auto& lbuffer_id : lupdater->lbuffer_ids) {
         const auto it = node_id_map.find(lbuffer_id);
         assert(it != node_id_map.end());
@@ -1639,12 +1654,6 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
   if (layout->lreality) {
     auto& lreality = layout->lreality;
     lreality->lsession = layout->lsession;
-
-    for (auto lswapchain : layout->lswapchains) {
-      if (!lswapchain->lwin) {
-        lreality->lswapchains.emplace_back(lswapchain);
-      }
-    }
   }
 
   if (layout->lsession) {
@@ -1676,6 +1685,107 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
       }
     }
   }
+
+  for (auto lreality_viewer : layout->lreality_viewers) {
+    if (lreality_viewer->lframe_id) {
+      const auto it = node_id_map.find(lreality_viewer->lframe_id);
+      assert(it != node_id_map.end());
+      lreality_viewer->lframe =
+          std::static_pointer_cast<LayoutFrame>(it->second);
+      assert(lreality_viewer->lframe);
+    }
+
+    if (lreality_viewer->lcamera_id) {
+      const auto it = node_id_map.find(lreality_viewer->lcamera_id);
+      assert(it != node_id_map.end());
+      lreality_viewer->lcamera =
+          std::static_pointer_cast<LayoutCamera>(it->second);
+      assert(lreality_viewer->lcamera);
+    }
+
+    for (auto& lcmd_context_id : lreality_viewer->lcmd_context_ids) {
+      const auto it = node_id_map.find(lcmd_context_id);
+      assert(it != node_id_map.end());
+      auto lcmd_context =
+          std::static_pointer_cast<LayoutCommandContext>(it->second);
+      assert(lcmd_context);
+      lreality_viewer->lcmd_contexts.emplace_back(lcmd_context);
+    }
+    lreality_viewer->lcmd_context_ids.clear();
+
+    if (lreality_viewer->lacquire_next_image) {
+      auto& lacquire_next_image = lreality_viewer->lacquire_next_image;
+      if (lacquire_next_image->lwait_fence_id) {
+        const auto it = node_id_map.find(lacquire_next_image->lwait_fence_id);
+        assert(it != node_id_map.end());
+        lacquire_next_image->lwait_fence =
+            std::static_pointer_cast<LayoutFence>(it->second);
+        assert(lacquire_next_image->lwait_fence);
+      }
+
+      if (lacquire_next_image->lsemaphore_id) {
+        const auto it = node_id_map.find(lacquire_next_image->lsemaphore_id);
+        assert(it != node_id_map.end());
+        lacquire_next_image->lsemaphore =
+            std::static_pointer_cast<LayoutSemaphore>(it->second);
+        assert(lacquire_next_image->lsemaphore);
+      }
+
+      if (lacquire_next_image->lfence_id) {
+        const auto it = node_id_map.find(lacquire_next_image->lfence_id);
+        assert(it != node_id_map.end());
+        lacquire_next_image->lfence =
+            std::static_pointer_cast<LayoutFence>(it->second);
+        assert(lacquire_next_image->lfence);
+      }
+    }
+
+    if (lreality_viewer->llocate_views) {
+      auto& llocate_views = lreality_viewer->llocate_views;
+      if (llocate_views->lspace_id) {
+        const auto it = node_id_map.find(llocate_views->lspace_id);
+        assert(it != node_id_map.end());
+        llocate_views->lspace =
+            std::static_pointer_cast<LayoutBase>(it->second);
+        assert(llocate_views->lspace);
+      }
+    }
+
+    for (auto& lqueue_submit_id : lreality_viewer->lqueue_submit_ids) {
+      const auto it = node_id_map.find(lqueue_submit_id);
+      assert(it != node_id_map.end());
+      auto lqueue_submit =
+          std::static_pointer_cast<LayoutQueueSubmit>(it->second);
+      assert(lqueue_submit);
+      lreality_viewer->lqueue_submits.emplace_back(lqueue_submit);
+    }
+    lreality_viewer->lqueue_submit_ids.clear();
+
+    if (lreality_viewer->lend_frame) {
+      auto& lend_frame = lreality_viewer->lend_frame;
+      for (auto& llayer_id : lend_frame->llayer_ids) {
+        const auto it = node_id_map.find(llayer_id);
+        assert(it != node_id_map.end());
+        auto llayer = std::static_pointer_cast<LayoutBase>(it->second);
+        assert(llayer);
+        lend_frame->llayers.emplace_back(llayer);
+      }
+      lend_frame->llayer_ids.clear();
+    }
+
+    if (lreality_viewer->lupdater) {
+      auto lupdater = lreality_viewer->lupdater;
+      for (auto& lbuffer_id : lupdater->lbuffer_ids) {
+        const auto it = node_id_map.find(lbuffer_id);
+        assert(it != node_id_map.end());
+        auto lbuffer = std::static_pointer_cast<LayoutBuffer>(it->second);
+        assert(lbuffer);
+        lupdater->lbuffers.emplace_back(lbuffer);
+      }
+      lupdater->lbuffer_ids.clear();
+    }
+  }
+
 #endif  // XG_ENABLE_REALITY
 }
 

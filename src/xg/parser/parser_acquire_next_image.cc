@@ -6,12 +6,11 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/parser/parser_internal.h"
-
 #include <memory>
 
 #include "tinyxml2.h"
 #include "xg/layout.h"
+#include "xg/parser/parser_internal.h"
 #include "xg/types.h"
 
 namespace xg {
@@ -23,9 +22,17 @@ bool ParserSingleton<ParserAcquireNextImage>::ParseElement(
   auto node = std::make_shared<LayoutAcquireNextImage>();
   if (!node) return false;
 
-  assert(status->parent->layout_type == LayoutType::kViewer);
-  auto lviewer = static_cast<LayoutViewer*>(status->parent.get());
-  lviewer->lacquire_next_image = node;
+  if (status->parent->layout_type == LayoutType::kWindowViewer) {
+    auto lwin_viewer = static_cast<LayoutWindowViewer*>(status->parent.get());
+    lwin_viewer->lacquire_next_image = node;
+  }
+#ifdef XG_ENABLE_REALITY
+  else if (status->parent->layout_type == LayoutType::kRealityViewer) {
+    auto lreality_viewer =
+        static_cast<LayoutRealityViewer*>(status->parent.get());
+    lreality_viewer->lacquire_next_image = node;
+  }
+#endif  // XG_ENABLE_REALITY
 
   node->lwait_fence_id = element->Attribute("waitFence");
 

@@ -242,71 +242,6 @@
     <xs:list itemType="ImageUsageType"/>
   </xs:simpleType>
 
-  <xs:element name="Swapchain">
-    <xs:complexType>
-      <xs:attribute name="id" type="xs:ID" use="required" />
-      <xs:attribute name="realize" type="xs:boolean" default="true" />
-      <xs:attribute name="window" type="xs:IDREF" />
-      <xs:attribute name="minImageCount" type="xs:unsignedByte" />
-      <xs:attribute name="imageFormat" type="FormatType" />
-      <xs:attribute name="imageColorSpace">
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="SrgbNonlinear" />
-            <xs:enumeration value="DisplayP3Nonlinear" />
-            <xs:enumeration value="ExtendedSrgbLinear" />
-            <xs:enumeration value="DisplayP3Linear" />
-            <xs:enumeration value="DciP3Nonlinear" />
-            <xs:enumeration value="Bt709Linear" />
-            <xs:enumeration value="Bt709Nonlinear" />
-            <xs:enumeration value="Bt2020Linear" />
-            <xs:enumeration value="Hdr10St2084" />
-            <xs:enumeration value="Dolbyvision" />
-            <xs:enumeration value="Hdr10Hlg" />
-            <xs:enumeration value="AdobergbLinear" />
-            <xs:enumeration value="AdobergbNonlinear" />
-            <xs:enumeration value="PassThrough" />
-            <xs:enumeration value="ExtendedSrgbNonlinear" />
-            <xs:enumeration value="DisplayNative" />
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="width" type="xs:string" />
-      <xs:attribute name="height" type="xs:string" />
-      <xs:attribute name="imageArrayLayers" type="xs:unsignedByte" />
-      <xs:attribute name="imageUsage" type="ImageUsageTypeList" />
-      <xs:attribute name="preTransform">
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="Identity" />
-            <xs:enumeration value="Rotate90" />
-            <xs:enumeration value="Rotate180" />
-            <xs:enumeration value="Rotate270" />
-            <xs:enumeration value="HorizontalMirror" />
-            <xs:enumeration value="HorizontalMirrorRotate90" />
-            <xs:enumeration value="HorizontalMirrorRotate180" />
-            <xs:enumeration value="HorizontalMirrorRotate270" />
-            <xs:enumeration value="Inherit" />
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="compositeAlpha" type="xs:string" />
-      <xs:attribute name="presentMode">
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="Immediate" />
-            <xs:enumeration value="Mailbox" />
-            <xs:enumeration value="Fifo" />
-            <xs:enumeration value="FifoRelaxed" />
-            <xs:enumeration value="SharedDemandRefresh" />
-            <xs:enumeration value="SharedContinuousRefresh" />
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="clipped" type="xs:boolean" />
-    </xs:complexType>
-  </xs:element>
-
   <xs:simpleType name="QueueFamilyType">
     <xs:restriction base="xs:token">
       <xs:enumeration value="Graphics" />
@@ -1414,21 +1349,6 @@
             <xs:complexType>
               <xs:sequence>
                 <xs:choice maxOccurs="unbounded">
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="Window">
-                    <xs:complexType>
-                      <xs:sequence>
-                        <xs:element minOccurs="0" ref="Swapchain" />
-                      </xs:sequence>
-                      <xs:attribute name="id" type="xs:ID" use="required" />
-                      <xs:attribute name="xpos" type="xs:string" default="-1" />
-                      <xs:attribute name="ypos" type="xs:string" default="-1" />
-                      <xs:attribute name="width" type="xs:string" use="required" />
-                      <xs:attribute name="height" type="xs:string" use="required" />
-                      <xs:attribute name="title" type="xs:string" />
-                      <xs:attribute name="resizable" type="xs:boolean" default="false" />
-                    </xs:complexType>
-                  </xs:element>
-                  <xs:element ref="Swapchain" minOccurs="0" />
                   <xs:element name="Device" minOccurs="1" maxOccurs="1">
                     <xs:complexType>
                       <xs:sequence>
@@ -1448,6 +1368,84 @@
               <xs:attribute name="appName" type="xs:string" use="required" />
               <xs:attribute name="debug" type="xs:boolean" default="false" />
               <xs:attribute name="validation" type="xs:boolean" default="false" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Window">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" ref="Swapchain" />
+              </xs:sequence>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="xpos" type="xs:string" default="-1" />
+              <xs:attribute name="ypos" type="xs:string" default="-1" />
+              <xs:attribute name="width" type="xs:string" use="required" />
+              <xs:attribute name="height" type="xs:string" use="required" />
+              <xs:attribute name="title" type="xs:string" />
+              <xs:attribute name="resizable" type="xs:boolean" default="false" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="Swapchain">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:ID" use="required" />
+              <xs:attribute name="realize" type="xs:boolean" default="true" />
+              <xs:attribute name="window" type="xs:IDREF" />
+              <xs:attribute name="minImageCount" type="xs:unsignedByte" />
+              <xs:attribute name="imageFormat" type="FormatType" />
+              <xs:attribute name="imageColorSpace">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="SrgbNonlinear" />
+                    <xs:enumeration value="DisplayP3Nonlinear" />
+                    <xs:enumeration value="ExtendedSrgbLinear" />
+                    <xs:enumeration value="DisplayP3Linear" />
+                    <xs:enumeration value="DciP3Nonlinear" />
+                    <xs:enumeration value="Bt709Linear" />
+                    <xs:enumeration value="Bt709Nonlinear" />
+                    <xs:enumeration value="Bt2020Linear" />
+                    <xs:enumeration value="Hdr10St2084" />
+                    <xs:enumeration value="Dolbyvision" />
+                    <xs:enumeration value="Hdr10Hlg" />
+                    <xs:enumeration value="AdobergbLinear" />
+                    <xs:enumeration value="AdobergbNonlinear" />
+                    <xs:enumeration value="PassThrough" />
+                    <xs:enumeration value="ExtendedSrgbNonlinear" />
+                    <xs:enumeration value="DisplayNative" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="width" type="xs:string" />
+              <xs:attribute name="height" type="xs:string" />
+              <xs:attribute name="imageArrayLayers" type="xs:unsignedByte" />
+              <xs:attribute name="imageUsage" type="ImageUsageTypeList" />
+              <xs:attribute name="preTransform">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="Identity" />
+                    <xs:enumeration value="Rotate90" />
+                    <xs:enumeration value="Rotate180" />
+                    <xs:enumeration value="Rotate270" />
+                    <xs:enumeration value="HorizontalMirror" />
+                    <xs:enumeration value="HorizontalMirrorRotate90" />
+                    <xs:enumeration value="HorizontalMirrorRotate180" />
+                    <xs:enumeration value="HorizontalMirrorRotate270" />
+                    <xs:enumeration value="Inherit" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="compositeAlpha" type="xs:string" />
+              <xs:attribute name="presentMode">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="Immediate" />
+                    <xs:enumeration value="Mailbox" />
+                    <xs:enumeration value="Fifo" />
+                    <xs:enumeration value="FifoRelaxed" />
+                    <xs:enumeration value="SharedDemandRefresh" />
+                    <xs:enumeration value="SharedContinuousRefresh" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="clipped" type="xs:boolean" />
             </xs:complexType>
           </xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="CommandPool">
@@ -1840,7 +1838,7 @@
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandContext" />
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="QueueSubmit" />
           <xs:element minOccurs="0" maxOccurs="unbounded" ref="QueuePresent" />
-          <xs:element minOccurs="0" maxOccurs="unbounded" name="Viewer">
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="WindowViewer">
             <xs:complexType>
               <xs:sequence>
                 <xs:choice maxOccurs="unbounded">

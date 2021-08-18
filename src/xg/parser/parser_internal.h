@@ -171,7 +171,7 @@ class ParserResetEvent : public ParserSingleton<ParserResetEvent> {};
 class ParserNextSubpass : public ParserSingleton<ParserNextSubpass> {};
 class ParserDrawOverlay : public ParserSingleton<ParserDrawOverlay> {};
 class ParserOverlay : public ParserSingleton<ParserOverlay> {};
-class ParserViewer : public ParserSingleton<ParserViewer> {};
+class ParserWindowViewer : public ParserSingleton<ParserWindowViewer> {};
 class ParserAcquireNextImage : public ParserSingleton<ParserAcquireNextImage> {
 };
 class ParserQueueSubmit : public ParserSingleton<ParserQueueSubmit> {};
@@ -186,6 +186,9 @@ class ParserSession : public ParserSingleton<ParserSession> {};
 class ParserReferenceSpace : public ParserSingleton<ParserReferenceSpace> {};
 class ParserCompositionLayerProjection
     : public ParserSingleton<ParserCompositionLayerProjection> {};
+class ParserRealityViewer : public ParserSingleton<ParserRealityViewer> {};
+class ParserLocateViews : public ParserSingleton<ParserLocateViews> {};
+class ParserEndFrame : public ParserSingleton<ParserEndFrame> {};
 #endif  // XG_ENABLE_REALITY
 
 // Utilities
@@ -259,6 +262,7 @@ glm::quat StringToQuaternion(const char* value);
 ViewConfigurationType StringToViewConfigurationType(const char* value);
 SwapchainUsage StringToSwapchainUsage(const char* value);
 CompositionLayerFlags StringToCompositionLayerFlags(const char* value);
+EnvironmentBlendMode StringToEnvironmentBlendMode(const char* value);
 
 #endif  // XG_ENABLE_REALITY
 

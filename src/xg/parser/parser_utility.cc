@@ -1275,6 +1275,20 @@ CompositionLayerFlags StringToCompositionLayerFlags(const char* value) {
   return result;
 }
 
+EnvironmentBlendMode StringToEnvironmentBlendMode(const char* value) {
+  static std::unordered_map<std::string, EnvironmentBlendMode> mapping{
+#define ENTRY(s) {#s, EnvironmentBlendMode::k##s}
+      ENTRY(Opaque), ENTRY(Additive), ENTRY(AlphaBlend)
+#undef ENTRY
+  };
+  const auto x = mapping.find(value);
+  if (x != std::end(mapping)) {
+    return x->second;
+  }
+  XG_ERROR("unknown environment blend mode: {}", value);
+  return EnvironmentBlendMode::kOpaque;
+}
+
 #endif  // XG_ENABLE_REALITY
 
 }  // namespace parser

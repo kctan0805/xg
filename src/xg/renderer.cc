@@ -32,6 +32,7 @@
 #include "xg/types.h"
 #include "xg/utility.h"
 #include "xg/viewer.h"
+#include "xg/window_viewer.h"
 
 namespace xg {
 
@@ -731,15 +732,16 @@ std::shared_ptr<QueueSubmit> Renderer::CreateQueueSubmit(
   return queue_submit;
 }
 
-std::shared_ptr<Viewer> Renderer::CreateViewer(const LayoutViewer& lviewer) {
-  auto viewer = std::make_shared<Viewer>();
+std::shared_ptr<Viewer> Renderer::CreateWindowViewer(
+    const LayoutWindowViewer& lwin_viewer) {
+  auto viewer = std::make_shared<WindowViewer>();
   if (!viewer) {
     XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
     return nullptr;
   }
   viewer->device_ = device_;
 
-  if (!viewer->Init(lviewer)) return nullptr;
+  if (!viewer->Init(lwin_viewer)) return nullptr;
 
   return viewer;
 }

@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Engine>
   <Renderer appName="triangle" debug="true">
-    <Window id="mainWindow" width="512" height="512" title="Triangle" resizable="true"/>
-    <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
-
     <Device>
       <Queue id="mainQueue" queueFamily="Graphics Transfer" presentable="true"/>
     </Device>
   </Renderer>
 
+  <Window id="mainWindow" width="512" height="512" title="Triangle" resizable="true"/>
+  <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
   <CommandPool id="mainCommandPool" queue="mainQueue"/>
 
   <RenderPass id="mainRenderPass">
@@ -93,7 +92,7 @@
     </CommandList>
   </CommandGroup>
 
-  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame">
+  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame">
     <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
     <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
     <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
@@ -110,5 +109,5 @@
       <GraphicsPipeline graphicsPipeline="drawPipeline"/>
       <Framebuffer framebuffer="mainFramebuffer"/>
     </Resizer>
-  </Viewer>
+  </WindowViewer>
 </Engine>

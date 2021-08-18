@@ -92,7 +92,7 @@ class Renderer {
   std::shared_ptr<QueueSubmit> CreateQueueSubmit(
       const LayoutQueueSubmit& lqueue_submit);
   virtual std::shared_ptr<Overlay> CreateOverlay(const LayoutOverlay& loverlay) = 0;
-  std::shared_ptr<Viewer> CreateViewer(const LayoutViewer& lviewer);
+  std::shared_ptr<Viewer> CreateWindowViewer(const LayoutWindowViewer& lwin_viewer);
   std::shared_ptr<QueuePresent> CreateQueuePresent(
       const LayoutQueuePresent& lqueue_present);
   virtual void DebugMarkerSetObjectName(const LayoutBase& lbase) const = 0;

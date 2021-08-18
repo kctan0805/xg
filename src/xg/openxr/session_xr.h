@@ -24,12 +24,9 @@ class SessionXR : public Session {
 
   std::shared_ptr<ReferenceSpace> CreateReferenceSpace(
       const LayoutReferenceSpace& lreference_space) override;
-  void Begin() override;
-  void End() override;
 
  protected:
   xr::Session session_;
-  xr::ViewConfigurationType view_config_type_;
 
   friend class RealityXR;
 };

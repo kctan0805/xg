@@ -4,14 +4,13 @@
   <Constant id="winHeight" value="480"/>
 
   <Renderer appName="skybox" debug="true" validation="true">
-    <Window id="mainWindow" width="winWidth" height="winHeight" title="Skybox" resizable="true"/>
-    <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
-
     <Device>
       <Queue id="mainQueue" queueFamily="Graphics Transfer" presentable="true"/>
     </Device>
   </Renderer>
 
+  <Window id="mainWindow" width="winWidth" height="winHeight" title="Skybox" resizable="true"/>
+  <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
   <CommandPool id="mainCommandPool" queue="mainQueue"/>
   <DescriptorPool id="mainDescriptorPool"/>
 
@@ -141,7 +140,7 @@
     <LookAt eye="0 0 -1" center="0 0 0" up="0 -1 0"/>
   </Camera>
 
-  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
+  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
     <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
     <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
     <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
@@ -161,5 +160,5 @@
     <Updater>
       <Buffer buffer="drawCommonUniformBuffer"/>
     </Updater>
-  </Viewer>
+  </WindowViewer>
 </Engine>

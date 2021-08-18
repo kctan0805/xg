@@ -22,11 +22,7 @@ bool ParserSingleton<ParserSwapchain>::ParseElement(
   auto node = std::make_shared<LayoutSwapchain>();
   if (!node) return false;
 
-  if (status->parent->layout_type == LayoutType::kWindow) {
-    node->lwin = std::static_pointer_cast<LayoutWindow>(status->parent);
-  } else {
-    node->lwin_id = element->Attribute("window");
-  }
+  node->lwin_id = element->Attribute("window");
 
   element->QueryIntAttribute("minImageCount", &node->min_image_count);
 
@@ -66,6 +62,12 @@ bool ParserSingleton<ParserSwapchain>::ParseElement(
   element->QueryIntAttribute("faceCount", &node->face_count);
   element->QueryIntAttribute("arraySize", &node->array_size);
   element->QueryIntAttribute("mipCount", &node->mip_count);
+
+  value = element->Attribute("viewConfigurationType");
+  if (value) node->view_config_type = StringToViewConfigurationType(value);
+
+  element->QueryIntAttribute("viewIndex", &node->view_index);
+
 #endif  // XG_ENABLE_REALITY
 
   status->node = node;

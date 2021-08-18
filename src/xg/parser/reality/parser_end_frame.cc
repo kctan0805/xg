@@ -6,31 +6,36 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/parser/parser_internal.h"
-
-#include <cstring>
 #include <memory>
 
 #include "tinyxml2.h"
 #include "xg/layout.h"
+#include "xg/parser/parser_internal.h"
 #include "xg/types.h"
 
 namespace xg {
 namespace parser {
 
 template <>
-bool ParserSingleton<ParserViewer>::ParseElement(
+bool ParserSingleton<ParserEndFrame>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
-  auto node = std::make_shared<LayoutViewer>();
+  auto node = std::make_shared<LayoutEndFrame>();
   if (!node) return false;
 
-  node->lwin_id = element->Attribute("window");
-  node->lframe_id = element->Attribute("frame");
-  node->lcamera_id = element->Attribute("camera");
-  node->loverlay_id = element->Attribute("overlay");
+  const char* value = element->Attribute("environmentBlendMode");
+  if (value) node->env_blend_mode = StringToEnvironmentBlendMode(value);
+
+  for (auto child = element->FirstChildElement(); child;
+       child = child->NextSiblingElement()) {
+    const char* name = child->Name();
+
+    if (strcmp(name, "Layer") == 0) {
+      auto llayer_id = child->Attribute("layer");
+      node->llayer_ids.emplace_back(llayer_id);
+    }
+  }
 
   status->node = node;
-  status->child_element = element->FirstChildElement();
 
   return ParserBase::Get().ParseElement(element, status);
 }

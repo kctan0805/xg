@@ -324,7 +324,7 @@ bool RendererVK::CreateGraphicsPipelines(
       }
 
       for (const auto& lscissor : lviewport_state->lscissors) {
-        if (lscissor->width == 0.0f) 
+        if (lscissor->width == 0.0f)
           lscissor->width = static_cast<float>(swapchain->GetWidth());
         else
           lscissor->width *= static_cast<float>(swapchain->GetWidth());
@@ -418,11 +418,14 @@ void RendererVK::DebugMarkerSetObjectName(const LayoutBase& lbase) const {
       break;
     }
     case LayoutType::kSwapchain: {
-      const auto swapchain = static_cast<SwapchainVK*>(lbase.instance.get());
-      name_info.setObjectType(vk::DebugReportObjectTypeEXT::eSwapchainKHR)
-          .setObject(
-              reinterpret_cast<uint64_t>((VkSwapchainKHR)swapchain->swapchain_))
-          .setPObjectName(lbase.id.c_str());
+      const auto swapchain = static_cast<Swapchain*>(lbase.instance.get());
+      const auto swapchain_vk = dynamic_cast<SwapchainVK*>(swapchain);
+      if (swapchain_vk) {
+        name_info.setObjectType(vk::DebugReportObjectTypeEXT::eSwapchainKHR)
+            .setObject(reinterpret_cast<uint64_t>(
+                (VkSwapchainKHR)swapchain_vk->swapchain_))
+            .setPObjectName(lbase.id.c_str());
+      }
       break;
     }
     case LayoutType::kQueue: {

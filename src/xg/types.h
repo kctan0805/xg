@@ -986,6 +986,8 @@ inline CompositionLayerFlags operator&(CompositionLayerFlags lhs,
       static_cast<std::underlying_type_t<CompositionLayerFlags>>(rhs));
 }
 
+enum class EnvironmentBlendMode { kOpaque = 1, kAdditive = 2, kAlphaBlend = 3 };
+
 #endif  // XG_ENABLE_REALITY
 
 }  // namespace xg

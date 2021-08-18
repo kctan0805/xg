@@ -6,6 +6,8 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
+#ifdef XG_ENABLE_REALITY
+
 #ifndef XG_REALITY_H_
 #define XG_REALITY_H_
 
@@ -16,6 +18,7 @@
 #include "xg/layout.h"
 #include "xg/session.h"
 #include "xg/swapchain.h"
+#include "xg/viewer.h"
 
 namespace xg {
 
@@ -28,20 +31,21 @@ class Reality {
   Reality& operator=(Reality&&) = delete;
   virtual ~Reality() = default;
 
-  const std::vector<std::shared_ptr<Swapchain>>& GetSwapchains() const {
-    return swapchains_;
-  }
   std::shared_ptr<Session> GetSession() const { return session_; }
 
+  virtual std::shared_ptr<Swapchain> CreateSwapchain(
+      LayoutSwapchain* lswapchain) const = 0;
   virtual std::shared_ptr<CompositionLayerProjection>
   CreateCompositionLayerProjection(
       const LayoutCompositionLayerProjection& lprojection) = 0;
+  virtual std::shared_ptr<Viewer> CreateRealityViewer(
+      const LayoutRealityViewer& lreality_viewer) = 0;
 
  protected:
-  std::vector<std::shared_ptr<Swapchain>> swapchains_;
   std::shared_ptr<Session> session_;
 };
 
 }  // namespace xg
 
 #endif  // XG_REALITY_H_
+#endif  // XG_ENABLE_REALITY

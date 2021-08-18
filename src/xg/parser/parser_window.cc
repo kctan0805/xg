@@ -24,9 +24,6 @@ bool ParserSingleton<ParserWindow>::ParseElement(
   auto node = std::make_shared<LayoutWindow>();
   if (!node) return false;
 
-  assert(status->parent->layout_type == LayoutType::kRenderer);
-  node->lrenderer = std::static_pointer_cast<LayoutRenderer>(status->parent);
-
   const char* value = element->Attribute("xpos");
   if (value) node->xpos = static_cast<int>(Expression::Get().Evaluate(value));
 

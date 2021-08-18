@@ -6,12 +6,11 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/parser/parser_internal.h"
-
 #include <memory>
 
 #include "tinyxml2.h"
 #include "xg/layout.h"
+#include "xg/parser/parser_internal.h"
 #include "xg/types.h"
 
 namespace xg {
@@ -23,16 +22,29 @@ bool ParserSingleton<ParserQueueSubmit>::ParseElement(
   auto node = std::make_shared<LayoutQueueSubmit>();
   if (!node) return false;
 
-  if (status->parent->layout_type == LayoutType::kViewer) {
-    auto lviewer = static_cast<LayoutViewer*>(status->parent.get());
+  if (status->parent->layout_type == LayoutType::kWindowViewer) {
+    auto lwin_viewer = static_cast<LayoutWindowViewer*>(status->parent.get());
     const char* value = element->Attribute("queueSubmit");
     if (value) {
-      lviewer->lqueue_submit_ids.emplace_back(value);
+      lwin_viewer->lqueue_submit_ids.emplace_back(value);
       return false;
     } else {
-      lviewer->lqueue_submits.emplace_back(node);
+      lwin_viewer->lqueue_submits.emplace_back(node);
     }
   }
+#ifdef XG_ENABLE_REALITY
+  else if (status->parent->layout_type == LayoutType::kRealityViewer) {
+    auto lreality_viewer =
+        static_cast<LayoutRealityViewer*>(status->parent.get());
+    const char* value = element->Attribute("queueSubmit");
+    if (value) {
+      lreality_viewer->lqueue_submit_ids.emplace_back(value);
+      return false;
+    } else {
+      lreality_viewer->lqueue_submits.emplace_back(node);
+    }
+  }
+#endif  // XG_ENABLE_REALITY
 
   node->lqueue_id = element->Attribute("queue");
   node->lfence_id = element->Attribute("fence");

@@ -23,9 +23,9 @@ bool ParserSingleton<ParserQueuePresent>::ParseElement(
   auto node = std::make_shared<LayoutQueuePresent>();
   if (!node) return false;
 
-  if (status->parent->layout_type == LayoutType::kViewer) {
-    auto lviewer = static_cast<LayoutViewer*>(status->parent.get());
-    lviewer->lqueue_present = node;
+  if (status->parent->layout_type == LayoutType::kWindowViewer) {
+    auto lwin_viewer = static_cast<LayoutWindowViewer*>(status->parent.get());
+    lwin_viewer->lqueue_present = node;
   }
 
   node->lqueue_id = element->Attribute("queue");

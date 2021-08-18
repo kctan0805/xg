@@ -23,9 +23,10 @@ bool ParserSingleton<ParserUpdater>::ParseElement(
   auto node = std::make_shared<LayoutUpdater>();
   if (!node) return false;
 
-  assert(status->parent->layout_type == LayoutType::kViewer);
-  auto lviewer = static_cast<LayoutViewer*>(status->parent.get());
-  lviewer->lupdater = node;
+  if (status->parent->layout_type == LayoutType::kWindowViewer) {
+    auto lwin_viewer = static_cast<LayoutWindowViewer*>(status->parent.get());
+    lwin_viewer->lupdater = node;
+  }
 
   for (auto child = element->FirstChildElement(); child;
        child = child->NextSiblingElement()) {

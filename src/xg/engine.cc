@@ -42,6 +42,7 @@
 #include "xg/types.h"
 #include "xg/utility.h"
 #include "xg/viewer.h"
+#include "xg/window_viewer.h"
 
 #ifdef XG_ENABLE_REALITY
 #include "xg/composition_layer_projection.h"
@@ -72,16 +73,17 @@ bool Engine::Init(std::shared_ptr<Layout> layout) {
   if (!CreateDevice(layout.get())) return false;
   if (!CreateQueues(layout.get())) return false;
   if (!InitSystem(*layout)) return false;
-  if (!CreateSwapchains(*layout)) return false;
-  if (!CreateCommandPools(*layout)) return false;
-  if (!CreateCommandBuffers(*layout)) return false;
-  if (!CreateFences(*layout)) return false;
 
 #ifdef XG_ENABLE_REALITY
   if (layout->lreality) {
     if (!CreateReality(*layout)) return false;
   }
 #endif  // XG_ENABLE_REALITY
+
+  if (!CreateSwapchains(*layout)) return false;
+  if (!CreateCommandPools(*layout)) return false;
+  if (!CreateCommandBuffers(*layout)) return false;
+  if (!CreateFences(*layout)) return false;
 
   if (!PostInit(layout)) return false;
 
@@ -205,9 +207,18 @@ bool Engine::CreateDevice(Layout* layout) {
 bool Engine::CreateSwapchains(const Layout& layout) {
   for (const auto& lswapchain : layout.lswapchains) {
     if (!lswapchain->realize) continue;
-    if (!lswapchain->lwin) continue;
 
-    auto swapchain = device_->CreateSwapchain(lswapchain.get());
+    std::shared_ptr<xg::Swapchain> swapchain;
+
+    if (lswapchain->lwin) {
+      swapchain = device_->CreateSwapchain(lswapchain.get());
+    }
+#ifdef XG_ENABLE_REALITY
+    else {
+      swapchain = reality_->CreateSwapchain(lswapchain.get());
+    }
+#endif  // XG_ENABLE_REALITY
+
     if (!swapchain) return false;
 
     lswapchain->instance = swapchain;
@@ -1193,19 +1204,36 @@ bool Engine::CreateOverlays(const Layout& layout) {
 }
 
 bool Engine::CreateViewers(const Layout& layout) {
-  for (const auto& lviewer : layout.lviewers) {
-    if (!lviewer->realize) continue;
+  for (const auto& lwin_viewer : layout.lwindow_viewers) {
+    if (!lwin_viewer->realize) continue;
 
-    auto viewer = renderer_->CreateViewer(*lviewer);
+    auto viewer = renderer_->CreateWindowViewer(*lwin_viewer);
     if (!viewer) return false;
 
-    if (!lviewer->id.empty())
-      instance_id_map_.insert(std::make_pair(lviewer->id, viewer));
+    if (!lwin_viewer->id.empty())
+      instance_id_map_.insert(std::make_pair(lwin_viewer->id, viewer));
 
-    lviewer->instance = viewer;
+    lwin_viewer->instance = viewer;
 
     viewers_.emplace_back(std::move(viewer));
   }
+
+#ifdef XG_ENABLE_REALITY
+  for (const auto& lreality_viewer : layout.lreality_viewers) {
+    if (!lreality_viewer->realize) continue;
+
+    auto viewer = reality_->CreateRealityViewer(*lreality_viewer);
+    if (!viewer) return false;
+
+    if (!lreality_viewer->id.empty())
+      instance_id_map_.insert(std::make_pair(lreality_viewer->id, viewer));
+
+    lreality_viewer->instance = viewer;
+
+    viewers_.emplace_back(std::move(viewer));
+  }
+#endif  // XG_ENABLE_REALITY
+
   return true;
 }
 
@@ -1276,6 +1304,8 @@ Result Engine::Run() {
     for (auto it = viewers_.begin(); it != viewers_.end();) {
       auto& viewer = *it;
 
+      viewer->PollEvents();
+
       if (viewer->should_exit_handler_()) {
         return Result::kSuccess;
       } else if (viewer->ShouldClose()) {
@@ -1285,7 +1315,7 @@ Result Engine::Run() {
         else
           continue;
       }
-      viewer->PollEvents();
+
       result = viewer->draw_handler_();
       if (result != Result::kSuccess) return result;
 
@@ -1387,20 +1417,6 @@ bool Engine::CreateReality(const Layout& layout) {
 
   if (!lsession->id.empty())
     instance_id_map_.insert(std::make_pair(lsession->id, session));
-
-  const auto& swapchains = reality_->GetSwapchains();
-  const auto& lswapchains = lreality->lswapchains;
-  assert(swapchains.size() == lswapchains.size());
-  int count = std::min(swapchains.size(), lswapchains.size());
-  for (int i = 0; i < count; ++i) {
-    const auto& swapchain = swapchains[i];
-    const auto& lswapchain = lswapchains[i];
-
-    lswapchain->instance = swapchain;
-
-    if (!lswapchain->id.empty())
-      instance_id_map_.insert(std::make_pair(lswapchain->id, swapchain));
-  }
 
   return true;
 }

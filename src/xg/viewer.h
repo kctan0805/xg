@@ -18,10 +18,7 @@
 #include "xg/command.h"
 #include "xg/device.h"
 #include "xg/layout.h"
-#include "xg/overlay.h"
-#include "xg/swapchain.h"
 #include "xg/types.h"
-#include "xg/window.h"
 
 namespace xg {
 
@@ -45,21 +42,14 @@ class Viewer {
   Viewer& operator=(Viewer&&) = delete;
   virtual ~Viewer() = default;
 
-  void PollEvents() const { win_->PollEvents(); }
-  std::shared_ptr<Window> GetWindow() const { return win_; }
-  std::shared_ptr<Swapchain> GetSwapchain() const {
-    return std::static_pointer_cast<Swapchain>(lframe_->lswapchain->instance);
-  }
+  virtual void PollEvents() = 0;
   std::shared_ptr<Camera> GetCamera() const { return camera_; }
 
   int GetCurrentFrame() const { return curr_frame_; }
   int GetCurrentImage() const { return curr_image_; }
+
   UpdateData& GetUpdateData(int index) { return updater_.update_data_[index]; }
-  bool ShouldClose() const { return win_->ShouldClose(); }
-  bool IsEnabled() const;
-  void Enable();
-  void Disable();
-  Result Resize();
+  virtual bool ShouldClose() const = 0;
   Result BuildCommandBuffers() const;
   void RebuildCommandBuffers();
 
@@ -81,39 +71,19 @@ class Viewer {
     should_exit_handler_ = handler;
   }
 
-  using ResizeHandlerType = void(int, int);
-
-  void SetResizeHandler(std::function<ResizeHandlerType> handler) {
-    resize_handler_ = handler;
-  }
-
-  using DrawOverlayHandlerType = void();
-
-  void SetDrawOverlayHandler(std::function<DrawOverlayHandlerType> handler) {
-    draw_overlay_handler_ = handler;
-  }
-
  protected:
-  bool Init(const LayoutViewer& lviewer);
-  void InitAcquireNextImage(const LayoutViewer& lviewer);
-  void InitUpdaterData(const LayoutViewer& lviewer);
-  bool InitQueuePresent(const LayoutViewer& lviewer);
-  Result AcquireNextImage();
+  void InitUpdater(const LayoutUpdater& lupdater);
   void UpdateUpdaterData();
-  void UpdateQueueSubmits();
-  void UpdateQueuePresent();
-  Result Draw();
-  Result Update() { return Result::kSuccess; }
-  Result PostUpdate();
+  virtual Result Draw() = 0;
+  virtual Result PostUpdate() = 0;
 
-  std::shared_ptr<Device> device_;
-  std::shared_ptr<Window> win_;
   std::shared_ptr<LayoutFrame> lframe_;
   std::shared_ptr<Camera> camera_;
-  std::shared_ptr<Overlay> overlay_;
+
   int curr_frame_ = 0;
   int curr_image_ = 0;
   bool first_round_ = true;
+
   std::function<DrawHandlerType> draw_handler_ = []() -> Result {
     return Result::kSuccess;
   };
@@ -123,22 +93,11 @@ class Viewer {
   std::function<ShouldExitHandlerType> should_exit_handler_ = []() -> bool {
     return false;
   };
-  std::function<ResizeHandlerType> resize_handler_ = [](int, int) {};
-  std::function<DrawOverlayHandlerType> draw_overlay_handler_ = []() {};
+
   std::vector<std::shared_ptr<CommandContext>> cmd_contexts_;
   std::vector<Fence*> wait_fences_;
   std::vector<Fence*> wait_image_fences_;
-  std::vector<AcquireNextImageInfo> acquire_next_image_infos_;
   std::vector<std::shared_ptr<LayoutQueueSubmit>> lqueue_submits_;
-  std::shared_ptr<LayoutQueuePresent> lqueue_present_;
-
-  struct {
-    bool enabled = false;
-    std::vector<std::shared_ptr<LayoutImage>> limages;
-    std::vector<std::shared_ptr<LayoutImageView>> limage_views;
-    std::vector<std::shared_ptr<LayoutGraphicsPipeline>> lgraphics_pipelines;
-    std::vector<std::shared_ptr<LayoutFramebuffer>> lframebuffers;
-  } resizer_;
 
   struct {
     std::vector<std::shared_ptr<LayoutBuffer>> lbuffers;

@@ -27,8 +27,6 @@ class Session {
 
   virtual std::shared_ptr<ReferenceSpace> CreateReferenceSpace(
       const LayoutReferenceSpace& lreference_space) = 0;
-  virtual void Begin() = 0;
-  virtual void End() = 0;
 };
 
 }  // namespace xg

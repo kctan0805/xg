@@ -99,13 +99,23 @@ CEREAL_REGISTER_TYPE(xg::LayoutPushConstants);
 CEREAL_REGISTER_TYPE(xg::LayoutResetQueryPool);
 CEREAL_REGISTER_TYPE(xg::LayoutSetEvent);
 CEREAL_REGISTER_TYPE(xg::LayoutResetEvent);
-CEREAL_REGISTER_TYPE(xg::LayoutViewer);
+CEREAL_REGISTER_TYPE(xg::LayoutWindowViewer);
 CEREAL_REGISTER_TYPE(xg::LayoutAcquireNextImage);
 CEREAL_REGISTER_TYPE(xg::LayoutQueueSubmit);
 CEREAL_REGISTER_TYPE(xg::LayoutQueuePresent);
 CEREAL_REGISTER_TYPE(xg::LayoutSubmit);
 CEREAL_REGISTER_TYPE(xg::LayoutResizer);
 CEREAL_REGISTER_TYPE(xg::LayoutUpdater);
+
+#ifdef XG_ENABLE_REALITY
+CEREAL_REGISTER_TYPE(xg::LayoutReality);
+CEREAL_REGISTER_TYPE(xg::LayoutSession);
+CEREAL_REGISTER_TYPE(xg::LayoutReferenceSpace);
+CEREAL_REGISTER_TYPE(xg::LayoutCompositionLayerProjection);
+CEREAL_REGISTER_TYPE(xg::LayoutRealityViewer);
+CEREAL_REGISTER_TYPE(xg::LayoutLocateViews);
+CEREAL_REGISTER_TYPE(xg::LayoutEndFrame);
+#endif  // XG_ENABLE_REALITY
 
 namespace xg {
 
@@ -138,7 +148,8 @@ bool Layout::Serialize(const std::string& filepath) {
   std::vector<uint8_t> data;
   data.resize(size);
 
-  OutStreamBuffer<char> stream_buffer(reinterpret_cast<char*>(data.data()), size);
+  OutStreamBuffer<char> stream_buffer(reinterpret_cast<char*>(data.data()),
+                                      size);
   std::ostream stream(&stream_buffer);
 
   cereal::BinaryOutputArchive archive(stream);
@@ -158,7 +169,8 @@ struct InStreamBuffer : std::streambuf {
 
 struct InStream : virtual InStreamBuffer, std::istream {
   InStream(char const* base, size_t size)
-      : InStreamBuffer(base, size), std::istream(static_cast<std::streambuf*>(this)) {}
+      : InStreamBuffer(base, size),
+        std::istream(static_cast<std::streambuf*>(this)) {}
 };
 
 std::shared_ptr<Layout> Layout::Deserialize(const std::string& filepath) {

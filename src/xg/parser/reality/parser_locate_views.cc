@@ -17,16 +17,14 @@ namespace xg {
 namespace parser {
 
 template <>
-bool ParserSingleton<ParserReality>::ParseElement(
+bool ParserSingleton<ParserLocateViews>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
-  auto node = std::make_shared<LayoutReality>();
+  auto node = std::make_shared<LayoutLocateViews>();
   if (!node) return false;
 
-  const char* value = element->Attribute("formFactor");
-  if (value) node->form_factor = StringToFormFactor(value);
+  node->lspace_id = element->Attribute("space");
 
   status->node = node;
-  status->child_element = element->FirstChildElement();
 
   return ParserBase::Get().ParseElement(element, status);
 }

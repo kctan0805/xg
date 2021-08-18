@@ -20,6 +20,7 @@
 #include "xg/layout.h"
 #include "xg/reality.h"
 #include "xg/session.h"
+#include "xg/viewer.h"
 
 namespace xg {
 
@@ -30,8 +31,12 @@ class RealityXR : public Reality {
 
   const xr::Instance& GetXrInstance() const { return instance_; }
 
+  std::shared_ptr<Swapchain> CreateSwapchain(
+      LayoutSwapchain* lswapchain) const override;
   std::shared_ptr<CompositionLayerProjection> CreateCompositionLayerProjection(
       const LayoutCompositionLayerProjection& lprojection) override;
+  std::shared_ptr<Viewer> CreateRealityViewer(
+      const LayoutRealityViewer& lreality_viewer) override;
 
  protected:
   bool Init(const LayoutReality& lreality);
@@ -41,7 +46,6 @@ class RealityXR : public Reality {
   bool CreateDebugMessenger();
   bool InitSystem(const LayoutReality& lreality);
   bool CreateSession(const LayoutReality& lreality);
-  bool CreateSwapchains(const LayoutReality& lreality);
 
   xr::DispatchLoaderDynamic dispatch_loader_dynamic_;
   xr::Instance instance_;

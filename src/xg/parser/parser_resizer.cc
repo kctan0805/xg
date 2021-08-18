@@ -23,9 +23,9 @@ bool ParserSingleton<ParserResizer>::ParseElement(
   auto node = std::make_shared<LayoutResizer>();
   if (!node) return false;
 
-  assert(status->parent->layout_type == LayoutType::kViewer);
-  auto lviewer = static_cast<LayoutViewer*>(status->parent.get());
-  lviewer->lresizer = node;
+  assert(status->parent->layout_type == LayoutType::kWindowViewer);
+  auto lwin_viewer = static_cast<LayoutWindowViewer*>(status->parent.get());
+  lwin_viewer->lresizer = node;
 
   for (auto child = element->FirstChildElement(); child;
        child = child->NextSiblingElement()) {

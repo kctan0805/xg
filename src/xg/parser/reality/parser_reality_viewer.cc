@@ -6,6 +6,9 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
+#ifdef XG_ENABLE_REALITY
+
+#include <cstring>
 #include <memory>
 
 #include "tinyxml2.h"
@@ -17,13 +20,16 @@ namespace xg {
 namespace parser {
 
 template <>
-bool ParserSingleton<ParserReality>::ParseElement(
+bool ParserSingleton<ParserRealityViewer>::ParseElement(
     const tinyxml2::XMLElement* element, ParserStatus* status) {
-  auto node = std::make_shared<LayoutReality>();
+  auto node = std::make_shared<LayoutRealityViewer>();
   if (!node) return false;
 
-  const char* value = element->Attribute("formFactor");
-  if (value) node->form_factor = StringToFormFactor(value);
+  const char* value = element->Attribute("viewConfigurationType");
+  if (value) node->view_config_type = StringToViewConfigurationType(value);
+
+  node->lframe_id = element->Attribute("frame");
+  node->lcamera_id = element->Attribute("camera");
 
   status->node = node;
   status->child_element = element->FirstChildElement();
@@ -33,3 +39,4 @@ bool ParserSingleton<ParserReality>::ParseElement(
 
 }  // namespace parser
 }  // namespace xg
+#endif  // XG_ENABLE_REALITY

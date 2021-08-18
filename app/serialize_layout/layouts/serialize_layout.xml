@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Engine>
   <Renderer appName="serialize_layout" debug="true" validation="true">
-    <Window id="mainWindow" width="640" height="480" title="SarializeLayout" resizable="false"/>
-    <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
-
     <Device>
       <Queue id="mainQueue" queueFamily="Graphics Transfer" presentable="true"/>
     </Device>
   </Renderer>
 
+  <Window id="mainWindow" width="640" height="480" title="SarializeLayout" resizable="false"/>
+  <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
   <CommandPool id="mainCommandPool" queue="mainQueue"/>
   <DescriptorPool id="mainDescriptorPool"/>
 
@@ -186,7 +185,7 @@
     <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
 
-  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
+  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
     <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
     <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
     <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
@@ -203,6 +202,6 @@
       <Buffer buffer="drawCommonUniformBuffer"/>
       <Buffer buffer="drawInstanceUniformBuffer"/>
     </Updater>
-  </Viewer>
+  </WindowViewer>
 
 </Engine>

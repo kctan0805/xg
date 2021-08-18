@@ -28,6 +28,7 @@ class CompositionLayerProjectionXR : public CompositionLayerProjection {
       composition_layer_projection_views_;
 
   friend class RealityXR;
+  friend class RealityViewerXR;
 };
 
 }  // namespace xg

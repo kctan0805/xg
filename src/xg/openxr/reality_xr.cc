@@ -22,11 +22,13 @@
 #include "xg/layout.h"
 #include "xg/logger.h"
 #include "xg/openxr/composition_layer_projection_xr.h"
+#include "xg/openxr/reality_viewer_xr.h"
 #include "xg/openxr/reference_space_xr.h"
 #include "xg/openxr/session_xr.h"
 #include "xg/openxr/swapchain_xr.h"
 #include "xg/session.h"
 #include "xg/utility.h"
+#include "xg/viewer.h"
 #include "xg/vulkan/device_vk.h"
 #include "xg/vulkan/image_view_vk.h"
 #include "xg/vulkan/image_vk.h"
@@ -50,7 +52,6 @@ bool RealityXR::Init(const LayoutReality& lreality) {
   if (lrenderer.validation && !CreateDebugMessenger()) return false;
   if (!InitSystem(lreality)) return false;
   if (!CreateSession(lreality)) return false;
-  if (!CreateSwapchains(lreality)) return false;
 
   return true;
 }
@@ -198,16 +199,6 @@ bool RealityXR::InitSystem(const LayoutReality& lreality) {
     return false;
   }
 
-  const auto view_configs =
-      instance_.enumerateViewConfigurationsToVector(system_id_);
-  const auto it = std::find(
-      view_configs.begin(), view_configs.end(),
-      static_cast<xr::ViewConfigurationType>(lreality.view_config_type));
-  if (it == view_configs.end()) {
-    XG_ERROR("unsupport view configuration type:{}", lreality.view_config_type);
-    return false;
-  }
-
   return true;
 }
 
@@ -237,137 +228,140 @@ bool RealityXR::CreateSession(const LayoutReality& lreality) {
     return false;
   }
 
-  session->view_config_type_ =
-      static_cast<xr::ViewConfigurationType>(lreality.view_config_type);
-
   session_ = session;
 
   return true;
 }
 
-bool RealityXR::CreateSwapchains(const LayoutReality& lreality) {
+std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
+    LayoutSwapchain* lswapchain) const {
   const auto& xr_session = static_cast<SessionXR*>(session_.get())->session_;
   const auto& views = instance_.enumerateViewConfigurationViewsToVector(
       system_id_,
-      static_cast<xr::ViewConfigurationType>(lreality.view_config_type));
-  if (views.size() == 0) return false;
+      static_cast<xr::ViewConfigurationType>(lswapchain->view_config_type));
+  if (views.size() == 0) return nullptr;
 
   const auto& swapchain_formats =
       xr_session.enumerateSwapchainFormatsToVector();
   assert(swapchain_formats.size() > 0);
-  assert(lreality.lswapchains.size() == views.size());
 
-  int count = std::min(lreality.lswapchains.size(), views.size());
-
-  for (int i = 0; i < count; ++i) {
-    auto swapchain = std::make_shared<SwapchainXR>();
-    if (!swapchain) {
-      XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
-      return false;
-    }
-
-    const auto& view = views[i];
-    auto lswapchain = *lreality.lswapchains[i];
-
-    auto format = swapchain_formats[0];
-    if (lswapchain.image_format != Format::kUndefined) {
-      const auto it =
-          std::find(swapchain_formats.begin(), swapchain_formats.end(),
-                    static_cast<int64_t>(lswapchain.image_format));
-      if (it != swapchain_formats.end()) format = *it;
-    }
-
-    xr::SwapchainCreateInfo info;
-    info.usageFlags = static_cast<xr::SwapchainUsageFlagBits>(lswapchain.usage);
-    info.format = format;
-    info.sampleCount = lswapchain.sample_count > 0
-                           ? lswapchain.sample_count
-                           : view.recommendedSwapchainSampleCount;
-    info.width = lswapchain.width > 0 ? lswapchain.width
-                                      : view.recommendedImageRectWidth;
-    info.height = lswapchain.height > 0 ? lswapchain.height
-                                        : view.recommendedImageRectHeight;
-    info.faceCount = lswapchain.face_count;
-    info.arraySize = lswapchain.array_size;
-    info.mipCount = lswapchain.mip_count;
-
-    auto result = xr_session.createSwapchain(info, swapchain->swapchain_);
-    if (result != xr::Result::Success) {
-      XG_ERROR(RealityResultString(static_cast<Result>(result)));
-      return false;
-    }
-
-    auto xr_images =
-        swapchain->swapchain_
-            .enumerateSwapchainImagesToVector<XrSwapchainImageVulkanKHR*>();
-
-    swapchain->images_.reserve(xr_images.size());
-    swapchain->image_views_.reserve(xr_images.size());
-
-    for (const auto& xr_image : xr_images) {
-      auto image = std::make_shared<ImageVK>();
-      if (!image) {
-        XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
-        return false;
-      }
-
-      swapchain->images_.emplace_back(image);
-
-      auto image_view = std::make_shared<ImageViewVK>();
-      if (!image_view) {
-        XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
-        return false;
-      }
-
-      image_view->device_ = vk_device_;
-      swapchain->image_views_.emplace_back(image_view);
-    }
-
-    auto& image_view_create_info =
-        vk::ImageViewCreateInfo()
-            .setViewType(vk::ImageViewType::e2D)
-            .setFormat(static_cast<vk::Format>(lswapchain.image_format))
-            .setSubresourceRange(
-                vk::ImageSubresourceRange()
-                    .setAspectMask(vk::ImageAspectFlagBits::eColor)
-                    .setLevelCount(1)
-                    .setLayerCount(1));
-
-    assert(vk_images.size() == images_.size());
-    assert(vk_images.size() == image_views_.size());
-
-    for (int i = 0; i < xr_images.size(); ++i) {
-      auto& xr_image = xr_images[i];
-      auto image = static_cast<ImageVK*>(swapchain->images_[i].get());
-
-      XG_TRACE("getSwapchainImagesKHR: {}", (void*)xr_image->image);
-
-      image->width_ = lswapchain.width;
-      image->height_ = lswapchain.height;
-      image->format_ = lswapchain.image_format;
-      image->image_ = xr_image->image;
-
-      auto image_view =
-          static_cast<ImageViewVK*>(swapchain->image_views_[i].get());
-
-      image_view_create_info.setImage(xr_image->image);
-
-      auto vk_result = vk_device_.createImageView(
-          &image_view_create_info, nullptr, &image_view->image_view_);
-      if (vk_result != vk::Result::eSuccess) {
-        XG_ERROR(ResultString(static_cast<Result>(result)));
-        return false;
-      }
-
-      XG_TRACE("createImageView: {}",
-               (void*)(VkImageView)image_view->image_view_);
-    }
-
-    if (swapchain->Init(lswapchain) != Result::kSuccess) return false;
-
-    swapchains_.emplace_back(swapchain);
+  auto swapchain = std::make_shared<SwapchainXR>();
+  if (!swapchain) {
+    XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+    return nullptr;
   }
-  return true;
+
+  if (lswapchain->view_index >= views.size()) {
+    XG_ERROR("out of view: {} >= {}", lswapchain->view_index, views.size());
+    return nullptr;
+  }
+
+  const auto& view = views[lswapchain->view_index];
+
+  if (lswapchain->image_format == Format::kUndefined) {
+    lswapchain->image_format = static_cast<xg::Format>(swapchain_formats[0]);
+  } else {
+    const auto it =
+        std::find(swapchain_formats.begin(), swapchain_formats.end(),
+                  static_cast<int64_t>(lswapchain->image_format));
+    if (it == swapchain_formats.end())
+      lswapchain->image_format = static_cast<xg::Format>(swapchain_formats[0]);
+  }
+
+  if (lswapchain->sample_count == 0)
+    lswapchain->sample_count = view.recommendedSwapchainSampleCount;
+
+  if (lswapchain->width == 0)
+    lswapchain->width = view.recommendedImageRectWidth;
+
+  if (lswapchain->height == 0)
+    lswapchain->height = view.recommendedImageRectHeight;
+
+  xr::SwapchainCreateInfo info;
+  info.usageFlags = static_cast<xr::SwapchainUsageFlagBits>(lswapchain->usage);
+  info.format = static_cast<int64_t>(lswapchain->image_format);
+  info.sampleCount = lswapchain->sample_count;
+  info.width = lswapchain->width;
+  info.height = lswapchain->height;
+  info.faceCount = lswapchain->face_count;
+  info.arraySize = lswapchain->array_size;
+  info.mipCount = lswapchain->mip_count;
+
+  auto result = xr_session.createSwapchain(info, swapchain->swapchain_);
+  if (result != xr::Result::Success) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return nullptr;
+  }
+
+  auto xr_images =
+      swapchain->swapchain_
+          .enumerateSwapchainImagesToVector<XrSwapchainImageVulkanKHR*>();
+
+  swapchain->images_.reserve(xr_images.size());
+  swapchain->image_views_.reserve(xr_images.size());
+
+  for (const auto& xr_image : xr_images) {
+    auto image = std::make_shared<ImageVK>();
+    if (!image) {
+      XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+      return nullptr;
+    }
+
+    swapchain->images_.emplace_back(image);
+
+    auto image_view = std::make_shared<ImageViewVK>();
+    if (!image_view) {
+      XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+      return nullptr;
+    }
+
+    image_view->device_ = vk_device_;
+    swapchain->image_views_.emplace_back(image_view);
+  }
+
+  auto& image_view_create_info =
+      vk::ImageViewCreateInfo()
+          .setViewType(vk::ImageViewType::e2D)
+          .setFormat(static_cast<vk::Format>(lswapchain->image_format))
+          .setSubresourceRange(
+              vk::ImageSubresourceRange()
+                  .setAspectMask(vk::ImageAspectFlagBits::eColor)
+                  .setLevelCount(1)
+                  .setLayerCount(1));
+
+  assert(vk_images.size() == images_.size());
+  assert(vk_images.size() == image_views_.size());
+
+  for (int i = 0; i < xr_images.size(); ++i) {
+    auto& xr_image = xr_images[i];
+    auto image = static_cast<ImageVK*>(swapchain->images_[i].get());
+
+    XG_TRACE("enumerateSwapchainImagesToVector: {}", (void*)xr_image->image);
+
+    image->width_ = lswapchain->width;
+    image->height_ = lswapchain->height;
+    image->format_ = static_cast<xg::Format>(lswapchain->image_format);
+    image->image_ = xr_image->image;
+
+    auto image_view =
+        static_cast<ImageViewVK*>(swapchain->image_views_[i].get());
+
+    image_view_create_info.setImage(xr_image->image);
+
+    auto vk_result = vk_device_.createImageView(
+        &image_view_create_info, nullptr, &image_view->image_view_);
+    if (vk_result != vk::Result::eSuccess) {
+      XG_ERROR(ResultString(static_cast<Result>(result)));
+      return nullptr;
+    }
+
+    XG_TRACE("createImageView: {}",
+             (void*)(VkImageView)image_view->image_view_);
+  }
+
+  if (swapchain->Init(*lswapchain) != Result::kSuccess) return nullptr;
+
+  return swapchain;
 }
 
 std::shared_ptr<CompositionLayerProjection>
@@ -405,6 +399,22 @@ RealityXR::CreateCompositionLayerProjection(
       projection->composition_layer_projection_views_.data();
 
   return projection;
+}
+
+std::shared_ptr<Viewer> RealityXR::CreateRealityViewer(
+    const LayoutRealityViewer& lreality_viewer) {
+  auto viewer = std::make_shared<RealityViewerXR>();
+  if (!viewer) {
+    XG_ERROR(ResultString(Result::kErrorOutOfHostMemory));
+    return nullptr;
+  }
+
+  viewer->instance_ = instance_;
+  viewer->session_ = static_cast<SessionXR*>(session_.get())->session_;
+
+  if (!viewer->Init(lreality_viewer)) return nullptr;
+
+  return viewer;
 }
 
 }  // namespace xg

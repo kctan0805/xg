@@ -18,6 +18,7 @@
 #include "xg/trackball.h"
 #include "xg/viewer.h"
 #include "xg/window.h"
+#include "xg/window_viewer.h"
 
 namespace xg {
 
@@ -26,21 +27,27 @@ bool SimpleApplication::Init(xg::Engine* engine) {
 
   int i = 0;
   for (const auto& viewer : viewers) {
-    const auto& win = viewer->GetWindow();
+    auto* win_viewer = dynamic_cast<WindowViewer*>(viewer.get());
+    if (win_viewer) {
+      const auto& win = win_viewer->GetWindow();
 
-    win->SetMouseDownHandler(
-        [this, &viewer](MouseButton button, int posx, int posy) {
-          this->OnMouseDown(viewer, button, posx, posy);
-        });
+      win->SetMouseDownHandler(
+          [this, &viewer](MouseButton button, int posx, int posy) {
+            this->OnMouseDown(viewer, button, posx, posy);
+          });
 
-    win->SetMouseUpHandler(
-        [this, &viewer](MouseButton button, int posx, int posy) {
-          this->OnMouseUp(viewer, button, posx, posy);
-        });
+      win->SetMouseUpHandler(
+          [this, &viewer](MouseButton button, int posx, int posy) {
+            this->OnMouseUp(viewer, button, posx, posy);
+          });
 
-    win->SetMouseMoveHandler([this, &viewer](int posx, int posy) {
-      this->OnMouseMove(viewer, posx, posy);
-    });
+      win->SetMouseMoveHandler([this, &viewer](int posx, int posy) {
+        this->OnMouseMove(viewer, posx, posy);
+      });
+
+      win_viewer->SetDrawOverlayHandler(
+          [this, &viewer]() { this->OnDrawOverlay(viewer); });
+    }
 
     viewer->SetUpdateHandler(
         [this, &viewer]() -> xg::Result { return this->OnUpdate(viewer); });
@@ -48,8 +55,7 @@ bool SimpleApplication::Init(xg::Engine* engine) {
     viewer->SetShouldExitHandler(
         [this, &viewer]() -> bool { return this->ShouldExit(viewer); });
 
-    viewer->SetDrawOverlayHandler(
-        [this, &viewer]() { this->OnDrawOverlay(viewer); });
+
 
     ViewerData viewer_data = {};
     viewer_data.viewer_index = i;

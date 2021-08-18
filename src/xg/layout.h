@@ -230,7 +230,7 @@ enum class LayoutType {
   kNextSubpass,
   kDrawOverlay,
   kOverlay,
-  kViewer,
+  kWindowViewer,
   kAcquireNextImage,
   kQueueSubmit,
   kQueuePresent,
@@ -241,7 +241,10 @@ enum class LayoutType {
   kReality,
   kSession,
   kReferenceSpace,
-  kCompositionLayerProjection
+  kCompositionLayerProjection,
+  kRealityViewer,
+  kLocateViews,
+  kEndFrame
 #endif  // XG_ENABLE_REALITY
 };
 
@@ -546,6 +549,9 @@ struct LayoutSwapchain : LayoutBase {
   int face_count = 1;
   int array_size = 1;
   int mip_count = 1;
+  ViewConfigurationType view_config_type =
+      ViewConfigurationType::kPrimaryStereo;
+  int view_index = 0;
 #endif  // XG_ENABLE_REALITY
 
   template <class Archive>
@@ -1749,8 +1755,8 @@ struct LayoutQueuePresent;
 struct LayoutResizer;
 struct LayoutUpdater;
 
-struct LayoutViewer : LayoutBase {
-  LayoutViewer() : LayoutBase{LayoutType::kViewer} {}
+struct LayoutWindowViewer : LayoutBase {
+  LayoutWindowViewer() : LayoutBase{LayoutType::kWindowViewer} {}
 
   std::shared_ptr<LayoutWindow> lwin;
   std::shared_ptr<LayoutFrame> lframe;
@@ -1899,16 +1905,12 @@ struct LayoutReality : LayoutBase {
   std::shared_ptr<LayoutRenderer> lrenderer;
 
   FormFactor form_factor = FormFactor::kHeadMountedDisplay;
-  ViewConfigurationType view_config_type =
-      ViewConfigurationType::kPrimaryStereo;
-
-  std::vector<std::shared_ptr<LayoutSwapchain>> lswapchains;
   std::shared_ptr<LayoutSession> lsession;
 
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), lrenderer, form_factor,
-            view_config_type, lswapchains, lsession);
+            lsession);
   }
 };
 
@@ -1963,6 +1965,65 @@ struct LayoutCompositionLayerProjection : LayoutBase {
   }
 
   const char* lspace_id = nullptr;
+};
+
+struct LayoutLocateViews;
+struct LayoutEndFrame;
+
+struct LayoutRealityViewer : LayoutBase {
+  LayoutRealityViewer() : LayoutBase{LayoutType::kRealityViewer} {}
+
+  ViewConfigurationType view_config_type =
+      ViewConfigurationType::kPrimaryStereo;
+
+  std::shared_ptr<LayoutFrame> lframe;
+  std::shared_ptr<LayoutCamera> lcamera;
+  std::vector<std::shared_ptr<LayoutCommandContext>> lcmd_contexts;
+  std::shared_ptr<LayoutAcquireNextImage> lacquire_next_image;
+  std::shared_ptr<LayoutLocateViews> llocate_views;
+  std::vector<std::shared_ptr<LayoutQueueSubmit>> lqueue_submits;
+  std::shared_ptr<LayoutEndFrame> lend_frame;
+  std::shared_ptr<LayoutUpdater> lupdater;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), view_config_type, lframe,
+            lcamera, lcmd_contexts, lacquire_next_image, llocate_views,
+            lqueue_submits, lend_frame, lupdater);
+  }
+
+  const char* lframe_id = nullptr;
+  const char* lcamera_id = nullptr;
+  std::vector<const char*> lcmd_context_ids;
+  std::vector<const char*> lqueue_submit_ids;
+};
+
+struct LayoutLocateViews : LayoutBase {
+  LayoutLocateViews() : LayoutBase{LayoutType::kLocateViews} {}
+
+  std::shared_ptr<LayoutBase> lspace;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), lspace);
+  }
+
+  const char* lspace_id = nullptr;
+};
+
+struct LayoutEndFrame : LayoutBase {
+  LayoutEndFrame() : LayoutBase{LayoutType::kEndFrame} {}
+
+  EnvironmentBlendMode env_blend_mode = EnvironmentBlendMode::kOpaque;
+
+  std::vector<std::shared_ptr<LayoutBase>> llayers;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), env_blend_mode, llayers);
+  }
+
+  std::vector<const char*> llayer_ids;
 };
 
 #endif  // XG_ENABLE_REALITY
@@ -2026,7 +2087,7 @@ struct Layout : std::enable_shared_from_this<Layout> {
   std::vector<std::shared_ptr<LayoutResetEvent>> lreset_events;
   std::vector<std::shared_ptr<LayoutDrawOverlay>> ldraw_overlays;
   std::vector<std::shared_ptr<LayoutOverlay>> loverlays;
-  std::vector<std::shared_ptr<LayoutViewer>> lviewers;
+  std::vector<std::shared_ptr<LayoutWindowViewer>> lwindow_viewers;
   std::vector<std::shared_ptr<LayoutQueueSubmit>> lqueue_submits;
   std::vector<std::shared_ptr<LayoutQueuePresent>> lqueue_presents;
 
@@ -2036,6 +2097,7 @@ struct Layout : std::enable_shared_from_this<Layout> {
   std::vector<std::shared_ptr<LayoutReferenceSpace>> lreference_spaces;
   std::vector<std::shared_ptr<LayoutCompositionLayerProjection>>
       lcomposition_layer_projections;
+  std::vector<std::shared_ptr<LayoutRealityViewer>> lreality_viewers;
 #endif  // XG_ENABLE_REALITY
 
   std::vector<std::shared_ptr<LayoutBase>> lnodes;
@@ -2105,7 +2167,7 @@ struct Layout : std::enable_shared_from_this<Layout> {
     archive(lreset_events);
     archive(ldraw_overlays);
     archive(loverlays);
-    archive(lviewers);
+    archive(lwindow_viewers);
     archive(lqueue_submits);
     archive(lqueue_presents);
 
@@ -2114,6 +2176,7 @@ struct Layout : std::enable_shared_from_this<Layout> {
     archive(lsession);
     archive(lreference_spaces);
     archive(lcomposition_layer_projections);
+    archive(lreality_viewers);
 #endif  // XG_ENABLE_REALITY
 
     archive(lnodes);

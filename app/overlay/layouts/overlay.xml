@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Engine>
   <Renderer appName="overlay" debug="true" validation="true">
-    <Window id="mainWindow" width="1024" height="768" title="Overlay" resizable="true"/>
-    <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
-
     <Device>
       <Queue id="mainQueue" queueFamily="Graphics Transfer" presentable="true"/>
     </Device>
   </Renderer>
 
+  <Window id="mainWindow" width="1024" height="768" title="Overlay" resizable="true"/>
+  <Swapchain id="mainSwapchain" window="mainWindow" minImageCount="3" presentMode="Mailbox"/>
   <CommandPool id="mainCommandPool" queue="mainQueue"/>
   <DescriptorPool id="mainDescriptorPool"/>
 
@@ -211,7 +210,7 @@
   </CommandGroup>
 
   <!-- Viewer -->
-  <Viewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera" overlay="mainOverlay">
+  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera" overlay="mainOverlay">
     <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
     <CommandContext commandGroup="overlayCommandGroup" commandBuffer="overlayCommandBuffer" dynamic="true"/>
     <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
@@ -236,5 +235,5 @@
     <Updater>
       <Buffer buffer="drawCommonUniformBuffer"/>
     </Updater>
-  </Viewer>
+  </WindowViewer>
 </Engine>
