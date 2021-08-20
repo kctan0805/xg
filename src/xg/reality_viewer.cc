@@ -32,13 +32,8 @@ bool RealityViewer::Init(const LayoutRealityViewer& lreality_viewer) {
     return false;
   }
 
-  if (lreality_viewer.lcamera) {
-    camera_ =
-        std::static_pointer_cast<Camera>(lreality_viewer.lcamera->instance);
-    if (!camera_) {
-      XG_ERROR("camera not found");
-      return false;
-    }
+  for (const auto& lcamera : lreality_viewer.lcameras) {
+    cameras_.emplace_back(std::static_pointer_cast<Camera>(lcamera->instance));
   }
 
   for (const auto& lcmd_context : lreality_viewer.lcmd_contexts) {

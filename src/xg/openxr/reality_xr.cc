@@ -409,6 +409,13 @@ std::shared_ptr<Viewer> RealityXR::CreateRealityViewer(
     return nullptr;
   }
 
+  uint32_t count = 0;
+  const auto& views = instance_.enumerateViewConfigurationViews(
+      system_id_,
+      static_cast<xr::ViewConfigurationType>(lreality_viewer.view_config_type),
+      0, &count, nullptr);
+
+  viewer->views_.resize(count);
   viewer->instance_ = instance_;
   viewer->session_ = static_cast<SessionXR*>(session_.get())->session_;
 

@@ -231,8 +231,6 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
                                                                 status);
   } else if (strcmp(name, "RealityViewer") == 0) {
     return ParserRealityViewer::Get().ParseElement(element, status);
-  } else if (strcmp(name, "LocateViews") == 0) {
-    return ParserLocateViews::Get().ParseElement(element, status);
   } else if (strcmp(name, "EndFrame") == 0) {
     return ParserEndFrame::Get().ParseElement(element, status);
   }
@@ -1442,51 +1440,50 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     }
   }
 
-  for (auto lreality_viewer : layout->lwindow_viewers) {
-    if (lreality_viewer->lwin_id) {
-      const auto it = node_id_map.find(lreality_viewer->lwin_id);
+  for (auto lwin_viewer : layout->lwindow_viewers) {
+    if (lwin_viewer->lwin_id) {
+      const auto it = node_id_map.find(lwin_viewer->lwin_id);
       assert(it != node_id_map.end());
-      lreality_viewer->lwin =
-          std::static_pointer_cast<LayoutWindow>(it->second);
-      assert(lreality_viewer->lwin);
+      lwin_viewer->lwin = std::static_pointer_cast<LayoutWindow>(it->second);
+      assert(lwin_viewer->lwin);
     }
 
-    if (lreality_viewer->lframe_id) {
-      const auto it = node_id_map.find(lreality_viewer->lframe_id);
+    if (lwin_viewer->lframe_id) {
+      const auto it = node_id_map.find(lwin_viewer->lframe_id);
       assert(it != node_id_map.end());
-      lreality_viewer->lframe =
-          std::static_pointer_cast<LayoutFrame>(it->second);
-      assert(lreality_viewer->lframe);
+      lwin_viewer->lframe = std::static_pointer_cast<LayoutFrame>(it->second);
+      assert(lwin_viewer->lframe);
     }
 
-    if (lreality_viewer->lcamera_id) {
-      const auto it = node_id_map.find(lreality_viewer->lcamera_id);
+    for (auto& lcamera_id : lwin_viewer->lcamera_ids) {
+      const auto it = node_id_map.find(lcamera_id);
       assert(it != node_id_map.end());
-      lreality_viewer->lcamera =
-          std::static_pointer_cast<LayoutCamera>(it->second);
-      assert(lreality_viewer->lcamera);
+      auto lcamera = std::static_pointer_cast<LayoutCamera>(it->second);
+      assert(lcamera);
+      lwin_viewer->lcameras.emplace_back(lcamera);
     }
+    lwin_viewer->lcamera_ids.clear();
 
-    if (lreality_viewer->loverlay_id) {
-      const auto it = node_id_map.find(lreality_viewer->loverlay_id);
+    if (lwin_viewer->loverlay_id) {
+      const auto it = node_id_map.find(lwin_viewer->loverlay_id);
       assert(it != node_id_map.end());
-      lreality_viewer->loverlay =
+      lwin_viewer->loverlay =
           std::static_pointer_cast<LayoutOverlay>(it->second);
-      assert(lreality_viewer->loverlay);
+      assert(lwin_viewer->loverlay);
     }
 
-    for (auto& lcmd_context_id : lreality_viewer->lcmd_context_ids) {
+    for (auto& lcmd_context_id : lwin_viewer->lcmd_context_ids) {
       const auto it = node_id_map.find(lcmd_context_id);
       assert(it != node_id_map.end());
       auto lcmd_context =
           std::static_pointer_cast<LayoutCommandContext>(it->second);
       assert(lcmd_context);
-      lreality_viewer->lcmd_contexts.emplace_back(lcmd_context);
+      lwin_viewer->lcmd_contexts.emplace_back(lcmd_context);
     }
-    lreality_viewer->lcmd_context_ids.clear();
+    lwin_viewer->lcmd_context_ids.clear();
 
-    if (lreality_viewer->lacquire_next_image) {
-      auto& lacquire_next_image = lreality_viewer->lacquire_next_image;
+    if (lwin_viewer->lacquire_next_image) {
+      auto& lacquire_next_image = lwin_viewer->lacquire_next_image;
       if (lacquire_next_image->lwait_fence_id) {
         const auto it = node_id_map.find(lacquire_next_image->lwait_fence_id);
         assert(it != node_id_map.end());
@@ -1512,18 +1509,18 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
       }
     }
 
-    for (auto& lqueue_submit_id : lreality_viewer->lqueue_submit_ids) {
+    for (auto& lqueue_submit_id : lwin_viewer->lqueue_submit_ids) {
       const auto it = node_id_map.find(lqueue_submit_id);
       assert(it != node_id_map.end());
       auto lqueue_submit =
           std::static_pointer_cast<LayoutQueueSubmit>(it->second);
       assert(lqueue_submit);
-      lreality_viewer->lqueue_submits.emplace_back(lqueue_submit);
+      lwin_viewer->lqueue_submits.emplace_back(lqueue_submit);
     }
-    lreality_viewer->lqueue_submit_ids.clear();
+    lwin_viewer->lqueue_submit_ids.clear();
 
-    if (lreality_viewer->lresizer) {
-      auto lresizer = lreality_viewer->lresizer;
+    if (lwin_viewer->lresizer) {
+      auto lresizer = lwin_viewer->lresizer;
 
       for (auto& limage_id : lresizer->limage_ids) {
         const auto it = node_id_map.find(limage_id);
@@ -1565,8 +1562,8 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
       lresizer->lframebuffer_ids.clear();
     }
 
-    if (lreality_viewer->lupdater) {
-      auto lupdater = lreality_viewer->lupdater;
+    if (lwin_viewer->lupdater) {
+      auto lupdater = lwin_viewer->lupdater;
       for (auto& lbuffer_id : lupdater->lbuffer_ids) {
         const auto it = node_id_map.find(lbuffer_id);
         assert(it != node_id_map.end());
@@ -1695,13 +1692,22 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
       assert(lreality_viewer->lframe);
     }
 
-    if (lreality_viewer->lcamera_id) {
-      const auto it = node_id_map.find(lreality_viewer->lcamera_id);
+    if (lreality_viewer->lspace_id) {
+      const auto it = node_id_map.find(lreality_viewer->lspace_id);
       assert(it != node_id_map.end());
-      lreality_viewer->lcamera =
-          std::static_pointer_cast<LayoutCamera>(it->second);
-      assert(lreality_viewer->lcamera);
+      lreality_viewer->lspace =
+          std::static_pointer_cast<LayoutBase>(it->second);
+      assert(lreality_viewer->lspace);
     }
+
+    for (auto& lcamera_id : lreality_viewer->lcamera_ids) {
+      const auto it = node_id_map.find(lcamera_id);
+      assert(it != node_id_map.end());
+      auto lcamera = std::static_pointer_cast<LayoutCamera>(it->second);
+      assert(lcamera);
+      lreality_viewer->lcameras.emplace_back(lcamera);
+    }
+    lreality_viewer->lcamera_ids.clear();
 
     for (auto& lcmd_context_id : lreality_viewer->lcmd_context_ids) {
       const auto it = node_id_map.find(lcmd_context_id);
@@ -1737,17 +1743,6 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
         lacquire_next_image->lfence =
             std::static_pointer_cast<LayoutFence>(it->second);
         assert(lacquire_next_image->lfence);
-      }
-    }
-
-    if (lreality_viewer->llocate_views) {
-      auto& llocate_views = lreality_viewer->llocate_views;
-      if (llocate_views->lspace_id) {
-        const auto it = node_id_map.find(llocate_views->lspace_id);
-        assert(it != node_id_map.end());
-        llocate_views->lspace =
-            std::static_pointer_cast<LayoutBase>(it->second);
-        assert(llocate_views->lspace);
       }
     }
 

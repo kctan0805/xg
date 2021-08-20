@@ -243,7 +243,12 @@
     
   </CommandGroup>
 
-  <Camera id="mainCamera" swapchain="mainSwapchain">
+  <Camera id="leftCamera" swapchain="leftSwapchain">
+    <Perspective fov="60" zNear="0.1" zFar="10.0"/>
+    <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
+  </Camera>
+
+  <Camera id="rightCamera" swapchain="rightSwapchain">
     <Perspective fov="60" zNear="0.1" zFar="10.0"/>
     <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
@@ -257,10 +262,11 @@
     <View swapchain="rightSwapchain"/>    
   </CompositionLayerProjection>
 
-  <RealityViewer id="mainViewer" viewConfigurationType="PrimaryStereo" frame="mainFrame" camera="mainCamera">
+  <RealityViewer id="mainViewer" viewConfigurationType="PrimaryStereo" space="mainSpace" frame="mainFrame">
+    <Camera camera="leftCamera"/>
+    <Camera camera="rightCamera"/>
     <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
     <AcquireNextImage waitFence="renderCompleteFence"/>
-    <LocateViews space="mainSpace"/>
     <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
       <Submit>
         <CommandBuffer commandBuffer="mainCommandBuffer"/>

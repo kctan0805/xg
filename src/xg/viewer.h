@@ -43,12 +43,15 @@ class Viewer {
   virtual ~Viewer() = default;
 
   virtual void PollEvents() = 0;
-  std::shared_ptr<Camera> GetCamera() const { return camera_; }
+  std::shared_ptr<Camera> GetCamera(int index = 0) const { return cameras_[index]; }
 
   int GetCurrentFrame() const { return curr_frame_; }
   int GetCurrentImage() const { return curr_image_; }
 
   UpdateData& GetUpdateData(int index) { return updater_.update_data_[index]; }
+  std::shared_ptr<Swapchain> GetSwapchain() const {
+    return std::static_pointer_cast<Swapchain>(lframe_->lswapchain->instance);
+  }
   virtual bool ShouldClose() const = 0;
   Result BuildCommandBuffers() const;
   void RebuildCommandBuffers();
@@ -72,13 +75,12 @@ class Viewer {
   }
 
  protected:
+  void InitAcquireNextImage(const LayoutAcquireNextImage& lacquire_next_image);
   void InitUpdater(const LayoutUpdater& lupdater);
   void UpdateUpdaterData();
+  void UpdateQueueSubmits();
   virtual Result Draw() = 0;
   virtual Result PostUpdate() = 0;
-
-  std::shared_ptr<LayoutFrame> lframe_;
-  std::shared_ptr<Camera> camera_;
 
   int curr_frame_ = 0;
   int curr_image_ = 0;
@@ -94,9 +96,12 @@ class Viewer {
     return false;
   };
 
+  std::shared_ptr<LayoutFrame> lframe_;
+  std::vector<std::shared_ptr<Camera>> cameras_;
   std::vector<std::shared_ptr<CommandContext>> cmd_contexts_;
   std::vector<Fence*> wait_fences_;
   std::vector<Fence*> wait_image_fences_;
+  std::vector<AcquireNextImageInfo> acquire_next_image_infos_;
   std::vector<std::shared_ptr<LayoutQueueSubmit>> lqueue_submits_;
 
   struct {

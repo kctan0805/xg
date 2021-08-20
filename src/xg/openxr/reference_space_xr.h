@@ -24,6 +24,7 @@ class ReferenceSpaceXR : public ReferenceSpace {
 
   friend class RealityXR;
   friend class SessionXR;
+  friend class RealityViewerXR;
 };
 
 }  // namespace xg

@@ -272,7 +272,8 @@
     <LookAt eye="-2.5 -2.5 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
 
-  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
+  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame">
+    <Camera camera="mainCamera"/>
     <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
     <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
     <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
@@ -290,7 +291,8 @@
     </Updater>
   </WindowViewer>
 
-  <WindowViewer id="subViewer" window="subWindow" frame="subFrame" camera="subCamera">
+  <WindowViewer id="subViewer" window="subWindow" frame="subFrame">
+    <Camera camera="subCamera"/>
     <CommandContext commandGroup="subCommandGroup" commandBuffer="subCommandBuffer"/>
     <AcquireNextImage waitFence="subRenderCompleteFence" semaphore="subImageAvailableSemaphore"/>
     <QueueSubmit queue="mainQueue" fence="subRenderCompleteFence">

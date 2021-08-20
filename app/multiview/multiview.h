@@ -24,7 +24,6 @@ class Application : xg::SimpleApplication {
   xg::Result OnUpdate(std::shared_ptr<xg::Viewer> viewer) override;
 
  private:
-  std::shared_ptr<xg::Camera> sub_camera_;
   xg::UpdateData* draw_update_data_ = nullptr;
 };
 

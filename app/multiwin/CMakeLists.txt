@@ -33,6 +33,11 @@ target_link_libraries(multiwin
     xg
 )
 
+file(COPY
+    ${image_files}
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 configure_file(layouts/multiwin.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 file(MAKE_DIRECTORY

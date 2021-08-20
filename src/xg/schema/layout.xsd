@@ -1813,6 +1813,7 @@
               </xs:sequence>
               <xs:attribute name="id" type="xs:ID" use="required" />
               <xs:attribute name="realize" type="xs:boolean" default="true" />
+              <xs:attribute name="camera" type="xs:IDREF" />
               <xs:attribute name="window" type="xs:IDREF" />
               <xs:attribute name="queue" type="xs:IDREF" />
               <xs:attribute name="descriptorPool" type="xs:IDREF" />
@@ -1842,6 +1843,7 @@
             <xs:complexType>
               <xs:sequence>
                 <xs:choice maxOccurs="unbounded">
+                  <xs:element minOccurs="0" maxOccurs="unbounded" ref="Camera" />
                   <xs:element minOccurs="0" maxOccurs="unbounded" ref="CommandContext" />
                   <xs:element minOccurs="0" name="AcquireNextImage">
                     <xs:complexType>
@@ -1899,7 +1901,6 @@
               <xs:attribute name="realize" type="xs:boolean" default="true" />              
               <xs:attribute name="window" type="xs:IDREF" use="required" />
               <xs:attribute name="frame" type="xs:IDREF" use="required" />
-              <xs:attribute name="camera" type="xs:IDREF" use="required" />
               <xs:attribute name="overlay" type="xs:IDREF" />
             </xs:complexType>
           </xs:element>

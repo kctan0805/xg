@@ -40,10 +40,12 @@ class RealityViewerXR : public RealityViewer {
 
   xr::Instance instance_;
   xr::Session session_;
-  xr::ViewConfigurationType view_config_type_ =
-      xr::ViewConfigurationType::PrimaryStereo;
-  xr::EnvironmentBlendMode env_blend_mode_ = xr::EnvironmentBlendMode::Opaque;
-
+  xr::FrameState frame_state_;
+  xr::ViewLocateInfo view_locate_info_;
+  XrViewState view_state_ = {XR_TYPE_VIEW_STATE};
+  std::vector<XrView> views_;
+  xr::FrameEndInfo frame_end_info_;
+  std::vector<xr::CompositionLayerProjection*> composition_layer_projections_;
   std::vector<xr::CompositionLayerBaseHeader*> composition_layers_;
 
   friend class RealityXR;

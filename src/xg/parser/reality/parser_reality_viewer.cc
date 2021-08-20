@@ -28,8 +28,8 @@ bool ParserSingleton<ParserRealityViewer>::ParseElement(
   const char* value = element->Attribute("viewConfigurationType");
   if (value) node->view_config_type = StringToViewConfigurationType(value);
 
+  node->lspace_id = element->Attribute("space");
   node->lframe_id = element->Attribute("frame");
-  node->lcamera_id = element->Attribute("camera");
 
   status->node = node;
   status->child_element = element->FirstChildElement();

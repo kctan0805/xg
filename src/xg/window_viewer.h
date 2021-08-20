@@ -37,9 +37,6 @@ class WindowViewer : public Viewer {
 
   void PollEvents() override { win_->PollEvents(); }
   std::shared_ptr<Window> GetWindow() const { return win_; }
-  std::shared_ptr<Swapchain> GetSwapchain() const {
-    return std::static_pointer_cast<Swapchain>(lframe_->lswapchain->instance);
-  }
 
   bool ShouldClose() const override { return win_->ShouldClose(); }
   bool IsEnabled() const;
@@ -61,22 +58,18 @@ class WindowViewer : public Viewer {
 
  protected:
   bool Init(const LayoutWindowViewer& lwin_viewer);
-  void InitAcquireNextImage(const LayoutWindowViewer& lviewer);
   bool InitQueuePresent(const LayoutWindowViewer& lviewer);
   Result AcquireNextImage();
-  void UpdateQueueSubmits();
   void UpdateQueuePresent();
   Result Draw() override;
   Result PostUpdate() override;
 
   std::shared_ptr<Device> device_;
   std::shared_ptr<Window> win_;
-  std::shared_ptr<LayoutFrame> lframe_;
   std::shared_ptr<Overlay> overlay_;
 
   std::function<ResizeHandlerType> resize_handler_ = [](int, int) {};
   std::function<DrawOverlayHandlerType> draw_overlay_handler_ = []() {};
-  std::vector<AcquireNextImageInfo> acquire_next_image_infos_;
   std::shared_ptr<LayoutQueuePresent> lqueue_present_;
 
   struct {

@@ -26,7 +26,6 @@ bool ParserSingleton<ParserWindowViewer>::ParseElement(
 
   node->lwin_id = element->Attribute("window");
   node->lframe_id = element->Attribute("frame");
-  node->lcamera_id = element->Attribute("camera");
   node->loverlay_id = element->Attribute("overlay");
 
   status->node = node;

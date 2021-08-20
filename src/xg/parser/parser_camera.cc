@@ -23,6 +23,30 @@ bool ParserSingleton<ParserCamera>::ParseElement(
   auto node = std::make_shared<LayoutCamera>();
   if (!node) return false;
 
+  if (status->parent->layout_type == LayoutType::kWindowViewer) {
+    auto lwin_viewer = static_cast<LayoutWindowViewer*>(status->parent.get());
+    const char* value = element->Attribute("camera");
+    if (value) {
+      lwin_viewer->lcamera_ids.emplace_back(value);
+      return false;
+    } else {
+      lwin_viewer->lcameras.emplace_back(node);
+    }
+  }
+#ifdef XG_ENABLE_REALITY
+  else if (status->parent->layout_type == LayoutType::kRealityViewer) {
+    auto lreality_viewer =
+        static_cast<LayoutRealityViewer*>(status->parent.get());
+    const char* value = element->Attribute("camera");
+    if (value) {
+      lreality_viewer->lcamera_ids.emplace_back(value);
+      return false;
+    } else {
+      lreality_viewer->lcameras.emplace_back(node);
+    }
+  }
+#endif  // XG_ENABLE_REALITY
+
   node->lswapchain_id = element->Attribute("swapchain");
 
   for (auto child = element->FirstChildElement(); child;
