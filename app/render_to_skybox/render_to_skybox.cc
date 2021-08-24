@@ -27,25 +27,22 @@ std::shared_ptr<xg::Layout> Application::CreateLayout() const {
 bool Application::Init(xg::Engine* engine) {
   if (!SimpleApplication::Init(engine)) return false;
 
-  auto& viewer = engine->GetViewers()[0];
-
-  draw_update_data_ = &viewer->GetUpdateData(0);
-
   return true;
 }
 
-xg::Result Application::OnUpdate(std::shared_ptr<xg::Viewer> viewer) {
-  const auto& camera = viewer->GetCamera();
+xg::Result Application::OnUpdate(xg::View* view) {
+  const auto& camera = view->GetCamera();
+  auto update_data = view->GetUpdateData(0);
 
   // update common uniform buffer
-  auto uniform_data = static_cast<glm::mat4*>(draw_update_data_->Map());
+  auto uniform_data = static_cast<glm::mat4*>(update_data->Map());
   assert(uniform_data);
 
   auto model_view = camera->GetViewMatrix();
   model_view[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-  *uniform_data = camera->GetPerspectiveMatrix() * model_view;
-  draw_update_data_->Unmap();
+  *uniform_data = camera->GetProjectionMatrix() * model_view;
+  update_data->Unmap();
 
   return xg::Result::kSuccess;
 }

@@ -26,29 +26,51 @@
 namespace xg {
 
 bool RealityViewer::Init(const LayoutRealityViewer& lreality_viewer) {
-  lframe_ = lreality_viewer.lframe;
-  if (!lframe_) {
-    XG_ERROR("frame not found");
-    return false;
-  }
+  assert(views_.size() == 0);
+  views_.reserve(lreality_viewer.lviews.size());
 
-  for (const auto& lcamera : lreality_viewer.lcameras) {
-    cameras_.emplace_back(std::static_pointer_cast<Camera>(lcamera->instance));
-  }
+  for (const auto& lview : lreality_viewer.lviews) {
+    View view;
 
-  for (const auto& lcmd_context : lreality_viewer.lcmd_contexts) {
-    cmd_contexts_.emplace_back(
-        std::static_pointer_cast<CommandContext>(lcmd_context->instance));
+    view.lframe_ = lview->lframe;
+    if (!view.lframe_) {
+      XG_ERROR("frame not found");
+      return false;
+    }
+
+    if (lview->lcamera) {
+      view.camera_ = std::static_pointer_cast<Camera>(lview->lcamera->instance);
+      if (!view.camera_) {
+        XG_ERROR("camera not found");
+        return false;
+      }
+    }
+
+    for (const auto& lcmd_context : lview->lcmd_contexts) {
+      view.cmd_contexts_.emplace_back(
+          std::static_pointer_cast<CommandContext>(lcmd_context->instance));
+    }
+
+    if (lview->lupdater) view.InitUpdater(*lview->lupdater);
+
+    view.lqueue_submits_ = lview->lqueue_submits;
+
+    views_.emplace_back(view);
   }
 
   SetDrawHandler([this]() -> Result { return this->Draw(); });
   SetShouldExitHandler([this]() -> bool { return this->ShouldClose(); });
 
-  if (lreality_viewer.lupdater) InitUpdater(*lreality_viewer.lupdater);
-
-  lqueue_submits_ = lreality_viewer.lqueue_submits;
-
   return true;
+}
+
+Result RealityViewer::BuildCommandBuffers() const {
+  for (const auto& view : views_) {
+    auto result = view.BuildCommandBuffers();
+    if (result != Result::kSuccess) return result;
+  }
+
+  return Result::kSuccess;
 }
 
 }  // namespace xg

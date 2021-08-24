@@ -6,12 +6,11 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/parser/parser_internal.h"
-
 #include <memory>
 
 #include "tinyxml2.h"
 #include "xg/layout.h"
+#include "xg/parser/parser_internal.h"
 #include "xg/types.h"
 
 namespace xg {
@@ -27,6 +26,12 @@ bool ParserSingleton<ParserUpdater>::ParseElement(
     auto lwin_viewer = static_cast<LayoutWindowViewer*>(status->parent.get());
     lwin_viewer->lupdater = node;
   }
+#ifdef XG_ENABLE_REALITY
+  else if (status->parent->layout_type == LayoutType::kView) {
+    auto lview = static_cast<LayoutView*>(status->parent.get());
+    lview->lupdater = node;
+  }
+#endif  // XG_ENABLE_REALITY
 
   for (auto child = element->FirstChildElement(); child;
        child = child->NextSiblingElement()) {

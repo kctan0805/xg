@@ -116,25 +116,30 @@
     </ColorBlendState>
   </GraphicsPipeline>
 
-  <Frame id="mainFrame" swapchain="leftSwapchain">
+  <Frame id="leftFrame" swapchain="leftSwapchain">
     <Framebuffer id="leftFramebuffer" renderPass="leftRenderPass">
       <Attachment swapchain="leftSwapchain"/>
       <Attachment imageView="leftDepthBufferImageView"/>
     </Framebuffer>
 
+    <Fence id="leftRenderCompleteFence" signaled="true"/>
+    <CommandBuffer id="leftCommandBuffer" commandPool="mainCommandPool"/>
+    <Buffer id="leftCommonUniformBuffer" size="4*16" usage="UniformBuffer" allocFlags="Undefined" memUsage="CpuToGpu"/> <!-- perspective * view matrix of camera -->
+
+    <DescriptorSet id="leftCommonDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawCommonDescriptorSetLayout">
+      <Descriptor binding="0" descriptorType="UniformBuffer"><BufferInfo buffer="leftCommonUniformBuffer"/></Descriptor>
+    </DescriptorSet>    
+  </Frame>
+
+  <Frame id="rightFrame" swapchain="leftSwapchain">
     <Framebuffer id="rightFramebuffer" renderPass="rightRenderPass">
       <Attachment swapchain="rightSwapchain"/>
       <Attachment imageView="rightDepthBufferImageView"/>
     </Framebuffer>
 
-    <Fence id="renderCompleteFence" signaled="true"/>
-    <CommandBuffer id="mainCommandBuffer" commandPool="mainCommandPool"/>
-    <Buffer id="leftCommonUniformBuffer" size="4*16" usage="UniformBuffer" allocFlags="Undefined" memUsage="CpuToGpu"/> <!-- perspective * view matrix of camera -->
+    <Fence id="rightRenderCompleteFence" signaled="true"/>
+    <CommandBuffer id="rightCommandBuffer" commandPool="mainCommandPool"/>
     <Buffer id="rightCommonUniformBuffer" size="4*16" usage="UniformBuffer" allocFlags="Undefined" memUsage="CpuToGpu"/> <!-- perspective * view matrix of camera -->
-
-    <DescriptorSet id="leftCommonDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawCommonDescriptorSetLayout">
-      <Descriptor binding="0" descriptorType="UniformBuffer"><BufferInfo buffer="leftCommonUniformBuffer"/></Descriptor>
-    </DescriptorSet>    
     
     <DescriptorSet id="rightCommonDescriptorSet" descriptorPool="mainDescriptorPool" setLayout="drawCommonDescriptorSetLayout">
       <Descriptor binding="0" descriptorType="UniformBuffer"><BufferInfo buffer="rightCommonUniformBuffer"/></Descriptor>
@@ -200,7 +205,7 @@
     </CommandList>
   </CommandGroup>
 
-  <CommandGroup id="mainCommandGroup">
+  <CommandGroup id="leftCommandGroup">
     <CommandList>
       <BeginRenderPass renderPass="leftRenderPass" framebuffer="leftFramebuffer">
         <ClearValues>
@@ -217,10 +222,15 @@
     </CommandList>
 
     <CommandGroup commandGroup="mainModelCommandGroup"/>
-
+    
     <CommandList>
       <EndRenderPass/>
-      
+    </CommandList>    
+    
+  </CommandGroup>
+
+  <CommandGroup id="rightCommandGroup">
+    <CommandList>
       <BeginRenderPass renderPass="rightRenderPass" framebuffer="rightFramebuffer">
         <ClearValues>
           <ClearColorValue value="0.0 0.0 0.0 1.0"/>
@@ -232,10 +242,10 @@
         <DescriptorSet descriptorSet="rightCommonDescriptorSet"/>
       </BindDescriptorSets>
 
-      <BindPipeline pipeline="rightPipeline"/>      
+      <BindPipeline pipeline="rightPipeline"/>
     </CommandList>
-    
-    <CommandGroup commandGroup="mainModelCommandGroup"/>    
+
+    <CommandGroup commandGroup="mainModelCommandGroup"/>
     
     <CommandList>
       <EndRenderPass/>
@@ -243,7 +253,7 @@
     
   </CommandGroup>
 
-  <Camera id="leftCamera" swapchain="leftSwapchain">
+  <Camera id="leftCamera" swapchain="leftSwapchain"/>
     <Perspective fov="60" zNear="0.1" zFar="10.0"/>
     <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
@@ -262,16 +272,33 @@
     <View swapchain="rightSwapchain"/>    
   </CompositionLayerProjection>
 
-  <RealityViewer id="mainViewer" viewConfigurationType="PrimaryStereo" space="mainSpace" frame="mainFrame">
-    <Camera camera="leftCamera"/>
-    <Camera camera="rightCamera"/>
-    <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
-    <AcquireNextImage waitFence="renderCompleteFence"/>
-    <QueueSubmit queue="mainQueue" fence="renderCompleteFence">
-      <Submit>
-        <CommandBuffer commandBuffer="mainCommandBuffer"/>
-      </Submit>
-    </QueueSubmit>
+  <RealityViewer id="mainViewer" viewConfigurationType="PrimaryStereo" space="mainSpace">
+    <View frame="leftFrame" camera="leftCamera">
+      <CommandContext commandGroup="leftCommandGroup" commandBuffer="leftCommandBuffer"/>
+      <AcquireNextImage waitFence="leftRenderCompleteFence"/>
+      <QueueSubmit queue="mainQueue" fence="leftRenderCompleteFence">
+        <Submit>
+          <CommandBuffer commandBuffer="leftCommandBuffer"/>
+        </Submit>
+      </QueueSubmit>
+      <Updater>
+        <Buffer buffer="leftCommonUniformBuffer"/>
+      </Updater>      
+    <View/>
+
+    <View frame="rightFrame" camera="rightCamera">
+      <CommandContext commandGroup="rightCommandGroup" commandBuffer="rightCommandBuffer"/>
+      <AcquireNextImage waitFence="rightRenderCompleteFence"/>
+      <QueueSubmit queue="mainQueue" fence="rightRenderCompleteFence">
+        <Submit>
+          <CommandBuffer commandBuffer="rightCommandBuffer"/>
+        </Submit>
+      </QueueSubmit>
+      <Updater>
+        <Buffer buffer="rightCommonUniformBuffer"/>
+      </Updater>            
+    <View/>
+
     <EndFrame environmentBlendMode="Opaque">
       <Layer layer="mainLayer"/>
     </EndFrame>    

@@ -10,7 +10,7 @@
 #define XG_SIMPLE_APPLICATION_H_
 
 #include <memory>
-#include <unordered_map>
+#include <vector>
 
 #include "glm/glm.hpp"
 #include "xg/camera.h"
@@ -37,7 +37,7 @@ class SimpleApplication {
   virtual void OnMouseDown(std::shared_ptr<Viewer> viewer, MouseButton button, int posx, int posy);
   virtual void OnMouseUp(std::shared_ptr<Viewer> viewer, MouseButton button, int posx, int posy);
   virtual void OnMouseMove(std::shared_ptr<Viewer> viewer, int posx, int posy);
-  virtual Result OnUpdate(std::shared_ptr<Viewer> viewer) {
+  virtual Result OnUpdate(View* view) {
     return Result::kSuccess;
   }
   virtual bool ShouldExit(std::shared_ptr<Viewer> viewer) {
@@ -45,12 +45,7 @@ class SimpleApplication {
   }
   virtual void OnDrawOverlay(std::shared_ptr<Viewer> viewer) {}
 
-  struct ViewerData {
-    int viewer_index = 0;
-    Trackball trackball;
-  };
-
-  std::unordered_map<std::shared_ptr<Viewer>, ViewerData> viewer_data_map_;
+  std::vector<Trackball> trackballs_;
 };
 
 }  // namespace xg

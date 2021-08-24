@@ -20,7 +20,7 @@ class Application : xg::SimpleApplication {
  public:
   std::shared_ptr<xg::Layout> CreateLayout() const;
   bool Init(xg::Engine* engine) override;
-  xg::Result OnUpdate(std::shared_ptr<xg::Viewer> viewer) override;
+  xg::Result OnUpdate(xg::View* view) override;
 
  private:
   xg::UpdateData* draw_update_data_ = nullptr;

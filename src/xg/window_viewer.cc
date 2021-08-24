@@ -36,14 +36,19 @@ bool WindowViewer::Init(const LayoutWindowViewer& lwin_viewer) {
     return false;
   }
 
-  lframe_ = lwin_viewer.lframe;
-  if (!lframe_) {
+  view_.lframe_ = lwin_viewer.lframe;
+  if (!view_.lframe_) {
     XG_ERROR("frame not found");
     return false;
   }
 
-  for (const auto& lcamera : lwin_viewer.lcameras) {
-    cameras_.emplace_back(std::static_pointer_cast<Camera>(lcamera->instance));
+  if (lwin_viewer.lcamera) {
+    view_.camera_ =
+        std::static_pointer_cast<Camera>(lwin_viewer.lcamera->instance);
+    if (!view_.camera_) {
+      XG_ERROR("camera not found");
+      return false;
+    }
   }
 
   if (lwin_viewer.loverlay) {
@@ -59,7 +64,7 @@ bool WindowViewer::Init(const LayoutWindowViewer& lwin_viewer) {
   }
 
   for (const auto& lcmd_context : lwin_viewer.lcmd_contexts) {
-    cmd_contexts_.emplace_back(
+    view_.cmd_contexts_.emplace_back(
         std::static_pointer_cast<CommandContext>(lcmd_context->instance));
   }
 
@@ -80,11 +85,11 @@ bool WindowViewer::Init(const LayoutWindowViewer& lwin_viewer) {
   });
 
   if (lwin_viewer.lacquire_next_image)
-    InitAcquireNextImage(*lwin_viewer.lacquire_next_image);
+    view_.InitAcquireNextImage(*lwin_viewer.lacquire_next_image);
 
-  if (lwin_viewer.lupdater) InitUpdater(*lwin_viewer.lupdater);
+  if (lwin_viewer.lupdater) view_.InitUpdater(*lwin_viewer.lupdater);
 
-  lqueue_submits_ = lwin_viewer.lqueue_submits;
+  view_.lqueue_submits_ = lwin_viewer.lqueue_submits;
 
   if (!InitQueuePresent(lwin_viewer)) return false;
 
@@ -98,7 +103,7 @@ bool WindowViewer::IsEnabled() const {
 }
 
 void WindowViewer::Enable() {
-  for (auto& lqueue_submit : lqueue_submits_) {
+  for (auto& lqueue_submit : view_.lqueue_submits_) {
     auto queue_submit =
         static_cast<QueueSubmit*>(lqueue_submit->instance.get());
     queue_submit->enabled = lqueue_submit->enabled;
@@ -110,7 +115,7 @@ void WindowViewer::Enable() {
 }
 
 void WindowViewer::Disable() {
-  for (auto& lqueue_submit : lqueue_submits_) {
+  for (auto& lqueue_submit : view_.lqueue_submits_) {
     auto queue_submit =
         static_cast<QueueSubmit*>(lqueue_submit->instance.get());
     queue_submit->enabled = false;
@@ -165,7 +170,7 @@ Result WindowViewer::Resize() {
     image->Exit();
   }
 
-  auto swapchain = GetSwapchain();
+  auto swapchain = view_.GetSwapchain();
   swapchain->Exit(false);
 
   // recreate
@@ -173,7 +178,7 @@ Result WindowViewer::Resize() {
   int height = 0;
   win_->GetDrawableSize(&width, &height);
 
-  auto lswapchain = lframe_->lswapchain.get();
+  auto lswapchain = view_.lframe_->lswapchain.get();
   lswapchain->width = width;
   lswapchain->height = height;
 
@@ -245,28 +250,30 @@ Result WindowViewer::Resize() {
 
   if (overlay_) overlay_->Resize();
 
-  RebuildCommandBuffers();
+  view_.RebuildCommandBuffers();
 
   return Result::kSuccess;
 }
 
 Result WindowViewer::AcquireNextImage() {
-  auto fence = wait_fences_[curr_frame_];
+  auto fence = view_.wait_fences_[view_.curr_frame_];
   assert(fence);
 
   fence->Wait();
 
-  auto& info = acquire_next_image_infos_[curr_frame_];
-  auto swapchain = GetSwapchain();
+  auto& info = view_.acquire_next_image_infos_[view_.curr_frame_];
+  auto swapchain = view_.GetSwapchain();
 
-  auto result = swapchain->AcquireNextImage(info, &curr_image_);
+  auto result = swapchain->AcquireNextImage(info, &view_.curr_image_);
   if (result == Result::kSuboptimal || result == Result::kErrorOutOfDate) {
     result = Resize();
   }
 
-  if (wait_image_fences_[curr_image_]) wait_image_fences_[curr_image_]->Wait();
+  if (view_.wait_image_fences_[view_.curr_image_])
+    view_.wait_image_fences_[view_.curr_image_]->Wait();
 
-  wait_image_fences_[curr_image_] = wait_fences_[curr_frame_];
+  view_.wait_image_fences_[view_.curr_image_] =
+      view_.wait_fences_[view_.curr_frame_];
 
   fence->Reset();
 
@@ -290,7 +297,7 @@ void WindowViewer::UpdateQueuePresent() {
     ++i;
   }
 
-  present_info.image_indices[0] = curr_image_;
+  present_info.image_indices[0] = view_.curr_image_;
 }
 
 Result WindowViewer::Draw() {
@@ -300,14 +307,15 @@ Result WindowViewer::Draw() {
     auto result = AcquireNextImage();
     if (result != Result::kSuccess) return result;
 
-    UpdateUpdaterData();
+    view_.UpdateUpdaterData();
 
     result = update_handler_();
     if (result != Result::kSuccess) return result;
 
-    for (auto& cmd_context : cmd_contexts_) cmd_context->Update(curr_image_);
+    for (auto& cmd_context : view_.cmd_contexts_)
+      cmd_context->Update(view_.curr_image_);
 
-    UpdateQueueSubmits();
+    view_.UpdateQueueSubmits();
     UpdateQueuePresent();
   }
   return Result::kSuccess;
@@ -325,11 +333,11 @@ Result WindowViewer::PostUpdate() {
     }
     if (result != Result::kSuccess) return result;
 
-    auto swapchain = GetSwapchain();
+    auto swapchain = view_.GetSwapchain();
 
-    curr_frame_ = (curr_frame_ + 1) % swapchain->GetFrameCount();
-    if (first_round_ && !curr_frame_) first_round_ = false;
-    lframe_->curr_frame = curr_frame_;
+    view_.curr_frame_ = (view_.curr_frame_ + 1) % swapchain->GetFrameCount();
+    if (view_.first_round_ && !view_.curr_frame_) view_.first_round_ = false;
+    view_.lframe_->curr_frame = view_.curr_frame_;
   }
   return Result::kSuccess;
 }
@@ -340,7 +348,7 @@ bool WindowViewer::InitQueuePresent(const LayoutWindowViewer& lviewer) {
       static_cast<QueuePresent*>(lqueue_present_->instance.get());
   auto& present_info = queue_present->present_info;
 
-  present_info.swapchains.emplace_back(GetSwapchain().get());
+  present_info.swapchains.emplace_back(view_.GetSwapchain().get());
   present_info.image_indices.emplace_back(0);
   present_info.results.emplace_back(Result::kSuccess);
 

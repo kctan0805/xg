@@ -15,8 +15,8 @@
 #include "xg/camera.h"
 #include "xg/layout.h"
 #include "xg/parser.h"
+#include "xg/reality_viewer.h"
 #include "xg/types.h"
-#include "xg/viewer.h"
 
 std::shared_ptr<xg::Layout> Application::CreateLayout() const {
   auto layout = xg::Parser::Get().ParseFile("hello_reality.xml");
@@ -27,21 +27,18 @@ std::shared_ptr<xg::Layout> Application::CreateLayout() const {
 bool Application::Init(xg::Engine* engine) {
   if (!SimpleApplication::Init(engine)) return false;
 
-  auto& viewer = engine->GetViewers()[0];
-
-  draw_update_data_ = &viewer->GetUpdateData(0);
-
   return true;
 }
 
-xg::Result Application::OnUpdate(std::shared_ptr<xg::Viewer> viewer) {
-  auto camera = viewer->GetCamera();
+xg::Result Application::OnUpdate(xg::View* view) {
+  auto camera = view->GetCamera();
+  auto update_data = view->GetUpdateData(0);
 
   // update common uniform buffer
-  auto uniform_data = static_cast<glm::mat4*>(draw_update_data_->Map());
+  auto uniform_data = static_cast<glm::mat4*>(update_data->Map());
   assert(uniform_data);
-  *uniform_data = camera->GetPerspectiveMatrix() * camera->GetViewMatrix();
-  draw_update_data_->Unmap();
+  *uniform_data = camera->GetProjectionMatrix() * camera->GetViewMatrix();
+  update_data->Unmap();
 
   return xg::Result::kSuccess;
 }

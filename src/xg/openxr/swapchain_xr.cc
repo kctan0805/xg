@@ -45,7 +45,30 @@ void SwapchainXR::Exit(bool destroy_swapchain) {
 
 Result SwapchainXR::AcquireNextImage(const AcquireNextImageInfo& info,
                                      int* image_index) {
-  return Result::kSuccess;
+  xr::SwapchainImageAcquireInfo acquire_info;
+
+  auto result = swapchain_.acquireSwapchainImage(
+      acquire_info, reinterpret_cast<uint32_t*>(image_index));
+  if (result != xr::Result::Success) {
+    XG_WARN(RealityResultString(static_cast<Result>(result)));
+    return static_cast<Result>(result);
+  }
+
+  xr::SwapchainImageWaitInfo wait_info;
+  wait_info.timeout = xr::Duration(info.timeout);
+
+  result = swapchain_.waitSwapchainImage(wait_info);
+  if (result != xr::Result::Success) {
+    XG_WARN(RealityResultString(static_cast<Result>(result)));
+  }
+
+  return static_cast<Result>(result);
+}
+
+void SwapchainXR::ReleaseSwapchainImage() {
+  xr::SwapchainImageReleaseInfo release_info;
+
+  swapchain_.releaseSwapchainImage(release_info);
 }
 
 }  // namespace xg

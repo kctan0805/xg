@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 
+#include "xg/buffer.h"
 #include "xg/camera.h"
 #include "xg/command.h"
 #include "xg/command_buffer.h"
@@ -38,11 +39,82 @@ void UpdateData::Unmap() {
   }
 }
 
-void Viewer::RebuildCommandBuffers() {
+void View::InitAcquireNextImage(
+    const LayoutAcquireNextImage& lacquire_next_image) {
+  auto swapchain = GetSwapchain();
+
+  int frame_count = swapchain->GetFrameCount();
+  wait_fences_.reserve(frame_count);
+  wait_image_fences_.reserve(frame_count);
+  acquire_next_image_infos_.reserve(frame_count);
+
+  for (int i = 0; i < frame_count; ++i) {
+    if (lacquire_next_image.lwait_fence) {
+      Fence* fence;
+      auto lfence = lacquire_next_image.lwait_fence.get();
+      if (lfence->lframe) {
+        auto fences =
+            std::static_pointer_cast<std::vector<std::shared_ptr<Fence>>>(
+                lfence->instance);
+        fence = (*fences)[i].get();
+      } else {
+        fence = static_cast<Fence*>(lfence->instance.get());
+      }
+      assert(fence);
+      wait_fences_.emplace_back(fence);
+      wait_image_fences_.emplace_back(nullptr);
+    }
+
+    AcquireNextImageInfo info;
+
+    info.timeout = lacquire_next_image.timeout;
+
+    if (lacquire_next_image.lsemaphore) {
+      auto lsemaphore = lacquire_next_image.lsemaphore.get();
+      if (lsemaphore->lframe) {
+        auto semaphores =
+            std::static_pointer_cast<std::vector<std::shared_ptr<Semaphore>>>(
+                lsemaphore->instance);
+        info.semaphore = (*semaphores)[i].get();
+      } else {
+        info.semaphore = static_cast<Semaphore*>(lsemaphore->instance.get());
+      }
+    }
+
+    if (lacquire_next_image.lfence) {
+      auto lfence = lacquire_next_image.lfence.get();
+      if (lfence->lframe) {
+        auto fences =
+            std::static_pointer_cast<std::vector<std::shared_ptr<Fence>>>(
+                lfence->instance);
+        info.fence = (*fences)[i].get();
+      } else {
+        info.fence = static_cast<Fence*>(lfence->instance.get());
+      }
+    }
+
+    acquire_next_image_infos_.emplace_back(info);
+  }
+}
+
+void View::InitUpdater(const LayoutUpdater& lupdater) {
+  updater_.lbuffers = lupdater.lbuffers;
+
+  for (const auto& lbuffer : updater_.lbuffers) {
+    UpdateData update_data;
+
+    if (!lbuffer->lframe) {
+      update_data.buffer_ = static_cast<Buffer*>(lbuffer->instance.get());
+    }
+    updater_.update_data_.emplace_back(update_data);
+  }
+}
+
+void View::RebuildCommandBuffers() {
   for (const auto& cmd_context : cmd_contexts_) cmd_context->Rebuild();
 }
 
-Result Viewer::BuildCommandBuffers() const {
+Result View::BuildCommandBuffers() const {
   for (const auto& cmd_context : cmd_contexts_) {
     auto result = cmd_context->Build();
     if (result != Result::kSuccess) return result;
@@ -50,7 +122,7 @@ Result Viewer::BuildCommandBuffers() const {
   return Result::kSuccess;
 }
 
-void Viewer::UpdateUpdaterData() {
+void View::UpdateUpdaterData() {
   int i = 0;
   for (const auto& lbuffer : updater_.lbuffers) {
     if (lbuffer->lframe) {
@@ -63,7 +135,7 @@ void Viewer::UpdateUpdaterData() {
   }
 }
 
-void Viewer::UpdateQueueSubmits() {
+void View::UpdateQueueSubmits() {
   for (auto& lqueue_submit : lqueue_submits_) {
     auto queue_submit =
         static_cast<QueueSubmit*>(lqueue_submit->instance.get());
@@ -122,78 +194,6 @@ void Viewer::UpdateQueueSubmits() {
       int curr_frame = lfence->lframe->curr_frame;
       queue_submit_info.fence = (*fences)[curr_frame].get();
     }
-  }
-}
-
-void Viewer::InitAcquireNextImage(
-    const LayoutAcquireNextImage& lacquire_next_image) {
-  auto swapchain = GetSwapchain();
-
-
-    int frame_count = swapchain->GetFrameCount();
-    wait_fences_.reserve(frame_count);
-    wait_image_fences_.reserve(frame_count);
-    acquire_next_image_infos_.reserve(frame_count);
-
-    for (int i = 0; i < frame_count; ++i) {
-      if (lacquire_next_image.lwait_fence) {
-        Fence* fence;
-        auto lfence = lacquire_next_image.lwait_fence.get();
-        if (lfence->lframe) {
-          auto fences =
-              std::static_pointer_cast<std::vector<std::shared_ptr<Fence>>>(
-                  lfence->instance);
-          fence = (*fences)[i].get();
-        } else {
-          fence = static_cast<Fence*>(lfence->instance.get());
-        }
-        assert(fence);
-        wait_fences_.emplace_back(fence);
-        wait_image_fences_.emplace_back(nullptr);
-      }
-
-      AcquireNextImageInfo info;
-
-      info.timeout = lacquire_next_image.timeout;
-
-      if (lacquire_next_image.lsemaphore) {
-        auto lsemaphore = lacquire_next_image.lsemaphore.get();
-        if (lsemaphore->lframe) {
-          auto semaphores =
-              std::static_pointer_cast<std::vector<std::shared_ptr<Semaphore>>>(
-                  lsemaphore->instance);
-          info.semaphore = (*semaphores)[i].get();
-        } else {
-          info.semaphore = static_cast<Semaphore*>(lsemaphore->instance.get());
-        }
-      }
-
-      if (lacquire_next_image.lfence) {
-        auto lfence = lacquire_next_image.lfence.get();
-        if (lfence->lframe) {
-          auto fences =
-              std::static_pointer_cast<std::vector<std::shared_ptr<Fence>>>(
-                  lfence->instance);
-          info.fence = (*fences)[i].get();
-        } else {
-          info.fence = static_cast<Fence*>(lfence->instance.get());
-        }
-      }
-
-      acquire_next_image_infos_.emplace_back(info);
-    }
-}
-
-void Viewer::InitUpdater(const LayoutUpdater& lupdater) {
-  updater_.lbuffers = lupdater.lbuffers;
-
-  for (const auto& lbuffer : updater_.lbuffers) {
-    UpdateData update_data;
-
-    if (!lbuffer->lframe) {
-      update_data.buffer_ = static_cast<Buffer*>(lbuffer->instance.get());
-    }
-    updater_.update_data_.emplace_back(update_data);
   }
 }
 

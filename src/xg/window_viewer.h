@@ -13,13 +13,9 @@
 #include <memory>
 #include <vector>
 
-#include "xg/buffer.h"
-#include "xg/camera.h"
-#include "xg/command.h"
 #include "xg/device.h"
 #include "xg/layout.h"
 #include "xg/overlay.h"
-#include "xg/swapchain.h"
 #include "xg/types.h"
 #include "xg/viewer.h"
 #include "xg/window.h"
@@ -37,8 +33,18 @@ class WindowViewer : public Viewer {
 
   void PollEvents() override { win_->PollEvents(); }
   std::shared_ptr<Window> GetWindow() const { return win_; }
+  std::shared_ptr<Camera> GetCamera() const { return view_.camera_; }
+  View* GetView() { return &view_; }
+  UpdateData* GetUpdateData(int index) { return view_.GetUpdateData(index); }
+  void* GetCustomData() const { return view_.GetCustomData(); }
+  void SetCustomData(void* data) { view_.SetCustomData(data); }
 
   bool ShouldClose() const override { return win_->ShouldClose(); }
+
+  Result BuildCommandBuffers() const override {
+    return view_.BuildCommandBuffers();
+  }
+
   bool IsEnabled() const;
   void Enable();
   void Disable();
@@ -64,6 +70,7 @@ class WindowViewer : public Viewer {
   Result Draw() override;
   Result PostUpdate() override;
 
+  View view_;
   std::shared_ptr<Device> device_;
   std::shared_ptr<Window> win_;
   std::shared_ptr<Overlay> overlay_;

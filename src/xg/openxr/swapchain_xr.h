@@ -25,6 +25,7 @@ class SwapchainXR : public Swapchain {
   virtual void Exit(bool destroy_swapchain) override;
   virtual Result AcquireNextImage(const AcquireNextImageInfo& info,
                                   int* image_index) override;
+  void ReleaseSwapchainImage();
 
  protected:
   xr::Swapchain swapchain_;

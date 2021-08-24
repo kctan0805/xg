@@ -34,6 +34,11 @@ target_link_libraries(skybox
     xg
 )
 
+file(COPY
+    ${image_files}
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 configure_file(layouts/skybox.xml ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 file(MAKE_DIRECTORY

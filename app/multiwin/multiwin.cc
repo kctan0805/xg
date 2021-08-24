@@ -14,8 +14,9 @@
 #include "xg/camera.h"
 #include "xg/layout.h"
 #include "xg/parser.h"
+#include "xg/trackball.h"
 #include "xg/types.h"
-#include "xg/viewer.h"
+#include "xg/window_viewer.h"
 
 std::shared_ptr<xg::Layout> Application::CreateLayout() const {
   auto layout = xg::Parser::Get().ParseFile("multiwin.xml");
@@ -26,24 +27,18 @@ std::shared_ptr<xg::Layout> Application::CreateLayout() const {
 bool Application::Init(xg::Engine* engine) {
   if (!SimpleApplication::Init(engine)) return false;
 
-  auto& viewers = engine->GetViewers();
-
-  for (const auto& viewer : viewers) {
-    view_update_data_[viewer.get()] = &viewer->GetUpdateData(0);
-  }
   return true;
 }
 
-xg::Result Application::OnUpdate(std::shared_ptr<xg::Viewer> viewer) {
-  const auto& camera = viewer->GetCamera();
+xg::Result Application::OnUpdate(xg::View* view) {
+  const auto& camera = view->GetCamera();
+  auto update_data = view->GetUpdateData(0);
 
   // update common uniform buffer
-  auto draw_update_data = view_update_data_[viewer.get()];
-  assert(draw_update_data);
-  auto uniform_data = static_cast<glm::mat4*>(draw_update_data->Map());
+  auto uniform_data = static_cast<glm::mat4*>(update_data->Map());
   assert(uniform_data);
-  *uniform_data = camera->GetPerspectiveMatrix() * camera->GetViewMatrix();
-  draw_update_data->Unmap();
+  *uniform_data = camera->GetProjectionMatrix() * camera->GetViewMatrix();
+  update_data->Unmap();
 
   return xg::Result::kSuccess;
 }

@@ -27,10 +27,9 @@ bool ParserSingleton<ParserAcquireNextImage>::ParseElement(
     lwin_viewer->lacquire_next_image = node;
   }
 #ifdef XG_ENABLE_REALITY
-  else if (status->parent->layout_type == LayoutType::kRealityViewer) {
-    auto lreality_viewer =
-        static_cast<LayoutRealityViewer*>(status->parent.get());
-    lreality_viewer->lacquire_next_image = node;
+  else if (status->parent->layout_type == LayoutType::kView) {
+    auto lview = static_cast<LayoutView*>(status->parent.get());
+    lview->lacquire_next_image = node;
   }
 #endif  // XG_ENABLE_REALITY
 

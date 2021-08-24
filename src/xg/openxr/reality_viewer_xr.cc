@@ -14,6 +14,8 @@
 #include <memory>
 #include <vector>
 
+#include "glm/glm.hpp"
+#include "glm/gtc/quaternion.hpp"
 #include "openxr/openxr.hpp"
 #include "xg/camera.h"
 #include "xg/fence.h"
@@ -22,6 +24,7 @@
 #include "xg/logger.h"
 #include "xg/openxr/composition_layer_projection_xr.h"
 #include "xg/openxr/reference_space_xr.h"
+#include "xg/openxr/swapchain_xr.h"
 #include "xg/swapchain.h"
 #include "xg/utility.h"
 
@@ -42,6 +45,8 @@ bool RealityViewerXR::Init(const LayoutRealityViewer& lreality_viewer) {
     assert(0);
   }
 
+  xr_views_.resize(views_.size());
+
   for (const auto& llayer : lreality_viewer.lend_frame->llayers) {
     if (llayer->layout_type == xg::LayoutType::kCompositionLayerProjection) {
       auto* composition_layer_projection_xr =
@@ -58,9 +63,6 @@ bool RealityViewerXR::Init(const LayoutRealityViewer& lreality_viewer) {
 
   frame_end_info_.environmentBlendMode = static_cast<xr::EnvironmentBlendMode>(
       lreality_viewer.lend_frame->env_blend_mode);
-  frame_end_info_.layerCount =
-      static_cast<uint32_t>(composition_layers_.size());
-  frame_end_info_.layers = composition_layers_.data();
 
   return true;
 }
@@ -91,7 +93,28 @@ void RealityViewerXR::PollEvents() {
   }
 }
 
-Result RealityViewerXR::AcquireNextImage() { return Result::kSuccess; }
+Result RealityViewerXR::AcquireNextImage(View* view) {
+  auto fence = view->wait_fences_[view->curr_frame_];
+  assert(fence);
+
+  fence->Wait();
+
+  auto& info = view->acquire_next_image_infos_[view->curr_frame_];
+  auto swapchain = view->GetSwapchain();
+
+  auto result = swapchain->AcquireNextImage(info, &view->curr_image_);
+  if (result != Result::kSuccess) return result;
+
+  if (view->wait_image_fences_[view->curr_image_])
+    view->wait_image_fences_[view->curr_image_]->Wait();
+
+  view->wait_image_fences_[view->curr_image_] =
+      view->wait_fences_[view->curr_frame_];
+
+  fence->Reset();
+
+  return result;
+}
 
 Result RealityViewerXR::Draw() {
   // wait frame
@@ -116,20 +139,48 @@ Result RealityViewerXR::Draw() {
     view_locate_info_.displayTime = frame_state_.predictedDisplayTime;
     uint32_t count = 0;
     result = session_.locateViews(view_locate_info_, &view_state_,
-                                  views_.size(), &count, views_.data());
+                                  views_.size(), &count, xr_views_.data());
     if (result != xr::Result::Success) {
       XG_WARN(RealityResultString(static_cast<Result>(result)));
       return static_cast<Result>(result);
     }
+    assert(views_.size() == count);
 
-    UpdateUpdaterData();
+    for (int i = 0; i < count; ++i) {
+      auto* view = &views_[i];
+      const auto& xr_view = xr_views_[i];
 
-    auto ret = update_handler_();
-    if (ret != Result::kSuccess) return ret;
+      // updat camera
+      const auto& camera = view->GetCamera();
 
-    for (auto& cmd_context : cmd_contexts_) cmd_context->Update(curr_image_);
+      const auto& fov = xr_view.fov;
+      camera->ComputeProjectionFromFov(fov.angleLeft, fov.angleRight,
+                                       fov.angleUp, fov.angleDown);
+      const auto& pose = xr_view.pose;
+      const glm::quat orientation =
+          glm::quat(pose.orientation.w * -1.0f, pose.orientation.x,
+                    pose.orientation.y * -1.0f, pose.orientation.z);
+      const glm::vec4 position =
+          glm::vec4(pose.position.x, -pose.position.y, pose.position.z, 1.0f);
+      camera->ComputeViewFromPose(orientation, position);
 
-    UpdateQueueSubmits();
+      view->UpdateUpdaterData();
+
+      auto ret = AcquireNextImage(view);
+      if (ret != Result::kSuccess) return ret;
+
+      ret = update_handler_();
+      if (ret != Result::kSuccess) return ret;
+
+      for (auto& cmd_context : view->cmd_contexts_)
+        cmd_context->Update(view->curr_image_);
+
+      view->UpdateQueueSubmits();
+
+      // release swapchain
+      auto swapchain_xr = static_cast<SwapchainXR*>(view->GetSwapchain().get());
+      swapchain_xr->ReleaseSwapchainImage();
+    }
   }
 
   return Result::kSuccess;
@@ -137,14 +188,23 @@ Result RealityViewerXR::Draw() {
 
 Result RealityViewerXR::PostUpdate() {
   // end frame
-  for (auto* projection : composition_layer_projections_) {
-    assert(views_.size() == projection->viewCount);
-    for (int i = 0; i < views_.size(); ++i) {
-      const auto& view = views_[i];
-      auto projection_view = projection->views[i];
-      projection_view.pose = view.pose;
-      projection_view.fov = view.fov;
+  if (frame_state_.shouldRender) {
+    frame_end_info_.layerCount =
+        static_cast<uint32_t>(composition_layers_.size());
+    frame_end_info_.layers = composition_layers_.data();
+
+    for (auto* projection : composition_layer_projections_) {
+      assert(xr_views_.size() == projection->viewCount);
+      for (int i = 0; i < xr_views_.size(); ++i) {
+        const auto& xr_view = xr_views_[i];
+        auto projection_view = projection->views[i];
+        projection_view.pose = xr_view.pose;
+        projection_view.fov = xr_view.fov;
+      }
     }
+  } else {
+    frame_end_info_.layerCount = 0;
+    frame_end_info_.layers = nullptr;
   }
   frame_end_info_.displayTime = frame_state_.predictedDisplayTime;
   session_.endFrame(frame_end_info_);

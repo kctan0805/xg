@@ -34,7 +34,7 @@ class RealityViewerXR : public RealityViewer {
 
  protected:
   bool Init(const LayoutRealityViewer& lreality_viewer);
-  Result AcquireNextImage();
+  Result AcquireNextImage(View* view);
   Result Draw() override;
   Result PostUpdate() override;
 
@@ -43,7 +43,7 @@ class RealityViewerXR : public RealityViewer {
   xr::FrameState frame_state_;
   xr::ViewLocateInfo view_locate_info_;
   XrViewState view_state_ = {XR_TYPE_VIEW_STATE};
-  std::vector<XrView> views_;
+  std::vector<XrView> xr_views_;
   xr::FrameEndInfo frame_end_info_;
   std::vector<xr::CompositionLayerProjection*> composition_layer_projections_;
   std::vector<xr::CompositionLayerBaseHeader*> composition_layers_;

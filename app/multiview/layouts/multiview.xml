@@ -223,9 +223,7 @@
     <LookAt eye="-2.5 -2.5 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
 
-  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame">
-    <Camera camera="mainCamera"/>
-    <Camera camera="subCamera"/>
+  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">
     <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
     <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>
     <QueueSubmit queue="mainQueue" fence="renderCompleteFence">

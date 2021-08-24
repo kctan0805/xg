@@ -210,8 +210,7 @@
   </CommandGroup>
 
   <!-- Viewer -->
-  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame" overlay="mainOverlay">
-    <Camera camera="mainCamera"/>
+  <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera" overlay="mainOverlay">
     <CommandContext commandGroup="mainCommandGroup" commandBuffer="mainCommandBuffer"/>
     <CommandContext commandGroup="overlayCommandGroup" commandBuffer="overlayCommandBuffer" dynamic="true"/>
     <AcquireNextImage waitFence="renderCompleteFence" semaphore="imageAvailableSemaphore"/>

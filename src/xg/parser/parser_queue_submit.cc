@@ -33,15 +33,14 @@ bool ParserSingleton<ParserQueueSubmit>::ParseElement(
     }
   }
 #ifdef XG_ENABLE_REALITY
-  else if (status->parent->layout_type == LayoutType::kRealityViewer) {
-    auto lreality_viewer =
-        static_cast<LayoutRealityViewer*>(status->parent.get());
+  else if (status->parent->layout_type == LayoutType::kView) {
+    auto lview = static_cast<LayoutView*>(status->parent.get());
     const char* value = element->Attribute("queueSubmit");
     if (value) {
-      lreality_viewer->lqueue_submit_ids.emplace_back(value);
+      lview->lqueue_submit_ids.emplace_back(value);
       return false;
     } else {
-      lreality_viewer->lqueue_submits.emplace_back(node);
+      lview->lqueue_submits.emplace_back(node);
     }
   }
 #endif  // XG_ENABLE_REALITY

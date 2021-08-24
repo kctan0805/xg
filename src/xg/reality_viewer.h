@@ -11,6 +11,8 @@
 #ifndef XG_REALITY_VIEWER_H_
 #define XG_REALITY_VIEWER_H_
 
+#include <vector>
+
 #include "xg/layout.h"
 #include "xg/viewer.h"
 
@@ -26,9 +28,14 @@ class RealityViewer : public Viewer {
   virtual ~RealityViewer() = default;
 
   bool ShouldClose() const override { return false; }
+  Result BuildCommandBuffers() const override;
+
+  View* GetView(int index) { return &views_[index]; }
 
  protected:
   bool Init(const LayoutRealityViewer& lreality_viewer);
+
+  std::vector<View> views_;
 
   friend class Engine;
   friend class Reality;

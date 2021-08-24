@@ -113,6 +113,7 @@ CEREAL_REGISTER_TYPE(xg::LayoutSession);
 CEREAL_REGISTER_TYPE(xg::LayoutReferenceSpace);
 CEREAL_REGISTER_TYPE(xg::LayoutCompositionLayerProjection);
 CEREAL_REGISTER_TYPE(xg::LayoutRealityViewer);
+CEREAL_REGISTER_TYPE(xg::LayoutView);
 CEREAL_REGISTER_TYPE(xg::LayoutEndFrame);
 #endif  // XG_ENABLE_REALITY
 

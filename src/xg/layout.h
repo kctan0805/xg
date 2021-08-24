@@ -242,6 +242,7 @@ enum class LayoutType {
   kSession,
   kReferenceSpace,
   kCompositionLayerProjection,
+  kView,
   kRealityViewer,
   kEndFrame
 #endif  // XG_ENABLE_REALITY
@@ -1759,7 +1760,7 @@ struct LayoutWindowViewer : LayoutBase {
 
   std::shared_ptr<LayoutWindow> lwin;
   std::shared_ptr<LayoutFrame> lframe;
-  std::vector<std::shared_ptr<LayoutCamera>> lcameras;
+  std::shared_ptr<LayoutCamera> lcamera;
   std::shared_ptr<LayoutOverlay> loverlay;
   std::vector<std::shared_ptr<LayoutCommandContext>> lcmd_contexts;
   std::shared_ptr<LayoutAcquireNextImage> lacquire_next_image;
@@ -1770,14 +1771,14 @@ struct LayoutWindowViewer : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lwin, lframe, lcameras,
+    archive(cereal::base_class<LayoutBase>(this), lwin, lframe, lcamera,
             loverlay, lcmd_contexts, lacquire_next_image, lqueue_submits,
             lqueue_present, lresizer, lupdater);
   }
 
   const char* lwin_id = nullptr;
   const char* lframe_id = nullptr;
-  std::vector<const char*> lcamera_ids;
+  const char* lcamera_id = nullptr;
   const char* loverlay_id = nullptr;
   std::vector<const char*> lcmd_context_ids;
   std::vector<const char*> lqueue_submit_ids;
@@ -1966,6 +1967,7 @@ struct LayoutCompositionLayerProjection : LayoutBase {
   const char* lspace_id = nullptr;
 };
 
+struct LayoutView;
 struct LayoutEndFrame;
 
 struct LayoutRealityViewer : LayoutBase {
@@ -1975,24 +1977,36 @@ struct LayoutRealityViewer : LayoutBase {
       ViewConfigurationType::kPrimaryStereo;
 
   std::shared_ptr<LayoutBase> lspace;
+  std::vector<std::shared_ptr<LayoutView>> lviews;
+  std::shared_ptr<LayoutEndFrame> lend_frame;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), view_config_type, lviews,
+            lend_frame);
+  }
+
+  const char* lspace_id = nullptr;
+};
+
+struct LayoutView : LayoutBase {
+  LayoutView() : LayoutBase{LayoutType::kView} {}
+
   std::shared_ptr<LayoutFrame> lframe;
-  std::vector<std::shared_ptr<LayoutCamera>> lcameras;
+  std::shared_ptr<LayoutCamera> lcamera;
   std::vector<std::shared_ptr<LayoutCommandContext>> lcmd_contexts;
   std::shared_ptr<LayoutAcquireNextImage> lacquire_next_image;
   std::vector<std::shared_ptr<LayoutQueueSubmit>> lqueue_submits;
-  std::shared_ptr<LayoutEndFrame> lend_frame;
   std::shared_ptr<LayoutUpdater> lupdater;
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), view_config_type, lframe,
-            lcameras, lcmd_contexts, lacquire_next_image, lqueue_submits,
-            lend_frame, lupdater);
+    archive(cereal::base_class<LayoutBase>(this), lframe, lcamera,
+            lcmd_contexts, lacquire_next_image, lqueue_submits, lupdater);
   }
 
-  const char* lspace_id = nullptr;
   const char* lframe_id = nullptr;
-  std::vector<const char*> lcamera_ids;
+  const char* lcamera_id = nullptr;
   std::vector<const char*> lcmd_context_ids;
   std::vector<const char*> lqueue_submit_ids;
 };

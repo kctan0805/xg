@@ -24,7 +24,7 @@
 namespace xg {
 
 struct AcquireNextImageInfo {
-  uint64_t timeout = std::numeric_limits<uint64_t>::max();
+  int64_t timeout = std::numeric_limits<int64_t>::max();
   Semaphore* semaphore = nullptr;
   Fence* fence = nullptr;
 };
@@ -51,7 +51,7 @@ class Swapchain {
     return image_views_[index];
   }
   virtual Result AcquireNextImage(const AcquireNextImageInfo& info,
-                                      int* image_index) = 0;
+                                  int* image_index) = 0;
 
  protected:
   Swapchain() = default;

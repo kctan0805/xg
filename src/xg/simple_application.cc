@@ -25,6 +25,8 @@ namespace xg {
 bool SimpleApplication::Init(xg::Engine* engine) {
   auto& viewers = engine->GetViewers();
 
+  TrackballInfo trackball_info = {};
+  trackballs_.resize(viewers.size());
   int i = 0;
   for (const auto& viewer : viewers) {
     auto* win_viewer = dynamic_cast<WindowViewer*>(viewer.get());
@@ -47,26 +49,22 @@ bool SimpleApplication::Init(xg::Engine* engine) {
 
       win_viewer->SetDrawOverlayHandler(
           [this, &viewer]() { this->OnDrawOverlay(viewer); });
+
+      viewer->SetUpdateHandler([this, win_viewer]() -> xg::Result {
+        return this->OnUpdate(win_viewer->GetView());
+      });
+
+      auto* trackball = &trackballs_[i];
+      trackball_info.camera = win_viewer->GetCamera();
+      trackball->Init(trackball_info);
+
+      win_viewer->SetCustomData(trackball);
     }
 
-    viewer->SetUpdateHandler(
-        [this, &viewer]() -> xg::Result { return this->OnUpdate(viewer); });
+    if (viewer->BuildCommandBuffers() != Result::kSuccess) return false;
 
     viewer->SetShouldExitHandler(
         [this, &viewer]() -> bool { return this->ShouldExit(viewer); });
-
-
-
-    ViewerData viewer_data = {};
-    viewer_data.viewer_index = i;
-
-    TrackballInfo trackball_info = {};
-    trackball_info.camera = viewer->GetCamera();
-    viewer_data.trackball.Init(trackball_info);
-
-    viewer_data_map_.insert(std::make_pair(viewer, viewer_data));
-
-    if (viewer->BuildCommandBuffers() != Result::kSuccess) return false;
 
     ++i;
   }
@@ -75,20 +73,23 @@ bool SimpleApplication::Init(xg::Engine* engine) {
 
 void SimpleApplication::OnMouseDown(std::shared_ptr<Viewer> viewer,
                                     MouseButton button, int posx, int posy) {
-  auto& viewer_data = viewer_data_map_[viewer];
-  viewer_data.trackball.OnMouseDown(button, posx, posy);
+  auto* win_viewer = static_cast<WindowViewer*>(viewer.get());
+  auto* trackball = static_cast<Trackball*>(win_viewer->GetCustomData());
+  trackball->OnMouseDown(button, posx, posy);
 }
 
 void SimpleApplication::OnMouseUp(std::shared_ptr<Viewer> viewer,
                                   MouseButton button, int posx, int posy) {
-  auto& viewer_data = viewer_data_map_[viewer];
-  viewer_data.trackball.OnMouseUp(button, posx, posy);
+  auto* win_viewer = static_cast<WindowViewer*>(viewer.get());
+  auto* trackball = static_cast<Trackball*>(win_viewer->GetCustomData());
+  trackball->OnMouseUp(button, posx, posy);
 }
 
 void SimpleApplication::OnMouseMove(std::shared_ptr<Viewer> viewer, int posx,
                                     int posy) {
-  auto& viewer_data = viewer_data_map_[viewer];
-  viewer_data.trackball.OnMouseMove(posx, posy);
+  auto* win_viewer = static_cast<WindowViewer*>(viewer.get());
+  auto* trackball = static_cast<Trackball*>(win_viewer->GetCustomData());
+  trackball->OnMouseMove(posx, posy);
 }
 
 }  // namespace xg
