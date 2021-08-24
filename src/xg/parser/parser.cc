@@ -1658,7 +1658,7 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
     const auto it = node_id_map.find(lsession->lqueue_id);
     assert(it != node_id_map.end());
     lsession->lqueue = std::static_pointer_cast<LayoutQueue>(it->second);
-    assert(lsession.lqueue);
+    assert(lsession->lqueue);
   }
 
   for (auto lcomposition_layer_projection :

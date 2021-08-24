@@ -6,12 +6,11 @@
 // current version of the MIT License.
 // http://www.opensource.org/licenses/MIT
 
-#include "xg/logger.h"
-
 #include "spdlog/sinks/android_sink.h"
 #include "spdlog/sinks/msvc_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
+#include "xg/logger.h"
 
 namespace xg {
 
@@ -27,6 +26,8 @@ Logger::Logger() {
   auto android_logger = spdlog::android_logger_mt("android");
   spdlog::set_default_logger(android_logger);
   spdlog::set_pattern("[%s:%#] %v");
+#else
+  spdlog::set_pattern("[%t:%s:%#] %v");
 #endif
 
   spdlog::set_level(

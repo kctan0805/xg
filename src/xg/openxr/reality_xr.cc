@@ -329,8 +329,8 @@ std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
                   .setLevelCount(1)
                   .setLayerCount(1));
 
-  assert(vk_images.size() == images_.size());
-  assert(vk_images.size() == image_views_.size());
+  assert(xr_images.size() == swapchain->images_.size());
+  assert(xr_images.size() == swapchain->image_views_.size());
 
   for (int i = 0; i < xr_images.size(); ++i) {
     auto& xr_image = xr_images[i];

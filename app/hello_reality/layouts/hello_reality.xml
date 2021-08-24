@@ -253,7 +253,7 @@
     
   </CommandGroup>
 
-  <Camera id="leftCamera" swapchain="leftSwapchain"/>
+  <Camera id="leftCamera" swapchain="leftSwapchain">
     <Perspective fov="60" zNear="0.1" zFar="10.0"/>
     <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
   </Camera>
@@ -284,7 +284,7 @@
       <Updater>
         <Buffer buffer="leftCommonUniformBuffer"/>
       </Updater>      
-    <View/>
+    </View>
 
     <View frame="rightFrame" camera="rightCamera">
       <CommandContext commandGroup="rightCommandGroup" commandBuffer="rightCommandBuffer"/>
@@ -297,7 +297,7 @@
       <Updater>
         <Buffer buffer="rightCommonUniformBuffer"/>
       </Updater>            
-    <View/>
+    </View>
 
     <EndFrame environmentBlendMode="Opaque">
       <Layer layer="mainLayer"/>
