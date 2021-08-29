@@ -26,11 +26,11 @@
 namespace xg {
 
 bool RealityViewer::Init(const LayoutRealityViewer& lreality_viewer) {
-  assert(views_.size() == 0);
-  views_.reserve(lreality_viewer.lviews.size());
+  assert(views_.size() == lreality_viewer.lviews.size());
 
-  for (const auto& lview : lreality_viewer.lviews) {
-    View view;
+  for (int i = 0; i < views_.size(); ++i) {
+    const auto& lview = lreality_viewer.lviews[i];
+    View& view = views_[i];
 
     view.lframe_ = lview->lframe;
     if (!view.lframe_) {
@@ -51,11 +51,12 @@ bool RealityViewer::Init(const LayoutRealityViewer& lreality_viewer) {
           std::static_pointer_cast<CommandContext>(lcmd_context->instance));
     }
 
+    if (lview->lacquire_next_image)
+      view.InitAcquireNextImage(*lview->lacquire_next_image);
+
     if (lview->lupdater) view.InitUpdater(*lview->lupdater);
 
     view.lqueue_submits_ = lview->lqueue_submits;
-
-    views_.emplace_back(view);
   }
 
   SetDrawHandler([this]() -> Result { return this->Draw(); });

@@ -11,10 +11,12 @@
 #include <memory>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "glm/glm.hpp"
 #include "xg/camera.h"
 #include "xg/engine.h"
+#include "xg/reality_viewer.h"
 #include "xg/trackball.h"
 #include "xg/viewer.h"
 #include "xg/window.h"
@@ -47,24 +49,36 @@ bool SimpleApplication::Init(xg::Engine* engine) {
         this->OnMouseMove(viewer, posx, posy);
       });
 
+      auto* view = win_viewer->GetView();
+      view->SetUpdateHandler(
+          [this, view]() -> xg::Result { return this->OnUpdate(view);
+      });
+
       win_viewer->SetDrawOverlayHandler(
           [this, &viewer]() { this->OnDrawOverlay(viewer); });
-
-      viewer->SetUpdateHandler([this, win_viewer]() -> xg::Result {
-        return this->OnUpdate(win_viewer->GetView());
-      });
 
       auto* trackball = &trackballs_[i];
       trackball_info.camera = win_viewer->GetCamera();
       trackball->Init(trackball_info);
 
       win_viewer->SetCustomData(trackball);
+    } else {
+#ifdef XG_ENABLE_REALITY
+      auto* reality_viewer = dynamic_cast<RealityViewer*>(viewer.get());
+      if (reality_viewer) {
+        auto& views = reality_viewer->GetViews();
+        for (auto& view : views) {
+          view.SetUpdateHandler(
+              [this, &view]() -> xg::Result { return this->OnUpdate(&view); });
+        }
+      }
+#endif  // XG_ENABLE_REALITY
     }
-
-    if (viewer->BuildCommandBuffers() != Result::kSuccess) return false;
 
     viewer->SetShouldExitHandler(
         [this, &viewer]() -> bool { return this->ShouldExit(viewer); });
+
+    if (viewer->BuildCommandBuffers() != Result::kSuccess) return false;
 
     ++i;
   }

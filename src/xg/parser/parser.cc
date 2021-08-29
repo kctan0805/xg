@@ -232,7 +232,7 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
   } else if (strcmp(name, "RealityViewer") == 0) {
     return ParserRealityViewer::Get().ParseElement(element, status);
   } else if (strcmp(name, "View") == 0) {
-    return ParserEndFrame::Get().ParseElement(element, status);
+    return ParserView::Get().ParseElement(element, status);
   } else if (strcmp(name, "EndFrame") == 0) {
     return ParserEndFrame::Get().ParseElement(element, status);
   }
@@ -743,8 +743,7 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
   }
 
   for (auto lswapchain : layout->lswapchains) {
-    if (lswapchain->lwin == nullptr) {
-      assert(lswapchain->lwin_id);
+    if (lswapchain->lwin_id) {
       const auto it = node_id_map.find(lswapchain->lwin_id);
       assert(it != node_id_map.end());
       lswapchain->lwin = std::static_pointer_cast<LayoutWindow>(it->second);

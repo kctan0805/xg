@@ -295,7 +295,7 @@ std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
 
   auto xr_images =
       swapchain->swapchain_
-          .enumerateSwapchainImagesToVector<XrSwapchainImageVulkanKHR*>();
+          .enumerateSwapchainImagesToVector<XrSwapchainImageVulkanKHR>();
 
   swapchain->images_.reserve(xr_images.size());
   swapchain->image_views_.reserve(xr_images.size());
@@ -341,12 +341,12 @@ std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
     image->width_ = lswapchain->width;
     image->height_ = lswapchain->height;
     image->format_ = static_cast<xg::Format>(lswapchain->image_format);
-    image->image_ = xr_image->image;
+    image->image_ = xr_image.image;
 
     auto image_view =
         static_cast<ImageViewVK*>(swapchain->image_views_[i].get());
 
-    image_view_create_info.setImage(xr_image->image);
+    image_view_create_info.setImage(xr_image.image);
 
     auto vk_result = vk_device_.createImageView(
         &image_view_create_info, nullptr, &image_view->image_view_);

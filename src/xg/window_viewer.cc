@@ -309,7 +309,7 @@ Result WindowViewer::Draw() {
 
     view_.UpdateUpdaterData();
 
-    result = update_handler_();
+    result = view_.update_handler_();
     if (result != Result::kSuccess) return result;
 
     for (auto& cmd_context : view_.cmd_contexts_)

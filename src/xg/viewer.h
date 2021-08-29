@@ -54,7 +54,17 @@ class View {
   void UpdateUpdaterData();
   void UpdateQueueSubmits();
 
+  using UpdateHandlerType = Result();
+
+  void SetUpdateHandler(std::function<UpdateHandlerType> handler) {
+    update_handler_ = handler;
+  }
+
  protected:
+  std::function<UpdateHandlerType> update_handler_ = []() -> Result {
+    return Result::kSuccess;
+  };
+
   int curr_frame_ = 0;
   int curr_image_ = 0;
   bool first_round_ = true;
@@ -98,12 +108,6 @@ class Viewer {
     draw_handler_ = handler;
   }
 
-  using UpdateHandlerType = Result();
-
-  void SetUpdateHandler(std::function<UpdateHandlerType> handler) {
-    update_handler_ = handler;
-  }
-
   using ShouldExitHandlerType = bool();
 
   void SetShouldExitHandler(std::function<ShouldExitHandlerType> handler) {
@@ -115,9 +119,6 @@ class Viewer {
   virtual Result PostUpdate() = 0;
 
   std::function<DrawHandlerType> draw_handler_ = []() -> Result {
-    return Result::kSuccess;
-  };
-  std::function<UpdateHandlerType> update_handler_ = []() -> Result {
     return Result::kSuccess;
   };
   std::function<ShouldExitHandlerType> should_exit_handler_ = []() -> bool {

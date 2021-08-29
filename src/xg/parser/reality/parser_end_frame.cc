@@ -22,6 +22,12 @@ bool ParserSingleton<ParserEndFrame>::ParseElement(
   auto node = std::make_shared<LayoutEndFrame>();
   if (!node) return false;
 
+  if (status->parent->layout_type == LayoutType::kRealityViewer) {
+    auto lreality_viewer =
+        static_cast<LayoutRealityViewer*>(status->parent.get());
+    lreality_viewer->lend_frame = node;
+  }
+
   const char* value = element->Attribute("environmentBlendMode");
   if (value) node->env_blend_mode = StringToEnvironmentBlendMode(value);
 

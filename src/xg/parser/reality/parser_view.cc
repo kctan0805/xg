@@ -22,6 +22,11 @@ bool ParserSingleton<ParserView>::ParseElement(
   auto node = std::make_shared<LayoutView>();
   if (!node) return false;
 
+  if (status->parent->layout_type == LayoutType::kRealityViewer) {
+    auto lreality_viewer = static_cast<LayoutRealityViewer*>(status->parent.get());
+    lreality_viewer->lviews.emplace_back(node);
+  }
+
   node->lframe_id = element->Attribute("frame");
   node->lcamera_id = element->Attribute("camera");
 

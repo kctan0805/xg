@@ -119,9 +119,6 @@ bool Engine::PostInit(const std::shared_ptr<Layout>& layout) {
   if (!CreateCommandContexts(*layout)) return false;
   if (!CreateQueueSubmits(*layout)) return false;
   if (!CreateQueuePresents(*layout)) return false;
-  if (!CreateViewers(*layout)) return false;
-
-  CreateDebugMarkers(*layout);
 
 #ifdef XG_ENABLE_REALITY
   if (layout->lreality) {
@@ -129,6 +126,10 @@ bool Engine::PostInit(const std::shared_ptr<Layout>& layout) {
     if (!CreateCompositionLayerProjection(*layout)) return false;
   }
 #endif  // XG_ENABLE_REALITY
+
+  if (!CreateViewers(*layout)) return false;
+
+  CreateDebugMarkers(*layout);
 
   return true;
 }

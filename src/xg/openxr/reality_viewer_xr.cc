@@ -70,26 +70,32 @@ bool RealityViewerXR::Init(const LayoutRealityViewer& lreality_viewer) {
 void RealityViewerXR::PollEvents() {
   xr::EventDataBuffer ev;
 
-  const auto result = instance_.pollEvent(ev);
-  if (result == xr::Result::Success) {
-    switch (ev.type) {
-      case xr::StructureType::EventDataSessionStateChanged: {
-        const auto state =
-            reinterpret_cast<xr::EventDataSessionStateChanged&>(ev).state;
-        switch (state) {
-          case xr::SessionState::Ready: {
-            xr::SessionBeginInfo info(view_locate_info_.viewConfigurationType);
-            session_.beginSession(info);
-          } break;
+  for (;;) {
+    const auto result = instance_.pollEvent(ev);
+    if (result == xr::Result::EventUnavailable) {
+      break;
+    } else if (result == xr::Result::Success) {
+      switch (ev.type) {
+        case xr::StructureType::EventDataSessionStateChanged: {
+          const auto state =
+              reinterpret_cast<xr::EventDataSessionStateChanged&>(ev).state;
+          switch (state) {
+            case xr::SessionState::Ready: {
+              xr::SessionBeginInfo info(
+                  view_locate_info_.viewConfigurationType);
+              session_.beginSession(info);
+            } break;
 
-          case xr::SessionState::Stopping: {
-            session_.endSession();
-          } break;
-        }
-      } break;
+            case xr::SessionState::Stopping: {
+              session_.endSession();
+            } break;
+          }
+        } break;
+      }
+    } else {
+      XG_WARN(RealityResultString(static_cast<Result>(result)));
+      break;
     }
-  } else if (result != xr::Result::EventUnavailable) {
-    XG_WARN(RealityResultString(static_cast<Result>(result)));
   }
 }
 
@@ -139,14 +145,14 @@ Result RealityViewerXR::Draw() {
     view_locate_info_.displayTime = frame_state_.predictedDisplayTime;
     uint32_t count = 0;
     result = session_.locateViews(view_locate_info_, &view_state_,
-                                  views_.size(), &count, xr_views_.data());
+                                  static_cast<uint32_t>(views_.size()), &count, xr_views_.data());
     if (result != xr::Result::Success) {
       XG_WARN(RealityResultString(static_cast<Result>(result)));
       return static_cast<Result>(result);
     }
     assert(views_.size() == count);
 
-    for (int i = 0; i < count; ++i) {
+    for (uint32_t i = 0; i < count; ++i) {
       auto* view = &views_[i];
       const auto& xr_view = xr_views_[i];
 
@@ -169,7 +175,7 @@ Result RealityViewerXR::Draw() {
       auto ret = AcquireNextImage(view);
       if (ret != Result::kSuccess) return ret;
 
-      ret = update_handler_();
+      ret = view->update_handler_();
       if (ret != Result::kSuccess) return ret;
 
       for (auto& cmd_context : view->cmd_contexts_)

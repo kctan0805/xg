@@ -30,7 +30,7 @@ class RealityViewer : public Viewer {
   bool ShouldClose() const override { return false; }
   Result BuildCommandBuffers() const override;
 
-  View* GetView(int index) { return &views_[index]; }
+  std::vector<View>& GetViews() { return views_; }
 
  protected:
   bool Init(const LayoutRealityViewer& lreality_viewer);

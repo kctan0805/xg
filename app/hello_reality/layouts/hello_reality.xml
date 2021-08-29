@@ -20,7 +20,7 @@
   <ImageView id="leftDepthBufferImageView" image="leftDepthBufferImage" format="D32Sfloat" aspectMask="Depth"/>
 
   <RenderPass id="leftRenderPass">
-    <Attachment id="leftColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc" swapchain="leftSwapchain"/>
+    <Attachment id="leftColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="ColorAttachmentOptimal" swapchain="leftSwapchain"/>
     <Attachment id="leftDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
     <Subpass id="leftSubpass">
       <ColorAttachment attachment="leftColorAttachment" layout="ColorAttachmentOptimal"/>
@@ -40,7 +40,7 @@
   <ImageView id="rightDepthBufferImageView" image="rightDepthBufferImage" format="D32Sfloat" aspectMask="Depth"/>
 
   <RenderPass id="rightRenderPass">
-    <Attachment id="rightColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="PresentSrc" swapchain="rightSwapchain"/>
+    <Attachment id="rightColorAttachment" loadOp="Clear" storeOp="Store" finalLayout="ColorAttachmentOptimal TransferSrcOptimal" swapchain="rightSwapchain"/>
     <Attachment id="rightDepthAttachment" format="D32Sfloat" loadOp="Clear" finalLayout="DepthStencilAttachmentOptimal"/>
     <Subpass id="rightSubpass">
       <ColorAttachment attachment="rightColorAttachment" layout="ColorAttachmentOptimal"/>
@@ -131,7 +131,7 @@
     </DescriptorSet>    
   </Frame>
 
-  <Frame id="rightFrame" swapchain="leftSwapchain">
+  <Frame id="rightFrame" swapchain="rightSwapchain">
     <Framebuffer id="rightFramebuffer" renderPass="rightRenderPass">
       <Attachment swapchain="rightSwapchain"/>
       <Attachment imageView="rightDepthBufferImageView"/>
