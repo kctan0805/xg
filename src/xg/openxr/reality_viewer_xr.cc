@@ -164,8 +164,8 @@ Result RealityViewerXR::Draw() {
                                        fov.angleUp, fov.angleDown);
       const auto& pose = xr_view.pose;
       const glm::quat orientation =
-          glm::quat(pose.orientation.w * -1.0f, pose.orientation.x,
-                    pose.orientation.y * -1.0f, pose.orientation.z);
+          glm::quat(pose.orientation.w, pose.orientation.x,
+                    pose.orientation.y, pose.orientation.z);
       const glm::vec4 position =
           glm::vec4(pose.position.x, -pose.position.y, pose.position.z, 1.0f);
       camera->ComputeViewFromPose(orientation, position);

@@ -178,18 +178,16 @@ bool RealityXR::InitSystem(const LayoutReality& lreality) {
   system_id_ = instance_.getSystem(info);
 
   xr::GraphicsRequirementsVulkanKHR req;
-  auto result = instance_.getVulkanGraphicsRequirements2KHR(
+  auto result = instance_.getVulkanGraphicsRequirementsKHR(
       system_id_, req, dispatch_loader_dynamic_);
   if (result != xr::Result::Success) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return false;
   }
 
-  xr::VulkanGraphicsDeviceGetInfoKHR device_get_info;
-  device_get_info.systemId = system_id_;
-  device_get_info.vulkanInstance = (VkInstance)vk_instance_;
-  result = instance_.getVulkanGraphicsDevice2KHR(
-      device_get_info, &vk_physical_device_, dispatch_loader_dynamic_);
+  result = instance_.getVulkanGraphicsDeviceKHR(
+      system_id_, (VkInstance)vk_instance_, &vk_physical_device_,
+      dispatch_loader_dynamic_);
   if (result != xr::Result::Success) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return false;
@@ -291,7 +289,7 @@ std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
 
   auto xr_images =
       swapchain->swapchain_
-          .enumerateSwapchainImagesToVector<XrSwapchainImageVulkan2KHR>();
+          .enumerateSwapchainImagesToVector<XrSwapchainImageVulkanKHR>();
 
   swapchain->images_.reserve(xr_images.size());
   swapchain->image_views_.reserve(xr_images.size());
@@ -332,7 +330,7 @@ std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
     auto& xr_image = xr_images[i];
     auto image = static_cast<ImageVK*>(swapchain->images_[i].get());
 
-    XG_TRACE("enumerateSwapchainImagesToVector: {}", (void*)xr_image->image);
+    XG_TRACE("enumerateSwapchainImagesToVector: {}", (void*)xr_image.image);
 
     image->width_ = lswapchain->width;
     image->height_ = lswapchain->height;
