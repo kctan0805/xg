@@ -26,7 +26,7 @@ add_executable(hello_reality
     ${src}
 )
 
-set_target_properties(hello_reality PROPERTIES WIN32_EXECUTABLE TRUE)
+#set_target_properties(hello_reality PROPERTIES WIN32_EXECUTABLE TRUE)
 
 if (MINGW)
     target_link_libraries(hello_reality

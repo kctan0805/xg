@@ -209,7 +209,7 @@
     <CommandList>
       <BeginRenderPass renderPass="leftRenderPass" framebuffer="leftFramebuffer">
         <ClearValues>
-          <ClearColorValue value="0.0 0.0 0.0 1.0"/>
+          <ClearColorValue value="0.184313729 0.309803933 0.309803933 1.0"/>
           <ClearDepthStencilValue depth="1.0" stencil="0"/>
         </ClearValues>
       </BeginRenderPass>
@@ -233,7 +233,7 @@
     <CommandList>
       <BeginRenderPass renderPass="rightRenderPass" framebuffer="rightFramebuffer">
         <ClearValues>
-          <ClearColorValue value="0.0 0.0 0.0 1.0"/>
+          <ClearColorValue value="0.184313729 0.309803933 0.309803933 1.0"/>
           <ClearDepthStencilValue depth="1.0" stencil="0"/>
         </ClearValues>
       </BeginRenderPass>
@@ -254,13 +254,11 @@
   </CommandGroup>
 
   <Camera id="leftCamera" swapchain="leftSwapchain">
-    <Perspective fov="60" zNear="0.1" zFar="10.0"/>
-    <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
+    <Perspective fov="60" zNear="0.05" zFar="100.0"/>
   </Camera>
 
   <Camera id="rightCamera" swapchain="rightSwapchain">
-    <Perspective fov="60" zNear="0.1" zFar="10.0"/>
-    <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
+    <Perspective fov="60" zNear="0.05" zFar="100.0"/>
   </Camera>
 
   <ReferenceSpace id="mainSpace" referenceSpaceType="Local">

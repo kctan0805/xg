@@ -175,25 +175,21 @@ bool RealityXR::CreateDebugMessenger() {
 bool RealityXR::InitSystem(const LayoutReality& lreality) {
   xr::SystemGetInfo info;
   info.formFactor = static_cast<xr::FormFactor>(lreality.form_factor);
-
-  // auto result = instance_.getSystem(info, system_id_);
-  // if (result != xr::Result::Success) {
-  //  XG_ERROR(RealityResultString(static_cast<Result>(result)));
-  //  return false;
-  //}
   system_id_ = instance_.getSystem(info);
 
   xr::GraphicsRequirementsVulkanKHR req;
-  auto result = instance_.getVulkanGraphicsRequirementsKHR(
+  auto result = instance_.getVulkanGraphicsRequirements2KHR(
       system_id_, req, dispatch_loader_dynamic_);
   if (result != xr::Result::Success) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return false;
   }
 
-  result = instance_.getVulkanGraphicsDeviceKHR(
-      system_id_, (VkInstance)vk_instance_, &vk_physical_device_,
-      dispatch_loader_dynamic_);
+  xr::VulkanGraphicsDeviceGetInfoKHR device_get_info;
+  device_get_info.systemId = system_id_;
+  device_get_info.vulkanInstance = (VkInstance)vk_instance_;
+  result = instance_.getVulkanGraphicsDevice2KHR(
+      device_get_info, &vk_physical_device_, dispatch_loader_dynamic_);
   if (result != xr::Result::Success) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return false;
@@ -295,7 +291,7 @@ std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
 
   auto xr_images =
       swapchain->swapchain_
-          .enumerateSwapchainImagesToVector<XrSwapchainImageVulkanKHR>();
+          .enumerateSwapchainImagesToVector<XrSwapchainImageVulkan2KHR>();
 
   swapchain->images_.reserve(xr_images.size());
   swapchain->image_views_.reserve(xr_images.size());

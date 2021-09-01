@@ -39,10 +39,12 @@ void Camera::ComputeProjectionFromFov(float angle_left, float angle_right,
                                       float angle_up, float angle_down) {
   const auto tan_left = std::tan(angle_left);
   const auto tan_right = std::tan(angle_right);
-  const auto tan_down = std::tan(angle_down);
   const auto tan_up = std::tan(angle_up);
+  const auto tan_down = std::tan(angle_down);
+
   const auto tan_width = tan_right - tan_left;
-  const auto tan_height = tan_up - tan_down;
+  const auto tan_height = tan_down - tan_up;
+
   const auto a11 = 2.0f / tan_width;
   const auto a22 = 2.0f / tan_height;
   const auto a31 = (tan_right + tan_left) / tan_width;
