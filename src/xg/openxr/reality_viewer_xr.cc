@@ -182,10 +182,6 @@ Result RealityViewerXR::Draw() {
         cmd_context->Update(view->curr_image_);
 
       view->UpdateQueueSubmits();
-
-      // release swapchain
-      auto swapchain_xr = static_cast<SwapchainXR*>(view->GetSwapchain().get());
-      swapchain_xr->ReleaseSwapchainImage();
     }
   }
 
@@ -193,8 +189,15 @@ Result RealityViewerXR::Draw() {
 }
 
 Result RealityViewerXR::PostUpdate() {
-  // end frame
   if (frame_state_.shouldRender) {
+    // release swapchain
+    for (const auto& view : views_) {
+      const auto& swapchain = view.GetSwapchain();
+      auto swapchain_xr = static_cast<SwapchainXR*>(swapchain.get());
+      swapchain_xr->ReleaseSwapchainImage();
+    }
+
+    // end frame
     frame_end_info_.layerCount =
         static_cast<uint32_t>(composition_layers_.size());
     frame_end_info_.layers = composition_layers_.data();
