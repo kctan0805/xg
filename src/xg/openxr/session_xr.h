@@ -11,7 +11,7 @@
 
 #include <memory>
 
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 #include "xg/reference_space.h"
 #include "xg/session.h"
 
@@ -26,7 +26,7 @@ class SessionXR : public Session {
       const LayoutReferenceSpace& lreference_space) override;
 
  protected:
-  xr::Session session_;
+  XrSession session_ = nullptr;
 
   friend class RealityXR;
 };

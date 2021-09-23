@@ -28,6 +28,7 @@ endif()
 
 if (MSVC)
     add_definitions(
+        -D_CRT_SECURE_NO_WARNINGS
         -D_SCL_SECURE_NO_WARNINGS
     )
     add_compile_options(/bigobj /utf-8)

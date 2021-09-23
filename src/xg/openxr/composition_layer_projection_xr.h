@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 #include "xg/composition_layer_projection.h"
 
 namespace xg {
@@ -23,8 +23,9 @@ class CompositionLayerProjectionXR : public CompositionLayerProjection {
   virtual ~CompositionLayerProjectionXR();
 
  protected:
-  xr::CompositionLayerProjection composition_layer_projection_;
-  std::vector<xr::CompositionLayerProjectionView>
+  XrCompositionLayerProjection composition_layer_projection_ = {
+      XR_TYPE_COMPOSITION_LAYER_PROJECTION};
+  std::vector<XrCompositionLayerProjectionView>
       composition_layer_projection_views_;
 
   friend class RealityXR;

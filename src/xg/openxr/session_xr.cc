@@ -10,7 +10,7 @@
 
 #include <memory>
 
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 #include "xg/logger.h"
 #include "xg/openxr/reference_space_xr.h"
 #include "xg/utility.h"
@@ -19,8 +19,11 @@ namespace xg {
 
 SessionXR::~SessionXR() {
   if (session_) {
-    XG_TRACE("destroy: {}", (void*)(XrSession)session_);
-    session_.destroy();
+    XG_TRACE("destroy: {}", (void*)session_);
+    const auto result = xrDestroySession(session_);
+    if (result != XR_SUCCESS) {
+      XG_WARN(RealityResultString(static_cast<Result>(result)));
+    }
   }
 }
 
@@ -34,18 +37,18 @@ std::shared_ptr<ReferenceSpace> SessionXR::CreateReferenceSpace(
 
   const auto& orientation = lreference_space.orientation_;
   const auto& position = lreference_space.position_;
-  xr::ReferenceSpaceCreateInfo info;
+  XrReferenceSpaceCreateInfo info = {XR_TYPE_REFERENCE_SPACE_CREATE_INFO};
 
-  info.referenceSpaceType = static_cast<xr::ReferenceSpaceType>(
-      lreference_space.reference_space_type_);
-  info.poseInReferenceSpace.orientation = xr::Quaternionf(
-      orientation.x, orientation.y, orientation.z, orientation.w);
+  info.referenceSpaceType =
+      static_cast<XrReferenceSpaceType>(lreference_space.reference_space_type_);
+  info.poseInReferenceSpace.orientation =
+      XrQuaternionf{orientation.x, orientation.y, orientation.z, orientation.w};
   info.poseInReferenceSpace.position =
-      xr::Vector3f(position.x, position.y, position.z);
+      XrVector3f{position.x, position.y, position.z};
 
   const auto result =
-      session_.createReferenceSpace(info, reference_space->space_);
-  if (result != xr::Result::Success) {
+      xrCreateReferenceSpace(session_, &info, &reference_space->space_);
+  if (result != XR_SUCCESS) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return nullptr;
   }

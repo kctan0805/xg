@@ -10,7 +10,7 @@
 
 #include <memory>
 
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 #include "xg/logger.h"
 #include "xg/utility.h"
 

@@ -13,7 +13,7 @@
 // clang-format off
 #include "vulkan/vulkan.hpp"
 #include "openxr/openxr_platform.h"
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 // clang-format on
 #include "xg/logger.h"
 #include "xg/utility.h"
@@ -38,27 +38,32 @@ void SwapchainXR::Exit(bool destroy_swapchain) {
   }
 
   if (destroy_swapchain && swapchain_) {
-    XG_TRACE("destroy: {}", (void*)(XrSwapchain)swapchain_);
-    swapchain_.destroy();
+    XG_TRACE("destroy: {}", (void*)swapchain_);
+    const auto result = xrDestroySwapchain(swapchain_);
+    if (result != XR_SUCCESS) {
+      XG_WARN(RealityResultString(static_cast<Result>(result)));
+    }
   }
 }
 
 Result SwapchainXR::AcquireNextImage(const AcquireNextImageInfo& info,
                                      int* image_index) {
-  xr::SwapchainImageAcquireInfo acquire_info;
+  XrSwapchainImageAcquireInfo acquire_info = {
+      XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO,
+  };
 
-  auto result = swapchain_.acquireSwapchainImage(
-      acquire_info, reinterpret_cast<uint32_t*>(image_index));
-  if (result != xr::Result::Success) {
+  auto result = xrAcquireSwapchainImage(
+      swapchain_, &acquire_info, reinterpret_cast<uint32_t*>(image_index));
+  if (result != XR_SUCCESS) {
     XG_WARN(RealityResultString(static_cast<Result>(result)));
     return static_cast<Result>(result);
   }
 
-  xr::SwapchainImageWaitInfo wait_info;
-  wait_info.timeout = xr::Duration(info.timeout);
+  XrSwapchainImageWaitInfo wait_info = {XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO};
+  wait_info.timeout = static_cast<XrDuration>(info.timeout);
 
-  result = swapchain_.waitSwapchainImage(wait_info);
-  if (result != xr::Result::Success) {
+  result = xrWaitSwapchainImage(swapchain_, &wait_info);
+  if (result != XR_SUCCESS) {
     XG_WARN(RealityResultString(static_cast<Result>(result)));
   }
 
@@ -66,9 +71,13 @@ Result SwapchainXR::AcquireNextImage(const AcquireNextImageInfo& info,
 }
 
 void SwapchainXR::ReleaseSwapchainImage() {
-  xr::SwapchainImageReleaseInfo release_info;
+  XrSwapchainImageReleaseInfo release_info = {
+      XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO};
 
-  swapchain_.releaseSwapchainImage(release_info);
+  const auto result = xrReleaseSwapchainImage(swapchain_, &release_info);
+  if (result != XR_SUCCESS) {
+    XG_WARN(RealityResultString(static_cast<Result>(result)));
+  }
 }
 
 }  // namespace xg

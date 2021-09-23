@@ -8,15 +8,19 @@
 
 #include "xg/openxr/reference_space_xr.h"
 
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 #include "xg/logger.h"
+#include "xg/utility.h"
 
 namespace xg {
 
 ReferenceSpaceXR::~ReferenceSpaceXR() {
   if (space_) {
-    XG_TRACE("destroy: {}", (void*)(XrSpace)space_);
-    space_.destroy();
+    XG_TRACE("destroy: {}", (void*)space_);
+    const auto result = xrDestroySpace(space_);
+    if (result != XR_SUCCESS) {
+      XG_WARN(RealityResultString(static_cast<Result>(result)));
+    }
   }
 }
 

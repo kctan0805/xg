@@ -14,7 +14,7 @@
 // clang-format off
 #include "vulkan/vulkan.hpp"
 #include "openxr/openxr_platform.h"
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 // clang-format on
 #include "xg/composition_layer_projection.h"
 #include "xg/layout.h"
@@ -29,7 +29,7 @@ class RealityXR : public Reality {
   RealityXR() = default;
   virtual ~RealityXR();
 
-  const xr::Instance& GetXrInstance() const { return instance_; }
+  const XrInstance& GetXrInstance() const { return instance_; }
 
   std::shared_ptr<Swapchain> CreateSwapchain(
       LayoutSwapchain* lswapchain) const override;
@@ -42,15 +42,13 @@ class RealityXR : public Reality {
   bool Init(const LayoutReality& lreality);
 
   bool CreateInstance(const LayoutReality& lreality);
-  void CreateDispatchLoader();
   bool CreateDebugMessenger();
   bool InitSystem(const LayoutReality& lreality);
   bool CreateSession(const LayoutReality& lreality);
 
-  xr::DispatchLoaderDynamic dispatch_loader_dynamic_;
-  xr::Instance instance_;
-  xr::DebugUtilsMessengerEXT debug_msg_;
-  xr::SystemId system_id_;
+  XrInstance instance_ = nullptr;
+  XrDebugUtilsMessengerEXT debug_msg_ = nullptr;
+  XrSystemId system_id_;
   vk::Instance vk_instance_;
   VkPhysicalDevice vk_physical_device_;
   vk::Device vk_device_;

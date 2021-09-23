@@ -9,7 +9,7 @@
 #ifndef XG_OPENXR_SWAPCHAIN_XR_H_
 #define XG_OPENXR_SWAPCHAIN_XR_H_
 
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 #include "xg/layout.h"
 #include "xg/swapchain.h"
 #include "xg/types.h"
@@ -28,7 +28,7 @@ class SwapchainXR : public Swapchain {
   void ReleaseSwapchainImage();
 
  protected:
-  xr::Swapchain swapchain_;
+  XrSwapchain swapchain_ = nullptr;
 
   friend class RealityXR;
 };

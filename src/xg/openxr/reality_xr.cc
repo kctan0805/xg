@@ -17,7 +17,7 @@
 // clang-format off
 #include "vulkan/vulkan.hpp"
 #include "openxr/openxr_platform.h"
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 // clang-format on
 #include "xg/layout.h"
 #include "xg/logger.h"
@@ -39,8 +39,11 @@ namespace xg {
 
 RealityXR::~RealityXR() {
   if (instance_) {
-    XG_TRACE("destroy: {}", (void*)(XrInstance)instance_);
-    instance_.destroy();
+    XG_TRACE("destroy: {}", (void*)instance_);
+    const auto result = xrDestroyInstance(instance_);
+    if (result != XR_SUCCESS) {
+      XG_WARN(RealityResultString(static_cast<Result>(result)));
+    }
   }
 }
 
@@ -48,7 +51,6 @@ bool RealityXR::Init(const LayoutReality& lreality) {
   const auto& lrenderer = *lreality.lrenderer;
 
   if (!CreateInstance(lreality)) return false;
-  CreateDispatchLoader();
   if (lrenderer.validation && !CreateDebugMessenger()) return false;
   if (!InitSystem(lreality)) return false;
   if (!CreateSession(lreality)) return false;
@@ -58,10 +60,26 @@ bool RealityXR::Init(const LayoutReality& lreality) {
 
 bool xg::RealityXR::CreateInstance(const LayoutReality& lreality) {
   const auto& lrenderer = *lreality.lrenderer;
-  const auto& found_extensions =
-      xr::enumerateInstanceExtensionPropertiesToVector(nullptr);
+
+  uint32_t count = 0;
+  auto result =
+      xrEnumerateInstanceExtensionProperties(nullptr, 0, &count, nullptr);
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
+
+  std::vector<XrExtensionProperties> found_extensions(
+      count, XrExtensionProperties{XR_TYPE_EXTENSION_PROPERTIES});
+  result = xrEnumerateInstanceExtensionProperties(nullptr, count, &count,
+                                                  found_extensions.data());
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
+
   std::vector<const char*> wanted_extensions{
-      XR_KHR_VULKAN_ENABLE_EXTENSION_NAME};
+      XR_KHR_VULKAN_ENABLE2_EXTENSION_NAME};
   std::vector<const char*> wanted_layers;
 
   if (lrenderer.validation) {
@@ -85,9 +103,21 @@ bool xg::RealityXR::CreateInstance(const LayoutReality& lreality) {
     }
   }
 
-  std::vector<const char*> layers;
-  const auto& found_layers = xr::enumerateApiLayerPropertiesToVector();
+  result = xrEnumerateApiLayerProperties(0, &count, nullptr);
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
 
+  std::vector<XrApiLayerProperties> found_layers(
+      count, XrApiLayerProperties{XR_TYPE_API_LAYER_PROPERTIES});
+  result = xrEnumerateApiLayerProperties(count, &count, found_layers.data());
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
+
+  std::vector<const char*> layers;
   for (auto i = 0; i < wanted_layers.size(); ++i) {
     for (const auto& found : found_layers) {
       if (std::strcmp(found.layerName, wanted_layers[i]) == 0) {
@@ -97,28 +127,25 @@ bool xg::RealityXR::CreateInstance(const LayoutReality& lreality) {
     }
   }
 
-  xr::InstanceCreateInfo create_info;
-  xr::ApplicationInfo& app_info = create_info.applicationInfo;
+  XrInstanceCreateInfo create_info = {XR_TYPE_INSTANCE_CREATE_INFO};
+  auto& app_info = create_info.applicationInfo;
 
   std::strncpy(app_info.applicationName, lrenderer.app_name.c_str(),
                XR_MAX_APPLICATION_NAME_SIZE);
-  app_info.applicationVersion = static_cast<uint32_t>(XR_MAKE_VERSION(1, 0, 0));
   std::strncpy(app_info.engineName, "xg", XR_MAX_ENGINE_NAME_SIZE);
-  app_info.engineVersion = static_cast<uint32_t>(XR_MAKE_VERSION(1, 0, 0));
-  app_info.apiVersion = xr::Version(XR_CURRENT_API_VERSION);
+  app_info.apiVersion = XR_CURRENT_API_VERSION;
 
   create_info.enabledApiLayerCount = static_cast<uint32_t>(layers.size());
   create_info.enabledApiLayerNames = layers.data();
   create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
   create_info.enabledExtensionNames = extensions.data();
 
-  const auto& result = xr::createInstance(create_info, instance_);
-  if (result != xr::Result::Success) {
+  result = xrCreateInstance(&create_info, &instance_);
+  if (result != XR_SUCCESS) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return false;
   }
-  XG_TRACE("createInstance: {} {}", (void*)(XrInstance)instance_,
-           lrenderer.app_name);
+  XG_TRACE("createInstance: {} {}", (void*)instance_, lrenderer.app_name);
 
   const auto renderer_vk = static_cast<RendererVK*>(lrenderer.instance.get());
   vk_instance_ = renderer_vk->GetVkInstance();
@@ -128,10 +155,6 @@ bool xg::RealityXR::CreateInstance(const LayoutReality& lreality) {
   vk_device_ = device_vk->GetVkDevice();
 
   return true;
-}
-
-void RealityXR::CreateDispatchLoader() {
-  dispatch_loader_dynamic_ = xr::DispatchLoaderDynamic(instance_);
 }
 
 static XRAPI_ATTR XrBool32 XRAPI_CALL DebugMessengerCallback(
@@ -152,43 +175,82 @@ static XRAPI_ATTR XrBool32 XRAPI_CALL DebugMessengerCallback(
 }
 
 bool RealityXR::CreateDebugMessenger() {
-  xr::Result result = xr::Result::Success;
-
   if (debug_msg_available_) {
-    xr::DebugUtilsMessengerCreateInfoEXT create_info;
+    PFN_xrCreateDebugUtilsMessengerEXT CreateDebugUtilsMessenger = nullptr;
+    auto result = xrGetInstanceProcAddr(
+        instance_, "xrCreateDebugUtilsMessengerEXT",
+        reinterpret_cast<PFN_xrVoidFunction*>(&CreateDebugUtilsMessenger));
+    if (result != XR_SUCCESS) {
+      XG_ERROR(RealityResultString(static_cast<Result>(result)));
+      return false;
+    }
+
+    XrDebugUtilsMessengerCreateInfoEXT create_info = {
+        XR_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
     create_info.messageSeverities =
-        xr::DebugUtilsMessageSeverityFlagBitsEXT::AllBits;
-    create_info.messageTypes = xr::DebugUtilsMessageTypeFlagBitsEXT::AllBits;
+        XR_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+        XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+        XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+        XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    create_info.messageTypes = XR_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                               XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                               XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
+                               XR_DEBUG_UTILS_MESSAGE_TYPE_CONFORMANCE_BIT_EXT;
     create_info.userCallback = DebugMessengerCallback;
-
-    result = instance_.createDebugUtilsMessengerEXT(create_info, debug_msg_,
-                                                    dispatch_loader_dynamic_);
+    result = CreateDebugUtilsMessenger(instance_, &create_info, &debug_msg_);
+    if (result != XR_SUCCESS) {
+      XG_ERROR(RealityResultString(static_cast<Result>(result)));
+      return false;
+    }
   }
 
-  if (result != xr::Result::Success) {
-    XG_ERROR(RealityResultString(static_cast<Result>(result)));
-    return false;
-  }
   return true;
 }
 
 bool RealityXR::InitSystem(const LayoutReality& lreality) {
-  xr::SystemGetInfo info;
-  info.formFactor = static_cast<xr::FormFactor>(lreality.form_factor);
-  system_id_ = instance_.getSystem(info);
-
-  xr::GraphicsRequirementsVulkanKHR req;
-  auto result = instance_.getVulkanGraphicsRequirementsKHR(
-      system_id_, req, dispatch_loader_dynamic_);
-  if (result != xr::Result::Success) {
+  XrSystemGetInfo sys_info = {XR_TYPE_SYSTEM_GET_INFO};
+  sys_info.formFactor = static_cast<XrFormFactor>(lreality.form_factor);
+  auto result = xrGetSystem(instance_, &sys_info, &system_id_);
+  if (result != XR_SUCCESS) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return false;
   }
 
-  result = instance_.getVulkanGraphicsDeviceKHR(
-      system_id_, (VkInstance)vk_instance_, &vk_physical_device_,
-      dispatch_loader_dynamic_);
-  if (result != xr::Result::Success) {
+  PFN_xrGetVulkanGraphicsRequirements2KHR GetVulkanGraphicsRequirements =
+      nullptr;
+  result = xrGetInstanceProcAddr(
+      instance_, "xrGetVulkanGraphicsRequirements2KHR",
+      reinterpret_cast<PFN_xrVoidFunction*>(&GetVulkanGraphicsRequirements));
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
+
+  XrGraphicsRequirementsVulkan2KHR req = {
+      XR_TYPE_GRAPHICS_REQUIREMENTS_VULKAN2_KHR};
+  result = GetVulkanGraphicsRequirements(instance_, system_id_, &req);
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
+
+  PFN_xrGetVulkanGraphicsDevice2KHR GetVulkanGraphicsDevice = nullptr;
+  result = xrGetInstanceProcAddr(
+      instance_, "xrGetVulkanGraphicsDevice2KHR",
+      reinterpret_cast<PFN_xrVoidFunction*>(&GetVulkanGraphicsDevice));
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
+
+  XrVulkanGraphicsDeviceGetInfoKHR device_info = {
+      XR_TYPE_VULKAN_GRAPHICS_DEVICE_GET_INFO_KHR};
+  device_info.systemId = system_id_;
+  device_info.vulkanInstance = (VkInstance)vk_instance_;
+
+  result =
+      GetVulkanGraphicsDevice(instance_, &device_info, &vk_physical_device_);
+  if (result != XR_SUCCESS) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return false;
   }
@@ -205,19 +267,19 @@ bool RealityXR::CreateSession(const LayoutReality& lreality) {
 
   const auto queue_vk =
       static_cast<QueueVK*>(lreality.lsession->lqueue->instance.get());
-  xr::GraphicsBindingVulkanKHR binding;
+  XrGraphicsBindingVulkan2KHR binding = {XR_TYPE_GRAPHICS_BINDING_VULKAN2_KHR};
   binding.instance = (VkInstance)vk_instance_;
   binding.physicalDevice = vk_physical_device_;
   binding.device = (VkDevice)vk_device_;
   binding.queueFamilyIndex = queue_vk->GetQueueFamilyIndex();
   binding.queueIndex = static_cast<uint32_t>(queue_vk->GetQueueIndex());
 
-  xr::SessionCreateInfo info;
+  XrSessionCreateInfo info = {XR_TYPE_SESSION_CREATE_INFO};
   info.next = &binding;
   info.systemId = system_id_;
 
-  const auto result = instance_.createSession(info, session->session_);
-  if (result != xr::Result::Success) {
+  const auto result = xrCreateSession(instance_, &info, &session->session_);
+  if (result != XR_SUCCESS) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return false;
   }
@@ -230,14 +292,41 @@ bool RealityXR::CreateSession(const LayoutReality& lreality) {
 std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
     LayoutSwapchain* lswapchain) const {
   const auto& xr_session = static_cast<SessionXR*>(session_.get())->session_;
-  const auto& views = instance_.enumerateViewConfigurationViewsToVector(
-      system_id_,
-      static_cast<xr::ViewConfigurationType>(lswapchain->view_config_type));
-  if (views.size() == 0) return nullptr;
+  const auto view_config_type =
+      static_cast<XrViewConfigurationType>(lswapchain->view_config_type);
 
-  const auto& swapchain_formats =
-      xr_session.enumerateSwapchainFormatsToVector();
-  assert(swapchain_formats.size() > 0);
+  uint32_t count = 0;
+  auto result = xrEnumerateViewConfigurationViews(
+      instance_, system_id_, view_config_type, 0, &count, nullptr);
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
+  if (count == 0) return nullptr;
+
+  std::vector<XrViewConfigurationView> views(
+      count, XrViewConfigurationView{XR_TYPE_VIEW_CONFIGURATION_VIEW});
+  result = xrEnumerateViewConfigurationViews(
+      instance_, system_id_, view_config_type, count, &count, views.data());
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
+
+  result = xrEnumerateSwapchainFormats(xr_session, 0, &count, nullptr);
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
+  assert(count > 0);
+
+  std::vector<int64_t> swapchain_formats(count);
+  result = xrEnumerateSwapchainFormats(xr_session, count, &count,
+                                       swapchain_formats.data());
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return false;
+  }
 
   auto swapchain = std::make_shared<SwapchainXR>();
   if (!swapchain) {
@@ -271,8 +360,8 @@ std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
   if (lswapchain->height == 0)
     lswapchain->height = view.recommendedImageRectHeight;
 
-  xr::SwapchainCreateInfo info;
-  info.usageFlags = static_cast<xr::SwapchainUsageFlagBits>(lswapchain->usage);
+  XrSwapchainCreateInfo info = {XR_TYPE_SWAPCHAIN_CREATE_INFO};
+  info.usageFlags = static_cast<XrSwapchainUsageFlags>(lswapchain->usage);
   info.format = static_cast<int64_t>(lswapchain->image_format);
   info.sampleCount = lswapchain->sample_count;
   info.width = lswapchain->width;
@@ -281,15 +370,28 @@ std::shared_ptr<Swapchain> RealityXR::CreateSwapchain(
   info.arraySize = lswapchain->array_size;
   info.mipCount = lswapchain->mip_count;
 
-  auto result = xr_session.createSwapchain(info, swapchain->swapchain_);
-  if (result != xr::Result::Success) {
+  result = xrCreateSwapchain(xr_session, &info, &swapchain->swapchain_);
+  if (result != XR_SUCCESS) {
     XG_ERROR(RealityResultString(static_cast<Result>(result)));
     return nullptr;
   }
 
-  auto xr_images =
-      swapchain->swapchain_
-          .enumerateSwapchainImagesToVector<XrSwapchainImageVulkanKHR>();
+  result =
+      xrEnumerateSwapchainImages(swapchain->swapchain_, 0, &count, nullptr);
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return nullptr;
+  }
+
+  std::vector<XrSwapchainImageVulkan2KHR> xr_images(
+      count, XrSwapchainImageVulkan2KHR{XR_TYPE_SWAPCHAIN_IMAGE_VULKAN2_KHR});
+  result = xrEnumerateSwapchainImages(
+      swapchain->swapchain_, count, &count,
+      reinterpret_cast<XrSwapchainImageBaseHeader*>(xr_images.data()));
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return nullptr;
+  }
 
   swapchain->images_.reserve(xr_images.size());
   swapchain->image_views_.reserve(xr_images.size());
@@ -368,14 +470,15 @@ RealityXR::CreateCompositionLayerProjection(
   }
 
   projection->composition_layer_projection_.layerFlags =
-      static_cast<xr::CompositionLayerFlagBits>(lprojection.layer_flags);
+      static_cast<XrCompositionLayerFlags>(lprojection.layer_flags);
 
   const auto space_xr =
       static_cast<ReferenceSpaceXR*>(lprojection.lspace->instance.get());
   projection->composition_layer_projection_.space = space_xr->space_;
 
   for (const auto& lview : lprojection.lviews) {
-    xr::CompositionLayerProjectionView view;
+    XrCompositionLayerProjectionView view = {
+        XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW};
     const auto swapchain =
         static_cast<SwapchainXR*>(lview.lswapchain->instance.get());
 
@@ -404,10 +507,14 @@ std::shared_ptr<Viewer> RealityXR::CreateRealityViewer(
   }
 
   uint32_t count = 0;
-  const auto& views = instance_.enumerateViewConfigurationViews(
-      system_id_,
-      static_cast<xr::ViewConfigurationType>(lreality_viewer.view_config_type),
-      0, &count, nullptr);
+  const auto result = xrEnumerateViewConfigurationViews(
+      instance_, system_id_,
+      static_cast<XrViewConfigurationType>(lreality_viewer.view_config_type), 0,
+      &count, nullptr);
+  if (result != XR_SUCCESS) {
+    XG_ERROR(RealityResultString(static_cast<Result>(result)));
+    return nullptr;
+  }
 
   viewer->views_.resize(count);
   viewer->instance_ = instance_;

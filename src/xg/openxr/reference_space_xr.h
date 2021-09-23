@@ -9,7 +9,7 @@
 #ifndef XG_OPENXR_REFERENCE_SPACE_XR_H_
 #define XG_OPENXR_REFERENCE_SPACE_XR_H_
 
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 #include "xg/reference_space.h"
 
 namespace xg {
@@ -20,7 +20,7 @@ class ReferenceSpaceXR : public ReferenceSpace {
   virtual ~ReferenceSpaceXR();
 
  protected:
-  xr::Space space_;
+  XrSpace space_ = nullptr;
 
   friend class RealityXR;
   friend class SessionXR;

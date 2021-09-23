@@ -14,7 +14,7 @@
 #include <memory>
 #include <vector>
 
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 #include "xg/layout.h"
 #include "xg/reality_viewer.h"
 
@@ -38,15 +38,15 @@ class RealityViewerXR : public RealityViewer {
   Result Draw() override;
   Result PostUpdate() override;
 
-  xr::Instance instance_;
-  xr::Session session_;
-  xr::FrameState frame_state_;
-  xr::ViewLocateInfo view_locate_info_;
+  XrInstance instance_ = nullptr;
+  XrSession session_ = nullptr;
+  XrFrameState frame_state_ = {XR_TYPE_FRAME_STATE};
+  XrViewLocateInfo view_locate_info_ = {XR_TYPE_VIEW_LOCATE_INFO};
   XrViewState view_state_ = {XR_TYPE_VIEW_STATE};
   std::vector<XrView> xr_views_;
-  xr::FrameEndInfo frame_end_info_;
-  std::vector<xr::CompositionLayerProjection*> composition_layer_projections_;
-  std::vector<xr::CompositionLayerBaseHeader*> composition_layers_;
+  XrFrameEndInfo frame_end_info_ = {XR_TYPE_FRAME_END_INFO};
+  std::vector<XrCompositionLayerProjection*> composition_layer_projections_;
+  std::vector<XrCompositionLayerBaseHeader*> composition_layers_;
 
   friend class RealityXR;
 };

@@ -16,7 +16,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/quaternion.hpp"
-#include "openxr/openxr.hpp"
+#include "openxr/openxr.h"
 #include "xg/camera.h"
 #include "xg/fence.h"
 #include "xg/image.h"
@@ -34,7 +34,7 @@ bool RealityViewerXR::Init(const LayoutRealityViewer& lreality_viewer) {
   if (!RealityViewer::Init(lreality_viewer)) return false;
 
   view_locate_info_.viewConfigurationType =
-      static_cast<xr::ViewConfigurationType>(lreality_viewer.view_config_type);
+      static_cast<XrViewConfigurationType>(lreality_viewer.view_config_type);
 
   const auto& lspace = lreality_viewer.lspace;
   if (lspace->layout_type == LayoutType::kReferenceSpace) {
@@ -54,40 +54,45 @@ bool RealityViewerXR::Init(const LayoutRealityViewer& lreality_viewer) {
       composition_layer_projections_.emplace_back(
           &composition_layer_projection_xr->composition_layer_projection_);
       composition_layers_.emplace_back(
-          static_cast<xr::CompositionLayerBaseHeader*>(
+          reinterpret_cast<XrCompositionLayerBaseHeader*>(
               &composition_layer_projection_xr->composition_layer_projection_));
     } else {
       assert(0);
     }
   }
 
-  frame_end_info_.environmentBlendMode = static_cast<xr::EnvironmentBlendMode>(
+  frame_end_info_.environmentBlendMode = static_cast<XrEnvironmentBlendMode>(
       lreality_viewer.lend_frame->env_blend_mode);
 
   return true;
 }
 
 void RealityViewerXR::PollEvents() {
-  xr::EventDataBuffer ev;
+  XrEventDataBuffer ev = {XR_TYPE_EVENT_DATA_BUFFER};
 
   for (;;) {
-    const auto result = instance_.pollEvent(ev);
-    if (result == xr::Result::EventUnavailable) {
+    auto result = xrPollEvent(instance_, &ev);
+    if (result == XR_EVENT_UNAVAILABLE) {
       break;
-    } else if (result == xr::Result::Success) {
+    } else if (result == XR_SUCCESS) {
       switch (ev.type) {
-        case xr::StructureType::EventDataSessionStateChanged: {
+        case XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED: {
           const auto state =
-              reinterpret_cast<xr::EventDataSessionStateChanged&>(ev).state;
+              reinterpret_cast<XrEventDataSessionStateChanged&>(ev).state;
           switch (state) {
-            case xr::SessionState::Ready: {
-              xr::SessionBeginInfo info(
-                  view_locate_info_.viewConfigurationType);
-              session_.beginSession(info);
+            case XR_SESSION_STATE_READY: {
+              XrSessionBeginInfo info = {
+                  XR_TYPE_SESSION_BEGIN_INFO, nullptr,
+                  view_locate_info_.viewConfigurationType};
+              result = xrBeginSession(session_, &info);
+              if (result != XR_SUCCESS)
+                XG_WARN(RealityResultString(static_cast<Result>(result)));
             } break;
 
-            case xr::SessionState::Stopping: {
-              session_.endSession();
+            case XR_SESSION_STATE_STOPPING: {
+              result = xrEndSession(session_);
+              if (result != XR_SUCCESS)
+                XG_WARN(RealityResultString(static_cast<Result>(result)));
             } break;
           }
         } break;
@@ -124,18 +129,18 @@ Result RealityViewerXR::AcquireNextImage(View* view) {
 
 Result RealityViewerXR::Draw() {
   // wait frame
-  xr::FrameWaitInfo frame_wait_info;
+  XrFrameWaitInfo frame_wait_info = {XR_TYPE_FRAME_WAIT_INFO};
 
-  auto result = session_.waitFrame(frame_wait_info, frame_state_);
-  if (result != xr::Result::Success) {
+  auto result = xrWaitFrame(session_, &frame_wait_info, &frame_state_);
+  if (result != XR_SUCCESS) {
     XG_WARN(RealityResultString(static_cast<Result>(result)));
     return static_cast<Result>(result);
   }
 
   // begin frame
-  xr::FrameBeginInfo begin_info;
-  result = session_.beginFrame(begin_info);
-  if (result != xr::Result::Success) {
+  XrFrameBeginInfo begin_info = {XR_TYPE_FRAME_BEGIN_INFO};
+  result = xrBeginFrame(session_, &begin_info);
+  if (result != XR_SUCCESS) {
     XG_WARN(RealityResultString(static_cast<Result>(result)));
     return static_cast<Result>(result);
   }
@@ -144,9 +149,10 @@ Result RealityViewerXR::Draw() {
     // update views
     view_locate_info_.displayTime = frame_state_.predictedDisplayTime;
     uint32_t count = 0;
-    result = session_.locateViews(view_locate_info_, &view_state_,
-                                  static_cast<uint32_t>(views_.size()), &count, xr_views_.data());
-    if (result != xr::Result::Success) {
+    result = xrLocateViews(session_, &view_locate_info_, &view_state_,
+                           static_cast<uint32_t>(views_.size()), &count,
+                           xr_views_.data());
+    if (result != XR_SUCCESS) {
       XG_WARN(RealityResultString(static_cast<Result>(result)));
       return static_cast<Result>(result);
     }
@@ -164,8 +170,8 @@ Result RealityViewerXR::Draw() {
                                        fov.angleUp, fov.angleDown);
       const auto& pose = xr_view.pose;
       const glm::quat orientation =
-          glm::quat(pose.orientation.w, pose.orientation.x,
-                    pose.orientation.y, pose.orientation.z);
+          glm::quat(pose.orientation.w, pose.orientation.x, pose.orientation.y,
+                    pose.orientation.z);
       const glm::vec4 position =
           glm::vec4(pose.position.x, -pose.position.y, pose.position.z, 1.0f);
       camera->ComputeViewFromPose(orientation, position);
@@ -216,9 +222,12 @@ Result RealityViewerXR::PostUpdate() {
     frame_end_info_.layers = nullptr;
   }
   frame_end_info_.displayTime = frame_state_.predictedDisplayTime;
-  session_.endFrame(frame_end_info_);
+  const auto result = xrEndFrame(session_, &frame_end_info_);
+  if (result != XR_SUCCESS) {
+    XG_WARN(RealityResultString(static_cast<Result>(result)));
+  }
 
-  return Result::kSuccess;
+  return static_cast<Result>(result);
 }
 
 }  // namespace xg
