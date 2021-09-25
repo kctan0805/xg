@@ -212,7 +212,8 @@ Result RealityViewerXR::PostUpdate() {
       assert(xr_views_.size() == projection->viewCount);
       for (int i = 0; i < xr_views_.size(); ++i) {
         const auto& xr_view = xr_views_[i];
-        auto projection_view = projection->views[i];
+        auto& projection_view =
+            const_cast<XrCompositionLayerProjectionView&>(projection->views[i]);
         projection_view.pose = xr_view.pose;
         projection_view.fov = xr_view.fov;
       }
