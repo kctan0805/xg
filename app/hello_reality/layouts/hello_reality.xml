@@ -209,7 +209,7 @@
     <CommandList>
       <BeginRenderPass renderPass="leftRenderPass" framebuffer="leftFramebuffer">
         <ClearValues>
-          <ClearColorValue value="0.184313729 0.309803933 0.309803933 1.0"/>
+			<ClearColorValue value="0.0 0.0 0.0 1.0"/>
           <ClearDepthStencilValue depth="1.0" stencil="0"/>
         </ClearValues>
       </BeginRenderPass>
@@ -233,7 +233,7 @@
     <CommandList>
       <BeginRenderPass renderPass="rightRenderPass" framebuffer="rightFramebuffer">
         <ClearValues>
-          <ClearColorValue value="0.184313729 0.309803933 0.309803933 1.0"/>
+			<ClearColorValue value="0.0 0.0 0.0 1.0"/>
           <ClearDepthStencilValue depth="1.0" stencil="0"/>
         </ClearValues>
       </BeginRenderPass>
