@@ -189,7 +189,7 @@
 
   <CommandGroup id="mainModelCommandGroup">
     <CommandList>
-      <PushConstants id="mainPushModelMatrix" layout="drawPipelineLayout" stageFlags="Vertex" data="mainModelMatrix"/>
+      <PushConstants id="mainPushModelMatrix" layout="drawPipelineLayout" stageFlags="Vertex"/>
 
       <!-- material -->
       <BindDescriptorSets layout="drawPipelineLayout" firstSet="1">
