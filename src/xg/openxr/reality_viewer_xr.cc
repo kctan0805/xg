@@ -195,7 +195,7 @@ Result RealityViewerXR::Draw() {
             glm::quat(pose.orientation.w, pose.orientation.x,
                       pose.orientation.y, pose.orientation.z);
         const glm::vec3 position =
-            glm::vec3(pose.position.x, -pose.position.y, pose.position.z);
+            glm::vec3(pose.position.x, pose.position.y, pose.position.z);
         glm::mat4 rotation = glm::mat4_cast(orientation);
         glm::mat4 translation = glm::translate(glm::mat4(1.0f), position);
         *space_location = translation * rotation;
@@ -217,7 +217,7 @@ Result RealityViewerXR::Draw() {
           glm::quat(pose.orientation.w, pose.orientation.x, pose.orientation.y,
                     pose.orientation.z);
       const glm::vec3 position =
-          glm::vec3(pose.position.x, -pose.position.y, pose.position.z);
+          glm::vec3(pose.position.x, pose.position.y, pose.position.z);
       camera->ComputeViewFromPose(orientation, position);
 
       view->UpdateUpdaterData();

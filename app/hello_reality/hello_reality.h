@@ -25,7 +25,7 @@ class Application : xg::SimpleApplication {
   xg::Result OnUpdate(xg::View* view) override;
 
  private:
-  glm::mat4 space_location_;
+  glm::mat4 space_location_ = glm::mat4(0.0f);
   glm::mat4 model_matrix_;
   std::shared_ptr<xg::CommandPushConstants> push_model_matrix_cmd_;
 };
