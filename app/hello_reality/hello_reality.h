@@ -11,6 +11,8 @@
 
 #include <memory>
 
+#include "glm/glm.hpp"
+#include "xg/command.h"
 #include "xg/engine.h"
 #include "xg/layout.h"
 #include "xg/simple_application.h"
@@ -21,6 +23,11 @@ class Application : xg::SimpleApplication {
   std::shared_ptr<xg::Layout> CreateLayout() const;
   bool Init(xg::Engine* engine) override;
   xg::Result OnUpdate(xg::View* view) override;
+
+ private:
+  glm::mat4 space_location_;
+  glm::mat4 model_matrix_;
+  std::shared_ptr<xg::CommandPushConstants> push_model_matrix_cmd_;
 };
 
 #endif  // HELLO_REALITY_H_

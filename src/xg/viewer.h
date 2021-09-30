@@ -33,10 +33,13 @@ class UpdateData {
   friend class View;
 };
 
+class Viewer;
+
 class View {
  public:
   View() = default;
 
+  Viewer* GetViewer() const { return viewer_;  }
   int GetCurrentFrame() const { return curr_frame_; }
   int GetCurrentImage() const { return curr_image_; }
   std::shared_ptr<Camera> GetCamera() const { return camera_; }
@@ -65,6 +68,7 @@ class View {
     return Result::kSuccess;
   };
 
+  Viewer* viewer_ = nullptr;
   int curr_frame_ = 0;
   int curr_image_ = 0;
   bool first_round_ = true;

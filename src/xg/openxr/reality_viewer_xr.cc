@@ -15,7 +15,9 @@
 #include <vector>
 
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "openxr/openxr.h"
 #include "xg/camera.h"
 #include "xg/fence.h"
@@ -43,6 +45,19 @@ bool RealityViewerXR::Init(const LayoutRealityViewer& lreality_viewer) {
     view_locate_info_.space = ref_space->space_;
   } else {
     assert(0);
+  }
+
+  if (lreality_viewer.llocate_space) {
+    for (const auto& lspace : lreality_viewer.llocate_space->lspaces) {
+      if (lspace->layout_type == LayoutType::kReferenceSpace) {
+        const auto* ref_space =
+            static_cast<ReferenceSpaceXR*>(lspace->instance.get());
+        xr_spaces_.emplace_back(ref_space->space_);
+      } else {
+        assert(0);
+      }
+    }
+    space_locations_.resize(xr_spaces_.size());
   }
 
   xr_views_.resize(views_.size());
@@ -158,11 +173,40 @@ Result RealityViewerXR::Draw() {
     }
     assert(views_.size() == count);
 
+    // update space locations
+    XrSpaceLocation xr_space_location = {XR_TYPE_SPACE_LOCATION};
+    for (int i = 0; i < xr_spaces_.size(); ++i) {
+      auto* space_location = &space_locations_[i];
+      const auto& xr_space = xr_spaces_[i];
+
+      result = xrLocateSpace(xr_space, view_locate_info_.space,
+                             view_locate_info_.displayTime, &xr_space_location);
+      if (result != XR_SUCCESS) {
+        XG_WARN(RealityResultString(static_cast<Result>(result)));
+        return static_cast<Result>(result);
+      }
+
+      if ((xr_space_location.locationFlags &
+           XR_SPACE_LOCATION_POSITION_VALID_BIT) &&
+          (xr_space_location.locationFlags &
+           XR_SPACE_LOCATION_ORIENTATION_VALID_BIT)) {
+        const auto& pose = xr_space_location.pose;
+        const glm::quat orientation =
+            glm::quat(pose.orientation.w, pose.orientation.x,
+                      pose.orientation.y, pose.orientation.z);
+        const glm::vec3 position =
+            glm::vec3(pose.position.x, -pose.position.y, pose.position.z);
+        glm::mat4 rotation = glm::mat4_cast(orientation);
+        glm::mat4 translation = glm::translate(glm::mat4(1.0f), position);
+        *space_location = translation * rotation;
+      }
+    }
+
     for (uint32_t i = 0; i < count; ++i) {
       auto* view = &views_[i];
       const auto& xr_view = xr_views_[i];
 
-      // updat camera
+      // update camera
       const auto& camera = view->GetCamera();
 
       const auto& fov = xr_view.fov;
@@ -172,8 +216,8 @@ Result RealityViewerXR::Draw() {
       const glm::quat orientation =
           glm::quat(pose.orientation.w, pose.orientation.x, pose.orientation.y,
                     pose.orientation.z);
-      const glm::vec4 position =
-          glm::vec4(pose.position.x, -pose.position.y, pose.position.z, 1.0f);
+      const glm::vec3 position =
+          glm::vec3(pose.position.x, -pose.position.y, pose.position.z);
       camera->ComputeViewFromPose(orientation, position);
 
       view->UpdateUpdaterData();

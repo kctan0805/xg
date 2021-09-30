@@ -189,7 +189,7 @@
 
   <CommandGroup id="mainModelCommandGroup">
     <CommandList>
-      <PushConstants layout="drawPipelineLayout" stageFlags="Vertex" data="mainModelMatrix"/>
+      <PushConstants id="mainPushModelMatrix" layout="drawPipelineLayout" stageFlags="Vertex" data="mainModelMatrix"/>
 
       <!-- material -->
       <BindDescriptorSets layout="drawPipelineLayout" firstSet="1">
@@ -296,6 +296,10 @@
         <Buffer buffer="rightCommonUniformBuffer"/>
       </Updater>            
     </View>
+
+    <LocateSpace>
+      <Space space="mainSpace"/>
+    </LocateSpace>    
 
     <EndFrame environmentBlendMode="Opaque">
       <Layer layer="mainLayer"/>

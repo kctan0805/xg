@@ -244,6 +244,7 @@ enum class LayoutType {
   kCompositionLayerProjection,
   kView,
   kRealityViewer,
+  kLocateSpace,
   kEndFrame
 #endif  // XG_ENABLE_REALITY
 };
@@ -1968,6 +1969,7 @@ struct LayoutCompositionLayerProjection : LayoutBase {
 };
 
 struct LayoutView;
+struct LayoutLocateSpace;
 struct LayoutEndFrame;
 
 struct LayoutRealityViewer : LayoutBase {
@@ -1978,12 +1980,13 @@ struct LayoutRealityViewer : LayoutBase {
 
   std::shared_ptr<LayoutBase> lspace;
   std::vector<std::shared_ptr<LayoutView>> lviews;
+  std::shared_ptr<LayoutLocateSpace> llocate_space;
   std::shared_ptr<LayoutEndFrame> lend_frame;
 
   template <class Archive>
   void serialize(Archive& archive) {
     archive(cereal::base_class<LayoutBase>(this), view_config_type, lviews,
-            lend_frame);
+            llocate_space, lend_frame);
   }
 
   const char* lspace_id = nullptr;
@@ -2009,6 +2012,19 @@ struct LayoutView : LayoutBase {
   const char* lcamera_id = nullptr;
   std::vector<const char*> lcmd_context_ids;
   std::vector<const char*> lqueue_submit_ids;
+};
+
+struct LayoutLocateSpace : LayoutBase {
+  LayoutLocateSpace() : LayoutBase{LayoutType::kLocateSpace} {}
+
+  std::vector<std::shared_ptr<LayoutBase>> lspaces;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<LayoutBase>(this), lspaces);
+  }
+
+  std::vector<const char*> lspace_ids;
 };
 
 struct LayoutEndFrame : LayoutBase {

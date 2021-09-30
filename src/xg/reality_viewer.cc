@@ -32,6 +32,8 @@ bool RealityViewer::Init(const LayoutRealityViewer& lreality_viewer) {
     const auto& lview = lreality_viewer.lviews[i];
     View& view = views_[i];
 
+    view.viewer_ = this;
+
     view.lframe_ = lview->lframe;
     if (!view.lframe_) {
       XG_ERROR("frame not found");

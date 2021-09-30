@@ -725,6 +725,13 @@ void CommandPushConstants::Build(const CommandInfo& cmd_info) const {
   cmd_info.cmd_buffer->PushConstants(info_);
 }
 
+void CommandPushConstants::SetData(const void* data, size_t size) {
+  data_.resize(size);
+  std::memcpy(data_.data(), data, size);
+  info_.size = size;
+  info_.values = data_.data();
+}
+
 void CommandResetQueryPool::Init(
     const LayoutResetQueryPool& lreset_query_pool) {
   if (lreset_query_pool.lquery_pool->lframe) {

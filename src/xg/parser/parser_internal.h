@@ -188,6 +188,7 @@ class ParserCompositionLayerProjection
     : public ParserSingleton<ParserCompositionLayerProjection> {};
 class ParserRealityViewer : public ParserSingleton<ParserRealityViewer> {};
 class ParserView : public ParserSingleton<ParserView> {};
+class ParserLocateSpace : public ParserSingleton<ParserLocateSpace> {};
 class ParserEndFrame : public ParserSingleton<ParserEndFrame> {};
 #endif  // XG_ENABLE_REALITY
 

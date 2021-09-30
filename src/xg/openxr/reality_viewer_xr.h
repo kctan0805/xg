@@ -44,6 +44,7 @@ class RealityViewerXR : public RealityViewer {
   XrViewLocateInfo view_locate_info_ = {XR_TYPE_VIEW_LOCATE_INFO};
   XrViewState view_state_ = {XR_TYPE_VIEW_STATE};
   std::vector<XrView> xr_views_;
+  std::vector<XrSpace> xr_spaces_;
   XrFrameEndInfo frame_end_info_ = {XR_TYPE_FRAME_END_INFO};
   std::vector<XrCompositionLayerProjection*> composition_layer_projections_;
   std::vector<XrCompositionLayerBaseHeader*> composition_layers_;

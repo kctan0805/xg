@@ -13,6 +13,7 @@
 
 #include <vector>
 
+#include "glm/glm.hpp"
 #include "xg/layout.h"
 #include "xg/viewer.h"
 
@@ -31,11 +32,13 @@ class RealityViewer : public Viewer {
   Result BuildCommandBuffers() const override;
 
   std::vector<View>& GetViews() { return views_; }
+  std::vector<glm::mat4>& GetSpaceLocations() { return space_locations_; }
 
  protected:
   bool Init(const LayoutRealityViewer& lreality_viewer);
 
   std::vector<View> views_;
+  std::vector<glm::mat4> space_locations_;
 
   friend class Engine;
   friend class Reality;

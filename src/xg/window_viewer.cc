@@ -36,6 +36,8 @@ bool WindowViewer::Init(const LayoutWindowViewer& lwin_viewer) {
     return false;
   }
 
+  view_.viewer_ = this;
+
   view_.lframe_ = lwin_viewer.lframe;
   if (!view_.lframe_) {
     XG_ERROR("frame not found");

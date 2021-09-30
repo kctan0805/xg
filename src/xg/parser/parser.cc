@@ -233,6 +233,8 @@ static bool ParseElement(const tinyxml2::XMLElement* element,
     return ParserRealityViewer::Get().ParseElement(element, status);
   } else if (strcmp(name, "View") == 0) {
     return ParserView::Get().ParseElement(element, status);
+  } else if (strcmp(name, "LocateSpace") == 0) {
+    return ParserLocateSpace::Get().ParseElement(element, status);
   } else if (strcmp(name, "EndFrame") == 0) {
     return ParserEndFrame::Get().ParseElement(element, status);
   }
@@ -1764,6 +1766,18 @@ void Parser::ResolveLayoutReferences(std::shared_ptr<Layout> layout) {
         }
         lupdater->lbuffer_ids.clear();
       }
+    }
+
+    if (lreality_viewer->llocate_space) {
+      auto& llocate_space = lreality_viewer->llocate_space;
+      for (auto& lspace_id : llocate_space->lspace_ids) {
+        const auto it = node_id_map.find(lspace_id);
+        assert(it != node_id_map.end());
+        auto lspace = std::static_pointer_cast<LayoutBase>(it->second);
+        assert(lspace);
+        llocate_space->lspaces.emplace_back(lspace);
+      }
+      llocate_space->lspace_ids.clear();
     }
 
     if (lreality_viewer->lend_frame) {

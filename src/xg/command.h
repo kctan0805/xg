@@ -353,6 +353,7 @@ class CommandPushConstants : public CommandBase {
 
   void Init(LayoutPushConstants* lpush_constants);
   void Build(const CommandInfo& cmd_info) const override;
+  void SetData(const void* data, size_t size);
 
  protected:
   PushConstantsInfo info_ = {};
