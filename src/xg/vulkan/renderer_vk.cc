@@ -140,7 +140,13 @@ bool RendererVK::CreateInstance(const LayoutRenderer& lrenderer) {
                              .setApplicationVersion(VK_MAKE_VERSION(1, 0, 0))
                              .setPEngineName("xg")
                              .setEngineVersion(VK_MAKE_VERSION(1, 0, 0))
-                             .setApiVersion(VK_HEADER_VERSION_COMPLETE);
+                             .setApiVersion(
+#ifdef VK_HEADER_VERSION_COMPLETE
+                                     VK_HEADER_VERSION_COMPLETE
+#else
+                                     VK_API_VERSION_1_1
+#endif
+                                     );
 
   const auto& create_info =
       vk::InstanceCreateInfo()
