@@ -36,7 +36,7 @@ class RealityViewerXR : public RealityViewer {
   bool Init(const LayoutRealityViewer& lreality_viewer);
   Result AcquireNextImage(View* view);
   Result Draw() override;
-  Result PostUpdate() override;
+  Result Complete() override;
 
   XrInstance instance_ = nullptr;
   XrSession session_ = nullptr;

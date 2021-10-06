@@ -120,7 +120,7 @@ class Viewer {
 
  protected:
   virtual Result Draw() = 0;
-  virtual Result PostUpdate() = 0;
+  virtual Result Complete() = 0;
 
   std::function<DrawHandlerType> draw_handler_ = []() -> Result {
     return Result::kSuccess;

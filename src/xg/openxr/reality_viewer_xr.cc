@@ -238,7 +238,7 @@ Result RealityViewerXR::Draw() {
   return Result::kSuccess;
 }
 
-Result RealityViewerXR::PostUpdate() {
+Result RealityViewerXR::Complete() {
   if (frame_state_.shouldRender) {
     // release swapchain
     for (const auto& view : views_) {

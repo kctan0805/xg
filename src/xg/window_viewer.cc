@@ -323,7 +323,7 @@ Result WindowViewer::Draw() {
   return Result::kSuccess;
 }
 
-Result WindowViewer::PostUpdate() {
+Result WindowViewer::Complete() {
   const auto queue_present =
       static_cast<QueuePresent*>(lqueue_present_->instance.get());
   if (queue_present->enabled) {

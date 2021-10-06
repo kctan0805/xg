@@ -68,7 +68,7 @@ class WindowViewer : public Viewer {
   Result AcquireNextImage();
   void UpdateQueuePresent();
   Result Draw() override;
-  Result PostUpdate() override;
+  Result Complete() override;
 
   View view_;
   std::shared_ptr<Device> device_;

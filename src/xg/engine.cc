@@ -1332,7 +1332,7 @@ Result Engine::Run() {
     }
 
     for (auto viewer : viewers_) {
-      result = viewer->PostUpdate();
+      result = viewer->Complete();
       if (result != Result::kSuccess) return result;
     }
   }
