@@ -363,14 +363,14 @@
 
   <!-- Geometry -->
   <Data id="drawVertexData">
-    <FloatValues>5 -5 -5</FloatValues>
-    <FloatValues>-5 -5 -5</FloatValues>
-    <FloatValues>5 -5 5</FloatValues>
-    <FloatValues>-5 -5 5</FloatValues>
+    <FloatValues>5 5 5</FloatValues>
+    <FloatValues>-5 5 5</FloatValues>
     <FloatValues>5 5 -5</FloatValues>
     <FloatValues>-5 5 -5</FloatValues>
-    <FloatValues>-5 5 5</FloatValues>
-    <FloatValues>5 5 5</FloatValues>
+    <FloatValues>5 -5 5</FloatValues>
+    <FloatValues>-5 -5 5</FloatValues>
+    <FloatValues>-5 -5 -5</FloatValues>
+    <FloatValues>5 -5 -5</FloatValues>
   </Data>
 
   <Buffer id="drawVertexBuffer" usage="TransferDst VertexBuffer"/>
@@ -456,7 +456,7 @@
 
   <Camera id="mainCamera">
     <Perspective fov="60" width="winWidth" height="winHeight" zNear="0.1" zFar="256.0"/>
-    <LookAt eye="0 0 -1" center="0 0 0" up="0 -1 0"/>
+    <LookAt eye="0 0 1" center="0 0 0" up="0 1 0"/>
   </Camera>
 
   <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">

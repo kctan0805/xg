@@ -114,21 +114,21 @@
 
   <!-- Geometry -->
   <Data id="drawVertexData">
-    <FloatValues>-0.5 -0.5 0.0 1.0 0.0 0.0 0.0 0.0</FloatValues>
-    <FloatValues>0.5 -0.5 0.0 0.0 1.0 0.0 1.0 0.0</FloatValues>
-    <FloatValues>0.5 0.5 0.0 0.0 0.0 1.0 1.0 1.0</FloatValues>
-    <FloatValues>-0.5 0.5 0.0 1.0 1.0 1.0 0.0 1.0</FloatValues>
-    <FloatValues>-0.5 -0.5 -0.5 1.0 0.0 0.0 1.0 0.0</FloatValues>
-    <FloatValues>0.5 -0.5 -0.5 0.0 1.0 0.0 0.0 0.0</FloatValues>
-    <FloatValues>0.5 0.5 -0.5 0.0 0.0 1.0 0.0 1.0</FloatValues>
-    <FloatValues>-0.5 0.5 -0.5 1.0 1.0 1.0 1.0 1.0</FloatValues>
+    <FloatValues>-0.5 -0.5 0.0 1.0 0.0 0.0 0.0 1.0</FloatValues>
+    <FloatValues>0.5 -0.5 0.0 0.0 1.0 0.0 1.0 1.0</FloatValues>
+    <FloatValues>0.5 0.5 0.0 0.0 0.0 1.0 1.0 0.0</FloatValues>
+    <FloatValues>-0.5 0.5 0.0 1.0 1.0 1.0 0.0 0.0</FloatValues>
+    <FloatValues>-0.5 -0.5 -0.5 1.0 0.0 0.0 0.0 1.0</FloatValues>
+    <FloatValues>0.5 -0.5 -0.5 0.0 1.0 0.0 1.0 1.0</FloatValues>
+    <FloatValues>0.5 0.5 -0.5 0.0 0.0 1.0 1.0 0.0</FloatValues>
+    <FloatValues>-0.5 0.5 -0.5 1.0 1.0 1.0 0.0 0.0</FloatValues>
   </Data>
 
   <Buffer id="drawVertexBuffer" usage="TransferDst VertexBuffer"/>
   <BufferLoader buffer="drawVertexBuffer" accessMask="VertexAttributeRead" queue="mainQueue" stageMask="VertexInput" data="drawVertexData"/>
 
   <Data id="drawIndexData">
-    <UInt32Values>0 1 2 2 3 0 4 5 6 6 7 4</UInt32Values>
+    <UInt32Values>2 1 0 0 3 2 6 5 4 4 7 6</UInt32Values>
   </Data>
 
   <Buffer id="drawIndexBuffer" usage="TransferDst IndexBuffer"/>
@@ -182,7 +182,7 @@
 
   <Camera id="mainCamera">
     <Perspective fov="60" width="640" height="480" zNear="0.1" zFar="10.0"/>
-    <LookAt eye="0.0 0.0 -2.5" center="0 0 0" up="0 -1 0"/>
+    <LookAt eye="0.0 0 2.5" center="0 0 0" up="0 1 0"/>
   </Camera>
 
   <WindowViewer id="mainViewer" window="mainWindow" frame="mainFrame" camera="mainCamera">

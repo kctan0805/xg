@@ -18,5 +18,5 @@ layout(location = 0) out vec3 frag_tex_coord_;
 void main() {
   gl_Position = proj_view_ * vec4(position_, 1.0);
   frag_tex_coord_ = position_;
-  frag_tex_coord_.xy *= -1.0;
+  frag_tex_coord_.x *= -1.0;
 }

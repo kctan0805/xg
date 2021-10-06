@@ -39,7 +39,6 @@ xg::Result Application::OnUpdate(xg::View* view) {
   assert(uniform_data);
 
   auto model_view = camera->GetViewMatrix();
-  model_view[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
   *uniform_data = camera->GetProjectionMatrix() * model_view;
   update_data->Unmap();
