@@ -34,6 +34,7 @@ enum class Result {
   kErrorTooManyObjects = -10,
   kErrorFormatNotSupported = -11,
   kErrorFragmentedPool = -12,
+  kErrorUnknown = -13,
   kErrorOutOfPoolMemory = -1000069000,
   kErrorInvalidExternalHandle = -1000072003,
   kErrorSurfaceLost = -1000000000,

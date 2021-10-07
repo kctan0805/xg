@@ -7,6 +7,12 @@ add_definitions(
     -DVULKAN_HPP_NO_NODISCARD_WARNINGS
 )
 
+if(ANDROID)
+    add_definitions(
+        -DVK_ERROR_UNKNOWN=VK_ERROR_VALIDATION_FAILED_EXT
+    )
+endif()
+
 target_link_libraries(xg
     Vulkan::Vulkan
 )
