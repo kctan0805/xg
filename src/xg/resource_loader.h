@@ -60,7 +60,8 @@ class ResourceLoader : public Task {
   static const std::shared_ptr<Device> GetDevice() { return device_; }
   static ResourceLoaderContext* AcquireNextContext(std::shared_ptr<Task> task);
 
-  virtual ResourceLoaderStatus GetStatus();
+  virtual void UpdateStatus();
+  ResourceLoaderStatus GetStatus() const { return status_; }
   void Finish() override;
   int GetResult() const { return result_; }
 

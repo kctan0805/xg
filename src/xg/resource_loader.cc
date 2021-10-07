@@ -75,9 +75,12 @@ ResourceLoaderContext* ResourceLoader::AcquireNextContext(
   auto find_ctxt_func = [](std::shared_ptr<ResourceLoaderContext> ctxt) {
     auto loader = std::static_pointer_cast<ResourceLoader>(ctxt->loader);
     if (loader) {
+      loader->UpdateStatus();
       const auto status = loader->GetStatus();
-      assert(status != ResourceLoaderStatus::kFinished);
-      if (status == ResourceLoaderStatus::kCompleted) {
+      if (status == ResourceLoaderStatus::kFinished) {
+        assert(!ctxt->loader);
+        return true;
+      } else if (status == ResourceLoaderStatus::kCompleted) {
         loader->Finish();
         return true;
       }
@@ -111,30 +114,27 @@ ResourceLoaderContext* ResourceLoader::AcquireNextContext(
   return context;
 }
 
-ResourceLoaderStatus ResourceLoader::GetStatus() {
-  if (status_ == ResourceLoaderStatus::kEnded) {
-    std::lock_guard<std::mutex> lock(mutex_);
+void ResourceLoader::UpdateStatus() {
+  std::lock_guard<std::mutex> lock(mutex_);
 
-    if (!context_)
-      return ResourceLoaderStatus::kFinished;
-    else if (context_->load_complete_fence->IsSignaled())
-      return ResourceLoaderStatus::kCompleted;
+  if (status_ == ResourceLoaderStatus::kEnded) {
+    if (context_->load_complete_fence->IsSignaled())
+      status_ = ResourceLoaderStatus::kCompleted;
   }
-  return status_;
 }
 
 void ResourceLoader::Finish() {
-  if (GetStatus() == ResourceLoaderStatus::kFinished) return;
-
   std::lock_guard<std::mutex> lock(mutex_);
+
+  if (status_ == ResourceLoaderStatus::kFinished) return;
 
   auto future = barrier_.get_future();
   future.wait();
 
-  assert(context_);
   context_->load_complete_fence->Wait();
   context_->loader.reset();
   context_ = nullptr;
+  status_ = ResourceLoaderStatus::kFinished;
 }
 
 }  // namespace xg
