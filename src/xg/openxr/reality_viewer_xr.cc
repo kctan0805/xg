@@ -220,10 +220,10 @@ Result RealityViewerXR::Draw() {
           glm::vec3(pose.position.x, pose.position.y, pose.position.z);
       camera->ComputeViewFromPose(orientation, position);
 
-      view->UpdateUpdaterData();
-
       auto ret = AcquireNextImage(view);
       if (ret != Result::kSuccess) return ret;
+
+      view->UpdateUpdaterData();
 
       ret = view->update_handler_();
       if (ret != Result::kSuccess) return ret;
@@ -241,10 +241,14 @@ Result RealityViewerXR::Draw() {
 Result RealityViewerXR::Complete() {
   if (frame_state_.shouldRender) {
     // release swapchain
-    for (const auto& view : views_) {
+    for (auto& view : views_) {
       const auto& swapchain = view.GetSwapchain();
       auto swapchain_xr = static_cast<SwapchainXR*>(swapchain.get());
       swapchain_xr->ReleaseSwapchainImage();
+
+      view.curr_frame_ = (view.curr_frame_ + 1) % swapchain->GetFrameCount();
+      if (view.first_round_ && !view.curr_frame_) view.first_round_ = false;
+      view.lframe_->curr_frame = view.curr_frame_;
     }
 
     // end frame
