@@ -52,6 +52,8 @@ class Renderer {
   Renderer& operator=(Renderer&&) = delete;
   virtual ~Renderer() = default;
 
+  virtual void Terminate() = 0;
+
   std::shared_ptr<Device> GetDevice() const { return device_; }
 
   virtual std::shared_ptr<Window> CreateWindow(const LayoutWindow& lwin) = 0;

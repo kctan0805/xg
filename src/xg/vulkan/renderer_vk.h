@@ -31,6 +31,8 @@ class RendererVK : public Renderer {
   RendererVK() = default;
   virtual ~RendererVK();
 
+  void Terminate() override;
+
   const vk::Instance& GetVkInstance() const { return instance_; }
 
   std::shared_ptr<Window> CreateWindow(const LayoutWindow& lwin) override;

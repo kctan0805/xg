@@ -50,7 +50,6 @@
 namespace xg {
 
 RendererVK::~RendererVK() {
-  OverlayVK::Terminate();
   device_.reset();
   if (instance_) {
     if (debug_msg_) {
@@ -68,6 +67,8 @@ RendererVK::~RendererVK() {
   }
   WindowSDL::Terminate();
 }
+
+void RendererVK::Terminate() { OverlayVK::Terminate(); }
 
 bool RendererVK::Init(const LayoutRenderer& lrenderer) {
   if (!WindowVK::Initialize()) return false;

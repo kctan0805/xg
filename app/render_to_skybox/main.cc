@@ -9,10 +9,6 @@
 #include <memory>
 #include <utility>
 
-#if defined(_MSC_VER) && !defined(NDEBUG)
-#include <vld.h>  // Visual Leak Detector
-#endif
-
 #include "render_to_skybox.h"
 #include "SDL_main.h"
 #include "xg/engine.h"

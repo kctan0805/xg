@@ -63,6 +63,7 @@ Engine::~Engine() {
   }
   cmd_buffers_.clear();
   swapchains_.clear();  // must cleared before windows
+  renderer_->Terminate();
   instance_id_map_.clear();
 }
 

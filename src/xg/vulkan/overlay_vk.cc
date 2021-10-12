@@ -28,8 +28,10 @@
 namespace xg {
 
 void OverlayVK::Terminate() {
-  ImGui_ImplVulkan_Shutdown();
-  ImGui_ImplSDL2_Shutdown();
+  if (ImGui::GetCurrentContext()) {
+    ImGui_ImplVulkan_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+  }
 }
 
 static void CheckVkResult(VkResult result) {
