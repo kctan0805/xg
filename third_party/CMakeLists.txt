@@ -101,3 +101,10 @@ set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(ZSTD_BUILD_PROGRAMS OFF CACHE BOOL "" FORCE)
 set(ZSTD_BUILD_SHARED OFF CACHE BOOL "" FORCE)
 add_subdirectory(zstd/build/cmake)
+
+if (XG_ENABLE_REALITY)
+    # openxr-sdk
+    set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(BUILD_CONFORMANCE_TESTS OFF CACHE BOOL "" FORCE)
+    add_subdirectory(OpenXR-SDK)
+endif()

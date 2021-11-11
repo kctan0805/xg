@@ -20,12 +20,6 @@ add_definitions(
     -DVULKAN_HPP_TYPESAFE_CONVERSION
 )
 
-if (XG_ENABLE_REALITY)
-    add_definitions(
-        -DXG_ENABLE_REALITY
-    )
-endif()
-
 if (MSVC)
     add_definitions(
         -D_CRT_SECURE_NO_WARNINGS
@@ -53,6 +47,16 @@ include_directories(
     third_party/thread-pool-cpp/include
     src
 )
+
+if (XG_ENABLE_REALITY)
+    add_definitions(
+        -DXG_ENABLE_REALITY
+    )
+    include_directories(
+        third_party/OpenXR-SDK/include
+    )
+endif()
+
 add_subdirectory(third_party)
 add_subdirectory(src)
 
