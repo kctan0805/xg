@@ -1962,7 +1962,7 @@ struct LayoutCompositionLayerProjection : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), lspace, lviews);
+    archive(cereal::base_class<LayoutBase>(this), layer_flags, lspace, lviews);
   }
 
   const char* lspace_id = nullptr;
@@ -1985,8 +1985,8 @@ struct LayoutRealityViewer : LayoutBase {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(cereal::base_class<LayoutBase>(this), view_config_type, lviews,
-            llocate_space, lend_frame);
+    archive(cereal::base_class<LayoutBase>(this), view_config_type, lspace,
+            lviews, llocate_space, lend_frame);
   }
 
   const char* lspace_id = nullptr;
