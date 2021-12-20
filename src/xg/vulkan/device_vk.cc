@@ -388,6 +388,8 @@ bool DeviceVK::CreateMemoryAllocator(const LayoutDevice& ldevice) {
     allocator_info.flags |= VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT;
 
   VmaVulkanFunctions functions = {};
+  functions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+  functions.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
   functions.vkAllocateMemory = vkAllocateMemory;
   functions.vkBindBufferMemory = vkBindBufferMemory;
   functions.vkBindImageMemory = vkBindImageMemory;

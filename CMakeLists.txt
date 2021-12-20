@@ -33,12 +33,19 @@ elseif (MINGW)
     add_compile_options(-Wa,-mbig-obj)
 endif()
 
+if (XG_ENABLE_REALITY)
+    add_definitions(
+        -DXG_ENABLE_REALITY
+    )
+endif()
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include_directories(
     ${CMAKE_BINARY_DIR}/third_party/SDL/include
     third_party
     third_party/cereal/include
+    third_party/glm
     third_party/imgui
     third_party/KTX-Software/include
     third_party/KTX-Software/other_include
@@ -47,15 +54,6 @@ include_directories(
     third_party/thread-pool-cpp/include
     src
 )
-
-if (XG_ENABLE_REALITY)
-    add_definitions(
-        -DXG_ENABLE_REALITY
-    )
-    include_directories(
-        third_party/OpenXR-SDK/include
-    )
-endif()
 
 add_subdirectory(third_party)
 add_subdirectory(src)
